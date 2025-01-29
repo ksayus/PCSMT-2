@@ -1,0 +1,17 @@
+2025-01-29 22:33:33,091 - PCSMT_log - INFO - 文件存在
+2025-01-29 22:33:33,091 - PCSMT_log - INFO - 已存在config文件
+2025-01-29 22:33:33,115 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 22:33:33,115 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 22:33:33,115 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 22:33:33,116 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 22:33:33,116 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 22:33:42,263 - PCSMT_log - ERROR - 参数错误，请输入正确的参数！
+2025-01-29 22:33:47,072 - PCSMT_log - ERROR - 修改服务器属性失败！
+2025-01-29 22:33:47,073 - PCSMT_log - ERROR - [Errno 2] No such file or directory: 'H:\\Project\\PCSMT 2\\saves/adw.json'
+2025-01-29 22:34:06,247 - PCSMT_log - ERROR - 参数错误，请输入正确的参数！
+2025-01-29 22:34:21,543 - PCSMT_log - INFO - 文件存在
+2025-01-29 22:34:21,545 - PCSMT_log - INFO - 最小内存:dwd
+2025-01-29 22:34:21,545 - PCSMT_log - INFO - 最大内存:dww
+2025-01-29 22:34:21,545 - PCSMT_log - INFO - 修改服务器启动内存成功
+2025-01-29 22:35:29,967 - PCSMT_log - INFO - 再见！
+2025-01-29 22:35:29,967 - PCSMT_log - INFO - 欢迎再次使用PCSMT 2

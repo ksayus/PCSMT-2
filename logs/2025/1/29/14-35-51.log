@@ -1,0 +1,11 @@
+2025-01-29 14:35:51,959 - PCSMT_log - INFO - 文件存在
+2025-01-29 14:35:51,961 - PCSMT_log - INFO - 已存在config文件
+2025-01-29 14:35:51,968 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 14:35:51,969 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 14:35:51,969 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 14:35:51,969 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 14:35:51,969 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 14:36:05,714 - PCSMT_log - ERROR - 打开服务器模组&插件文件夹失败！
+2025-01-29 14:36:05,714 - PCSMT_log - ERROR - [Errno 2] No such file or directory: 'H:\\Project\\PCSMT 2\\saves/.json'
+2025-01-29 14:48:57,041 - PCSMT_log - INFO - 再见！
+2025-01-29 14:48:57,042 - PCSMT_log - INFO - 欢迎再次使用PCSMT 2

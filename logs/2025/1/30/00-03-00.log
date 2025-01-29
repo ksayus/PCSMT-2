@@ -1,0 +1,26 @@
+2025-01-30 00:03:00,498 - PCSMT_log - INFO - 文件存在
+2025-01-30 00:03:00,498 - PCSMT_log - INFO - 已存在config文件
+2025-01-30 00:03:00,504 - PCSMT_log - INFO - 文件夹存在
+2025-01-30 00:03:00,505 - PCSMT_log - INFO - 文件夹存在
+2025-01-30 00:03:00,505 - PCSMT_log - INFO - 文件夹存在
+2025-01-30 00:03:00,505 - PCSMT_log - INFO - 文件夹存在
+2025-01-30 00:03:00,505 - PCSMT_log - INFO - 文件夹存在
+2025-01-30 00:03:30,102 - PCSMT_log - INFO - 找到服务器核心文件：H:\Project\PCSMT\server\test.jar
+2025-01-30 00:03:30,102 - PCSMT_log - INFO - 文件夹存在
+2025-01-30 00:03:30,103 - PCSMT_log - INFO - 文件存在
+2025-01-30 00:03:30,103 - PCSMT_log - INFO - 找到服务器启动批处理文件,位置:H:\Project\PCSMT\server\start.bat
+2025-01-30 00:03:30,103 - PCSMT_log - ERROR - 文件不存在
+2025-01-30 00:03:30,104 - PCSMT_log - INFO - 文件不存在，创建文件
+2025-01-30 00:03:47,069 - PCSMT_log - ERROR - 参数错误:请输入true或false
+2025-01-30 00:03:52,997 - PCSMT_log - INFO - 文件存在
+2025-01-30 00:03:52,998 - PCSMT_log - INFO - 修改nogui设置成功
+2025-01-30 00:03:52,998 - PCSMT_log - INFO - 文件存在
+2025-01-30 00:03:52,998 - PCSMT_log - INFO - 已存在config文件
+2025-01-30 00:04:07,294 - PCSMT_log - ERROR - 参数错误，请输入正确的参数！
+2025-01-30 00:04:14,814 - PCSMT_log - WARNING - 参数错误:最小内存不能大于最大内存
+2025-01-30 00:04:14,815 - PCSMT_log - INFO - 已自动调整最小内存为最大内存
+2025-01-30 00:04:14,816 - PCSMT_log - INFO - 正在修改服务器启动批处理文件...
+2025-01-30 00:04:14,816 - PCSMT_log - INFO - 修改服务器启动内存为：1223 3423
+2025-01-30 00:04:14,816 - PCSMT_log - INFO - 修改完毕！
+2025-01-30 00:06:36,694 - PCSMT_log - INFO - 再见！
+2025-01-30 00:06:36,694 - PCSMT_log - INFO - 欢迎再次使用PCSMT 2

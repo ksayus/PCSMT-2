@@ -1,0 +1,11 @@
+2025-01-29 15:27:39,825 - PCSMT_log - INFO - 文件存在
+2025-01-29 15:27:39,826 - PCSMT_log - INFO - 已存在config文件
+2025-01-29 15:27:39,826 - PCSMT_log - ERROR - 读取config文件失败
+2025-01-29 15:27:39,826 - PCSMT_log - ERROR - 'dict' object has no attribute 'strip'
+2025-01-29 15:27:39,830 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 15:27:39,830 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 15:27:39,830 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 15:27:39,830 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 15:27:39,831 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 15:28:08,745 - PCSMT_log - INFO - 再见！
+2025-01-29 15:28:08,745 - PCSMT_log - INFO - 欢迎再次使用PCSMT 2

@@ -1,0 +1,7 @@
+{
+    "server_name": "test",
+    "start_count": 0,
+    "server_core": "H:\\Project\\PCSMT\\server\\test.jar",
+    "server_path": "H:\\Project\\PCSMT\\server",
+    "server_start_batch_path": "H:\\Project\\PCSMT\\server\\start.bat"
+}

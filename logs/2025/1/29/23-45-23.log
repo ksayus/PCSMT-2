@@ -1,0 +1,37 @@
+2025-01-29 23:45:23,727 - PCSMT_log - INFO - 文件存在
+2025-01-29 23:45:23,727 - PCSMT_log - INFO - 已存在config文件
+2025-01-29 23:45:23,736 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 23:45:23,736 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 23:45:23,737 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 23:45:23,737 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 23:45:23,737 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 23:45:57,015 - PCSMT_log - INFO - 找到服务器核心文件：H:\Project\PCSMT\server\test.jar
+2025-01-29 23:45:57,016 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 23:45:57,016 - PCSMT_log - INFO - 文件不存在，创建文件
+2025-01-29 23:45:57,017 - PCSMT_log - INFO - 找到服务器启动批处理文件,位置:H:\Project\PCSMT\server\start.bat
+2025-01-29 23:45:57,017 - PCSMT_log - ERROR - 文件不存在
+2025-01-29 23:45:57,017 - PCSMT_log - INFO - 文件不存在，创建文件
+2025-01-29 23:46:21,014 - PCSMT_log - INFO - 文件存在
+2025-01-29 23:46:21,014 - PCSMT_log - INFO - 最小内存:1243
+2025-01-29 23:46:21,014 - PCSMT_log - INFO - 最大内存:3424
+2025-01-29 23:46:21,015 - PCSMT_log - INFO - 修改服务器启动内存成功
+2025-01-29 23:46:31,886 - PCSMT_log - INFO - 找到服务器核心文件：H:\Project\PCSMT\server\test.jar
+2025-01-29 23:46:31,887 - PCSMT_log - INFO - 文件夹存在
+2025-01-29 23:46:31,887 - PCSMT_log - INFO - 文件不存在，创建文件
+2025-01-29 23:46:31,887 - PCSMT_log - INFO - 找到服务器启动批处理文件,位置:H:\Project\PCSMT\server\start.bat
+2025-01-29 23:46:31,887 - PCSMT_log - ERROR - 文件不存在
+2025-01-29 23:46:31,887 - PCSMT_log - INFO - 文件不存在，创建文件
+2025-01-29 23:46:56,637 - PCSMT_log - INFO - 文件存在
+2025-01-29 23:46:56,638 - PCSMT_log - INFO - 修改nogui设置成功
+2025-01-29 23:46:57,246 - PCSMT_log - INFO - 文件存在
+2025-01-29 23:46:57,246 - PCSMT_log - INFO - 默认启用nogui状态已为:false，无需修改
+2025-01-29 23:47:37,762 - PCSMT_log - INFO - 正在修改服务器启动批处理文件...
+2025-01-29 23:47:37,762 - PCSMT_log - INFO - 修改服务器启动内存为：1241 2313
+2025-01-29 23:47:37,762 - PCSMT_log - INFO - 修改完毕！
+2025-01-29 23:47:55,262 - PCSMT_log - INFO - 文件存在
+2025-01-29 23:47:55,263 - PCSMT_log - INFO - 修改nogui设置成功
+2025-01-29 23:47:59,296 - PCSMT_log - INFO - 正在修改服务器启动批处理文件...
+2025-01-29 23:47:59,297 - PCSMT_log - INFO - 修改服务器启动内存为：1241 2314
+2025-01-29 23:47:59,297 - PCSMT_log - INFO - 修改完毕！
+2025-01-29 23:48:43,909 - PCSMT_log - INFO - 再见！
+2025-01-29 23:48:43,909 - PCSMT_log - INFO - 欢迎再次使用PCSMT 2
