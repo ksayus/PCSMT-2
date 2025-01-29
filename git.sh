@@ -2,8 +2,9 @@
 # 获取当前日期，格式为 YYYYMMDD
 current_date=$(date +%Y%m%d)
 
-git init
-git add .
+git add ./bin/*
+git add ./PCSMT2.py
+git add ./git.sh
 git commit -m "updated${current_date}_xk"
 git remote set-url origin https://github.com/ksayus/PCSMT-2.git
 git branch -M main
