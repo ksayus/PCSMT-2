@@ -2,6 +2,7 @@
 # 获取当前日期，格式为 YYYYMMDD
 current_date=$(date +%Y%m%d)
 
+git init
 git add ./bin/*
 git add ./PCSMT2.py
 git add ./git.sh
