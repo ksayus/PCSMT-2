@@ -1,6 +1,6 @@
 git init
 git add .
 git commit -m "first commit"
-git remote set-url origin git@github.com:ksayus/PCSMT-2.git
+git remote set-url origin https://github.com/ksayus/PCSMT-2.git
 git branch -M main
 git push -u origin main -f
