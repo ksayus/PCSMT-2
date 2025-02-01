@@ -30,7 +30,7 @@ mohist_core_default_name = '/mohist-server.jar'
 work_path = os.getcwd()
 
 config = {
-            "PCSMTVersion": "1.0.1",
+            "PCSMTVersion": "1.0.2",
             "default_server_run_memories_min": 1024,
             "default_server_run_memories_max": 2048,
             "server_start_nogui": True
