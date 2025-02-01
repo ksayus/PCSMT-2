@@ -73,6 +73,18 @@ def read_config_json():
                         log.logger.info('写入启用图形界面参数为True')
                         config_read['server_start_nogui'] = program_info.config['server_start_nogui']
 
+                #wait_server_eula_generate_time
+                if not 'wait_server_eula_generate_time' in config_read:
+                    log.logger.warning('config文件已存在，但等待eula生成时间关键字不存在')
+                    log.logger.info('写入等待eula生成时间参数为默认值')
+                    config_read['wait_server_eula_generate_time'] = program_info.config['wait_server_eula_generate_time']
+                else:
+                    if config_read['wait_server_eula_generate_time'] == None:
+                        log.logger.warning('config文件已存在，但等待eula生成时间未设置')
+                        log.logger.info('写入等待eula生成时间参数为默认值')
+                        config_read['wait_server_eula_generate_time'] = program_info.config['wait_server_eula_generate_time']
+
+
                 try:
                     with open(program_info.work_path + program_info.program_config, "w") as f:
                         f.write(json.dumps(config_read, indent=4))

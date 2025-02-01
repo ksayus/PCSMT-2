@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import shutil
 from bin.find_files import find_file
 from bin.find_files import find_folder
 from bin.export import program_info
@@ -64,8 +65,8 @@ def add_server(server_path, server_name, rewrite):
                             log.logger.error('服务器启动批处理文件读取失败!')
                             log.logger.error(e)
                             f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core + ' nogui')
-                        else:
-                            f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core + ' nogui')
+                    else:
+                        f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core + ' nogui')
                     if program_info.server_start_nogui == "true":
                         f.write(' -nogui')
                     else:
@@ -276,4 +277,48 @@ def download_server_core(server_name, core_type, core_support_version):
         else:
             log.logger.error('创建服务器失败！')
             return
+        return
+    
+def delete_server(server_name):
+    try:
+        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        if server_info == False:
+            log.logger.error('未找到服务器，请检查服务器名称是否正确！')
+            return
+        else:
+            log.logger.info('已找到服务器:' + server_info['server_path'])
+            try_count = 3
+            while try_count:
+                input_str = input('输入服务器名称以二次确认删除服务器:')
+                if input_str == server_name:
+                    ensure_delete_server = True
+                    while ensure_delete_server:
+                        ensure = input('真的要删除服务器吗？这将会永久删除,无法恢复.(y/n)\n').strip().lower()
+    
+                        if ensure in ['y', 'yes']:
+                            try_count = 0
+                            break
+                        elif ensure in ['n', 'no']:
+                            log.logger.info('已取消删除服务器！')
+                            return
+                        else:
+                            log.logger.warning('输入错误，请输入 y 或 n！')
+                else:
+                    log.logger.warning('服务器名称错误！')
+                    try_count -= 1
+                    log.logger.warning('您还有' + str(try_count) + '次机会！')
+                    if try_count == 0:
+                        log.logger.error('错误过多，删除服务器失败！')
+                        return
+            log.logger.info('正在删除服务器...')
+            if find_folder.find_folders_with_existence(server_info['server_path']):
+                shutil.rmtree(server_info['server_path'])
+                log.logger.info('删除服务器成功！')
+                log.logger.info('正在删除服务器信息文件...')
+                os.remove(program_info.work_path + program_info.server_save_path + '/' + server_name +'.json')
+            log.logger.info('删除完成!')
+            return
+    except Exception as e:
+        log.logger.error('读取服务器信息文件失败！')
+        log.logger.error(e)
         return

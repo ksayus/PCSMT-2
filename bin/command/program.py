@@ -56,3 +56,29 @@ def change_server_start_nogui(argument):
             log.logger.error('读取程序配置文件失败！')
             log.logger.error(e)
             return
+        
+def change_wait_server_eula_generate_time(argument):
+    """修改写入服务器启动脚本默认等待eula生成时间"""
+    if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
+        try:
+            with open(program_info.work_path + program_info.program_config, "r") as f:
+                config_read = json.load(f) # 读取json文件
+                f.close()
+            if(config_read['wait_server_eula_generate_time'] == argument):
+                log.logger.info('等待eula生成时间已为:' + argument + '，无需修改')
+                return
+            else:
+                config_read['wait_server_eula_generate_time'] = argument
+                try:
+                    with open(program_info.work_path + program_info.program_config, "w") as f:
+                        json.dump(config_read, f, indent=4) # 写入json文件
+                        f.close()
+                    log.logger.info("修改等待eula生成时间设置成功")
+                    program_info.wait_server_eula_generate_time= argument
+                except Exception as e:
+                    log.logger.error('写入程序配置文件失败！')
+                    log.logger.error(e)
+        except Exception as e:
+            log.logger.error('读取程序配置文件失败！')
+            log.logger.error(e)
+            return

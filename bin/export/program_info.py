@@ -33,14 +33,16 @@ config = {
             "PCSMTVersion": "1.0.2",
             "default_server_run_memories_min": 1024,
             "default_server_run_memories_max": 2048,
-            "server_start_nogui": True
+            "server_start_nogui": True,
+            "wait_server_eula_generate_time": 15
 }
 
 program_config_read = {
     "PCSMTVersion": "",
     "default_server_run_memories_min": 0,
     "default_server_run_memories_max": 0,
-    "server_start_nogui": False
+    "server_start_nogui": False,
+    "wait_server_eula_generate_time": 0
 }
 
 program_config_read = init.read_config_json()
@@ -49,3 +51,4 @@ PCSMTVersion = program_config_read['PCSMTVersion']
 default_server_run_memories_min = program_config_read['default_server_run_memories_min']
 default_server_run_memories_max = program_config_read['default_server_run_memories_max']
 server_start_nogui = program_config_read['server_start_nogui']
+wait_server_eula_generate_time = program_config_read['wait_server_eula_generate_time']

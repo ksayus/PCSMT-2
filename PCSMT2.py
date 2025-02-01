@@ -124,6 +124,27 @@ class PCSMT2(Cmd):
             return
         server.download_server_core(server_name, core_type, core_support_version)
 
+    def do_change_wait_server_eula_generate_time(self, arg):
+        """修改等待服务器eula生成时间"""
+        try:
+            argument = arg.strip()
+            if not argument.isdigit():
+                log.logger.error('参数错误:请输入数字')
+                return
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        program.change_wait_server_eula_generate_time(argument)
+
+    def do_delete_server(self, arg):
+        """删除服务器"""
+        try:
+            server_name = arg.strip()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        server.delete_server(server_name)
+
     def do_exit(self, arg):
         """退出控制台"""
         log.logger.info("再见！")
