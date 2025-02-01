@@ -1,8 +1,0 @@
-2025-01-28 18:27:09,982 - PCSMT_log - INFO - 文件存在
-2025-01-28 18:27:10,022 - PCSMT_log - INFO - 文件夹存在
-2025-01-28 18:27:10,022 - PCSMT_log - INFO - 文件夹存在
-2025-01-28 18:27:10,022 - PCSMT_log - INFO - 文件夹存在
-2025-01-28 18:27:10,022 - PCSMT_log - INFO - 文件夹存在
-2025-01-28 18:27:10,023 - PCSMT_log - INFO - 文件夹存在
-2025-01-28 18:27:10,028 - PCSMT_log - INFO - 文件 H:\project\pcsmt\server\server.properties 中的 online-mode 已替换为 true
-2025-01-28 18:27:10,029 - PCSMT_log - DEBUG - 匹配到行 35: online-mode=false

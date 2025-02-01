@@ -1,4 +1,0 @@
-2025-01-29 15:06:31,809 - PCSMT_log - INFO - 文件存在
-2025-01-29 15:06:31,809 - PCSMT_log - INFO - 已存在config文件
-2025-01-29 15:06:31,810 - PCSMT_log - ERROR - 读取config文件失败
-2025-01-29 15:06:31,810 - PCSMT_log - ERROR - must have exactly one of create/read/write/append mode
