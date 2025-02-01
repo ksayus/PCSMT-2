@@ -61,5 +61,34 @@ def download_server_core(server_name, core_type, core_support_version):
             log.logger.error(e)
             return False
         
+    #mohist核心
+    if core_type == 'mohist':
+        try:
+            version_manifest = requests.get('https://mohistmc.com/api/v2/projects/mohist/' + core_support_version + '/builds').json()
+            version_builds = version_manifest['builds']
+            version_info = version_builds[-1]
+            server_download_url = version_info['url']
+            log.logger.info('正在下载Mohist核心...')
+            log.logger.info('当前下载链接:' + server_download_url)
+            os.system('powershell curl -o '+ program_info.work_path + program_info.program_server_folder + '\\' + server_name + program_info.mohist_core_default_name + ' ' + server_download_url)
+            return True
+        except Exception as e:
+            log.logger.error('下载Mohist核心失败,请检查')
+            log.logger.error(e)
+            return False
+        
+    # if core_type == 'spigot':
+    #     if core_installer.init_core_installer(core_type, core_support_version):
+    #         time.sleep(3)
+    #         try:
+    #             log.logger.info('正在下载Spigot核心...')
+    #             os.system('cd ' + program_info.work_path + program_info.program_server_folder + '\\' + server_name)
+    #             os.system('java -Djavax.net.ssl.trustStore="C:\Program Files\Java\jdk-21\lib\security\cacerts" -jar ' + program_info.work_path + program_info.spigot_core_installation + ' --rev  ' + core_support_version)
+    #             log.logger.info('下载Spigot核心成功')
+    #             return True
+    #         except Exception as e:
+    #             log.logger.error('下载Spigot核心失败,请检查')
+    #             log.logger.error(e)
+    #             return False
 
     log.logger.error('输入的核心类型不正确，请检查输入')

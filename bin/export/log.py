@@ -8,6 +8,12 @@ now_work_path = os.getcwd()
 logger = logging.getLogger('PCSMT_log')
 logger.setLevel(logging.DEBUG)
 
+work_path = os.getcwd()
+
+find_folder.find_folders_with_existence_and_create(work_path + '/logs/' + str(get_time.this_year))
+find_folder.find_folders_with_existence_and_create(work_path + '/logs/' + str(get_time.this_year) + '/' + str(get_time.this_month))
+find_folder.find_folders_with_existence_and_create(work_path + '/logs/' + str(get_time.this_year) + '/' + str(get_time.this_month) + '/' + str(get_time.this_day))
+
 if find_folder.find_folders_with_existence("logs"):
     if find_folder.find_folders_with_existence(now_work_path + '/logs' + '/' + str(get_time.this_year) + '/' + str(get_time.this_month) + '/' + str(get_time.this_day)):
 

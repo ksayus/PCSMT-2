@@ -44,3 +44,17 @@ def init_core_installer(core_type, core_support_version):
             log.logger.error('下载Forge核心失败,请检查')
             log.logger.error(e)
             return False
+    # if core_type == 'spigot':
+    #     if find_file.find_files_with_existence(program_info.work_path + program_info.spigot_core_installation):
+    #         log.logger.info('Spigot核心下载器已存在')
+    #         return True
+    #     else:
+    #         try:
+    #             log.logger.warning('Fabric核心下载器不存在')
+    #             log.logger.info('正在下载Fabric核心下载器...')
+    #             os.system('powershell curl -o '+ program_info.work_path + program_info.spigot_core_installation + ' https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.exe')
+    #             log.logger.info('下载完成')
+    #             return True
+    #         except Exception as e:
+    #             log.logger.error('获取Fabric核心下载器失败,请检查')
+    #             return False

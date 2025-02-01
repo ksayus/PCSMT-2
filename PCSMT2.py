@@ -1,3 +1,4 @@
+from bin.export import log
 from bin.export import program_info
 from bin.introduction import introduction
 from bin.command import start
@@ -8,7 +9,6 @@ from bin.export import numbers
 from bin.command import program
 from bin.export import init
 from cmd import Cmd
-from bin.export import log
 import json
 import sys
 

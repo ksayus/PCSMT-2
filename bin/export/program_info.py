@@ -20,10 +20,12 @@ forge_server_JVM_args = '@user_jvm_args.txt'
 
 fabric_core_installation = '/bin/source/core_installation/fabric-installer.jar'
 forge_core_installation = '/bin/source/core_installation/forge-installer.jar'
+spigot_core_installation = '/bin/source/core_installation/spigot-installer.exe'
 
 fabric_core_default_name = '/fabric-server-launch.jar'
 forge_core_default_name = '/forge-installer.jar'
-official_core_default_name = '/official_server_core.jar'
+official_core_default_name = '/official-server.jar'
+mohist_core_default_name = '/mohist-server.jar'
 
 work_path = os.getcwd()
 
