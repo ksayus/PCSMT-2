@@ -18,6 +18,7 @@ def download_server_core(server_name, core_type, core_support_version):
                 if core_path_default.exists():
                     core_path_default.rename(program_info.work_path + program_info.program_server_folder + '\\' + server_name + '\\' + server_name + '.jar')
                     log.logger.info('下载Fabric核心成功')
+                    #os.remove(program_info.work_path + program_info.fabric_core_installation)
                     return True
             except Exception as e:
                 log.logger.error('下载Fabric核心失败,请检查')

@@ -19,19 +19,19 @@ class PCSMT2(Cmd):
     prompt = "PCSMT2>"
 
     def do_version(self, arg):
-        """查看版本号"""
+        """查看版本号\nCommand: version"""
         introduction.Version()
 
     def do_about(self, arg):
-        """查看介绍"""
+        """查看介绍\nCommand: about"""
         introduction.Homepage()
 
     def do_sta(self, file_path):
-        """打开文件或目录"""
+        """打开文件或目录\nCommand: sta <file_path>"""
         start.start_file(file_path)
 
     def do_add_server(self, arg):
-        """添加服务器"""
+        """添加服务器\nCommand: add_server <server_path> <server_name>"""
         try:
             server_path, server_name = arg.split()
         except ValueError:
@@ -40,7 +40,7 @@ class PCSMT2(Cmd):
         server.add_server(server_path, server_name, False)
 
     def do_start_server(self, arg):
-        """启动服务器"""
+        """启动服务器\nCommand: start_server <server_name>"""
         try:
             server_name = arg.strip()
         except ValueError:
@@ -49,11 +49,11 @@ class PCSMT2(Cmd):
         server.start_server(server_name)
 
     def do_server_list(self, arg):
-        """查看服务器列表"""
+        """查看服务器列表\nCommand: server_list"""
         server.server_list()
 
     def do_change_server_properties(self, arg):
-        """修改服务器属性"""
+        """修改服务器属性\nCommand: change_server_properties <server_name> <keyword> <argument>"""
         try:
             server_name, keyword, argument = arg.split()
         except ValueError:
@@ -62,7 +62,7 @@ class PCSMT2(Cmd):
         server.change_server_properties(server_name, keyword, argument)
 
     def do_change_server_run_memories_config(self, arg):
-        """修改写入服务器启动脚本默认使用运行内存"""
+        """修改写入服务器启动脚本默认使用运行内存\nCommand: change_server_run_memories_config <memories_min> <memories_max>"""
         try:
             argument_min, argument_max = arg.split()
             #检查参数是否为数字
@@ -79,7 +79,7 @@ class PCSMT2(Cmd):
         program.change_server_run_memories_config(argument_min, argument_max)
 
     def do_server_mods(self, arg):
-        """查看服务器插件列表"""
+        """查看服务器插件列表\nCommand: server_mods <server_name>"""
         try:
             server_name = arg.strip()
         except ValueError:
@@ -88,7 +88,7 @@ class PCSMT2(Cmd):
         server.open_server_mod_and_plugins_folder(server_name)
 
     def do_server_start_batch_rewrite_run_memories(self, arg):
-        """重写服务器启动脚本"""
+        """重写服务器启动脚本\nCommand: server_start_batch_rewrite_run_memories <server_name> <memories_min> <memories_max>"""
         try:
             server_name, memories_min, memories_max = arg.split()
             if not memories_min.isdigit() or not memories_max.isdigit():
@@ -104,7 +104,7 @@ class PCSMT2(Cmd):
         server.server_start_batch_rewrite_run_memories(server_name, memories_min, memories_max)
 
     def do_change_server_start_nogui(self, arg):
-        """修改服务器启动nogui"""
+        """修改服务器启动nogui\nCommand: change_server_start_nogui <true/false>"""
         try:
             argument = arg.strip()
             if argument != "true" and argument != "false":
@@ -116,7 +116,7 @@ class PCSMT2(Cmd):
         program.change_server_start_nogui(argument)
 
     def do_download_server_core(self, arg):
-        """下载服务器核心"""
+        """下载服务器核心\nCommand: download_server_core <server_name> <core_type> <game_version>"""
         try:
             server_name, core_type, core_support_version = arg.split()
         except ValueError:
@@ -125,7 +125,7 @@ class PCSMT2(Cmd):
         server.download_server_core(server_name, core_type, core_support_version)
 
     def do_change_wait_server_eula_generate_time(self, arg):
-        """修改等待服务器eula生成时间"""
+        """修改等待服务器eula生成时间\nCommand: change_wait_server_eula_generate_time <time>"""
         try:
             argument = arg.strip()
             if not argument.isdigit():
@@ -137,7 +137,7 @@ class PCSMT2(Cmd):
         program.change_wait_server_eula_generate_time(argument)
 
     def do_delete_server(self, arg):
-        """删除服务器"""
+        """删除服务器\nCommand: delete_server <server_name>"""
         try:
             server_name = arg.strip()
         except ValueError:
@@ -145,8 +145,17 @@ class PCSMT2(Cmd):
             return
         server.delete_server(server_name)
 
+    def do_search_server(self, arg):
+        """搜索服务器\nCommand: search_server <server_name>"""
+        try:
+            server_name = arg.strip()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        server.search_server(server_name)
+
     def do_exit(self, arg):
-        """退出控制台"""
+        """退出控制台\nCommand: exit"""
         log.logger.info("再见！")
         log.logger.info("欢迎再次使用PCSMT 2")
         return True  # 返回True会退出命令行循环

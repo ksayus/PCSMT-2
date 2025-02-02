@@ -55,7 +55,7 @@ def add_server(server_path, server_name, rewrite):
                                         break
                                 if server_start_command is None:
                                     log.logger.warning('未找到包含java的命令,请检查run.bat文件是否正确！')
-                                    f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core + ' nogui')
+                                    f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
                                 else:
                                     log.logger.info('读取服务器启动批处理文件成功!')
                                     log.logger.info('服务器启动核心命令:' + server_start_command + '\n')
@@ -64,9 +64,9 @@ def add_server(server_path, server_name, rewrite):
                         except Exception as e:
                             log.logger.error('服务器启动批处理文件读取失败!')
                             log.logger.error(e)
-                            f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core + ' nogui')
+                            f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
                     else:
-                        f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core + ' nogui')
+                        f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
                     if program_info.server_start_nogui == "true":
                         f.write(' -nogui')
                     else:
@@ -317,6 +317,28 @@ def delete_server(server_name):
                 log.logger.info('正在删除服务器信息文件...')
                 os.remove(program_info.work_path + program_info.server_save_path + '/' + server_name +'.json')
             log.logger.info('删除完成!')
+            return
+    except Exception as e:
+        log.logger.error('读取服务器信息文件失败！')
+        log.logger.error(e)
+        return
+    
+def search_server(server_name):
+    try:
+        log.logger.info('正在搜索服务器...')
+        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        if server_info == False:
+            log.logger.error('未找到服务器，请检查服务器名称是否正确！')
+            return
+        else:
+            log.logger.info('已找到服务器:' + server_info['server_path'])
+            log.logger.info('已读取服务器信息文件...')
+            log.logger.info('服务器信息:')
+            log.logger.info('服务器名称: ' + server_info['server_name'])
+            log.logger.info('服务器启动次数: ' + str(server_info['start_count']))
+            log.logger.info('服务器核心: ' + server_info['server_core'])
+            log.logger.info('服务器路径: ' + server_info['server_path'])
+            log.logger.info('服务器启动批处理路径: ' + server_info['server_start_batch_path'])
             return
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
