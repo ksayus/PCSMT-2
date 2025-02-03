@@ -27,10 +27,13 @@ forge_core_default_name = '/forge-installer.jar'
 official_core_default_name = '/official-server.jar'
 mohist_core_default_name = '/mohist-server.jar'
 
+github_repository = "https://api.github.com/repos/ksayus/PCSMT-2/releases/latest"
+gitee_repository = "https://gitee.com/api/v5/repos/ksayus/PCSMT-2/releases/latest?access_token=7a91263148087aa5e2c9447297fa04b1"
+
 work_path = os.getcwd()
 
 config = {
-            "PCSMTVersion": "1.0.2",
+            "PCSMTVersion": "1.0.5",
             "default_server_run_memories_min": 1024,
             "default_server_run_memories_max": 2048,
             "server_start_nogui": True,

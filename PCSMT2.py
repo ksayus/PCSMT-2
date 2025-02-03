@@ -8,7 +8,7 @@ from bin.find_files import find_folder
 from bin.export import numbers
 from bin.command import program
 from bin.export import init
-from cmd import Cmd
+from cmd2 import Cmd
 import json
 import sys
 

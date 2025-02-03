@@ -1,5 +1,5 @@
 {
-    "PCSMTVersion": "1.0.2",
+    "PCSMTVersion": "1.0.1",
     "default_server_run_memories_min": "4096",
     "default_server_run_memories_max": "5054",
     "server_start_nogui": "true",

@@ -3,9 +3,16 @@ from bin.introduction import introduction
 from bin.export import program_info
 from bin.export import get_time
 from bin.export import log
+from bin.download import update
 import json
 
 def init_program():
+    result = update.update_program_github()
+    if result == 0:
+        log.logger.info("GitHub 更新失败,尝试 Gitee 更新...")
+        result = update.update_program_gitee()
+        if result == 0:
+            log.logger.info("无法完成自动更新,请手动更新!")
     find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.server_save_path)
     find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_logs)
     find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_server_folder)
