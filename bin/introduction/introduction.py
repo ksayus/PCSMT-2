@@ -9,6 +9,9 @@ AuthorBilibiliPage = "--Bilibili:\t\thttps://space.bilibili.com/558271819"
 PersonalWebsite = "--Personal Website:\thttps://ksayus.github.io"
 
 def Homepage():
+    """
+    用于显示主页
+    """
     print("-------------------------------")
     print("_____   _____  _____ __  __ _______     \t")
     print("|  __\ / ____|/  ___|  \/  |__   __|    \t")
@@ -26,11 +29,18 @@ def Homepage():
     print("\nVersion:" + program_info.PCSMTVersion)
     print("-------------------------------")
 
-def Homepage_GUI():
-    HP = "-------------------------------\n_____   _____  _____ __  __ _______     \t\n|  __\ / ____|/  ___|  \/  |__   __|    \t\n| |__ )| |    | (___| \  / |  | |       \t\n| ___/ | |    \___ \| |\/| |  | |       \t\n| |    | |________) | |  | |  | |       \t\n|_|    \_____|_____/|_|  |_|  |_|       \t\nWelcome " + ProgramName + '\n' + PowerBy + "My own homepage-->\n" + GithubPage + '\n' + GiteePage + '\n' + KsayusPage + '\n' + AuthorBilibiliPage + '\n' + PersonalWebsite + '\n' + "\nVersion:" + program_info.PCSMTVersion + '\n' + "-------------------------------"
-    return HP
+# def Homepage_GUI():
+#     """
+#     用于显示主页
+#     GUI版本
+#     """
+#     HP = "-------------------------------\n_____   _____  _____ __  __ _______     \t\n|  __\ / ____|/  ___|  \/  |__   __|    \t\n| |__ )| |    | (___| \  / |  | |       \t\n| ___/ | |    \___ \| |\/| |  | |       \t\n| |    | |________) | |  | |  | |       \t\n|_|    \_____|_____/|_|  |_|  |_|       \t\nWelcome " + ProgramName + '\n' + PowerBy + "My own homepage-->\n" + GithubPage + '\n' + GiteePage + '\n' + KsayusPage + '\n' + AuthorBilibiliPage + '\n' + PersonalWebsite + '\n' + "\nVersion:" + program_info.PCSMTVersion + '\n' + "-------------------------------"
+#     return HP
 
 def Version():
+    """
+    用于显示版本
+    """
     print("-------------------------------")
     print("Version:" + program_info.PCSMTVersion)
     print("-------------------------------")

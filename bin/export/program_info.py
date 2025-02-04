@@ -1,5 +1,6 @@
 import os
 import json
+from bin.command import server
 from bin.find_files import find_file
 from bin.find_files import find_folder
 from bin.export import log
@@ -14,6 +15,9 @@ program_config = '\config.json'
 server_mods_folder = '\mods'
 server_plugins_folder = '\plugins'
 program_server_folder = '\servers'
+
+banned_player = '/banned-players.json'
+banned_ip = '/banned-ips.json'
 
 forge_server_start_batch_default_name = '/run.bat'
 forge_server_JVM_args = '@user_jvm_args.txt'
@@ -31,6 +35,27 @@ github_repository = "https://api.github.com/repos/ksayus/PCSMT-2/releases/latest
 gitee_repository = "https://gitee.com/api/v5/repos/ksayus/PCSMT-2/releases/latest?access_token=7a91263148087aa5e2c9447297fa04b1"
 
 work_path = os.getcwd()
+
+
+server_list = server.server_list()
+
+
+banned_players ={
+    "uuid": "",
+    "name": "",
+    "created": "",
+    "source": "PCSMT-2",
+    "expires": "forever",
+    "reason": "Banned by PCSMT-2"
+}
+
+banned_ips = {
+    "ip": "",
+    "created": "",
+    "source": "PCSMT-2",
+    "expires": "forever",
+    "reason": "Banned by PCSMT-2"
+}
 
 config = {
             "PCSMTVersion": "1.0.5",

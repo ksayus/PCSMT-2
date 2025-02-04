@@ -2,6 +2,10 @@ import os
 from bin.export import log
 
 def start_file(file_path):
+    """
+    打开文件
+    :param file_path: 文件路径
+    """
     try:
         return_code = os.system("start " + file_path)
         if return_code == 0:

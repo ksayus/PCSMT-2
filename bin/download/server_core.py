@@ -7,6 +7,13 @@ import requests
 import time
 
 def download_server_core(server_name, core_type, core_support_version):
+    """
+    下载服务器核心
+    :param server_name: 服务器名称
+    :param core_type: 核心类型
+    :param core_support_version: 核心支持版本
+    :return: bool
+    """
     #fabric核心
     if core_type == 'fabric':
         if core_installer.init_core_installer(core_type, core_support_version):
@@ -24,7 +31,7 @@ def download_server_core(server_name, core_type, core_support_version):
                 log.logger.error('下载Fabric核心失败,请检查')
                 log.logger.error(e)
                 return False
-        
+
     #forge下载网址示例
     #https://maven.minecraftforge.net/net/minecraftforge/forge/1.16.5-36.2.42/forge-1.16.5-36.2.42-installer.jar
     #version api
@@ -44,7 +51,7 @@ def download_server_core(server_name, core_type, core_support_version):
                 log.logger.error('下载Forge核心失败,请检查')
                 log.logger.error(e)
                 return False
-            
+
     #官方核心
     if core_type == 'official':
         try:
@@ -61,7 +68,7 @@ def download_server_core(server_name, core_type, core_support_version):
             log.logger.error('下载官方核心失败,请检查')
             log.logger.error(e)
             return False
-        
+
     #mohist核心
     if core_type == 'mohist':
         try:
@@ -77,7 +84,7 @@ def download_server_core(server_name, core_type, core_support_version):
             log.logger.error('下载Mohist核心失败,请检查')
             log.logger.error(e)
             return False
-        
+
     # if core_type == 'spigot':
     #     if core_installer.init_core_installer(core_type, core_support_version):
     #         time.sleep(3)

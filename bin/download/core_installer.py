@@ -5,6 +5,11 @@ import os
 import requests
 
 def init_core_installer(core_type, core_support_version):
+    """
+    初始化核心下载器
+    :param core_type: 核心类型
+    :param core_support_version: 核心支持版本
+    """
     if core_type == 'fabric':
         if find_file.find_files_with_existence(program_info.work_path + program_info.fabric_core_installation):
             log.logger.info('Fabric核心下载器已存在')

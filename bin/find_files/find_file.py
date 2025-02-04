@@ -16,6 +16,12 @@ def find_files_with_extension(directory, extension):
     return matched_files
 
 def find_files_with_existence_and_create(directory):
+    """
+    在指定目录中查找指定的文件
+    若不存在则自动创建该文件的空文件
+    :param directory: 要搜索的目录
+    :return: 匹配的文件列表
+    """
     if os.path.exists(directory):
         log.logger.info("文件存在:" + directory)
         return True
@@ -28,16 +34,26 @@ def find_files_with_existence_and_create(directory):
         except OSError:
             log.logger.error("创建文件失败")
             return False
-        
+
 def find_files_with_existence(directory):
+    """
+    在指定目录中查找指定的文件
+    若不存在则返回False
+    """
     if os.path.exists(directory):
         log.logger.info("文件存在:" + directory)
         return True
     else:
         log.logger.error("文件不存在:" + directory)
         return False
-    
+
 def find_keyword_inline_and_change_argument(file_path, keyword, argument):
+    """
+    在指定文件中查找指定的关键字并替换为指定的参数
+    :param file_path: 要搜索的文件路径
+    :param keyword: 要搜索的关键字
+    :param argument: 要替换的参数
+    """
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             lines = f.readlines()

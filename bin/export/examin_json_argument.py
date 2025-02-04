@@ -3,6 +3,11 @@ from bin.export import program_info
 from bin.export import log
 
 def examin_saves_json_argument(server_name):
+    """
+    检查服务器信息json文件
+    :param server_name: 服务器名称
+    :return: False(错误) or server_info(正确)
+    """
     try:
         with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r', encoding='utf-8') as f:
             server_info = json.load(f)
@@ -26,4 +31,4 @@ def examin_saves_json_argument(server_name):
     except Exception as e:
         log.logger.error('读取服务器信息失败！')
         log.logger.error(e)
-        return False    
+        return False

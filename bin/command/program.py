@@ -6,6 +6,11 @@ from bin.export import log
 from bin.export import init
 
 def change_server_run_memories_config(argument_min, argument_max):
+    """
+    修改写入服务器启动脚本默认运行内存
+    :param argument_min: 最小内存
+    :param argument_max: 最大内存
+    """
     """修改写入服务器启动脚本默认使用运行内存"""
     if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
         try:
@@ -30,8 +35,12 @@ def change_server_run_memories_config(argument_min, argument_max):
     else:
         log.logger.error("程序配置文件不存在")
         return
-    
+
 def change_server_start_nogui(argument):
+    """
+    修改写入服务器启动脚本默认使用 nogui 启动
+    :param argument: True/False
+    """
     """修改写入服务器启动脚本默认使用 nogui 启动"""
     if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
         try:
@@ -56,9 +65,13 @@ def change_server_start_nogui(argument):
             log.logger.error('读取程序配置文件失败！')
             log.logger.error(e)
             return
-        
+
 def change_wait_server_eula_generate_time(argument):
-    """修改写入服务器启动脚本默认等待eula生成时间"""
+    """
+    修改写入服务器启动脚本默认等待eula生成时间
+    :param argument: 等待eula生成时间
+
+    """
     if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
         try:
             with open(program_info.work_path + program_info.program_config, "r") as f:

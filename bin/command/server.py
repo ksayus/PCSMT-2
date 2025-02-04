@@ -2,6 +2,7 @@ import os
 import json
 import time
 import shutil
+import requests
 from bin.find_files import find_file
 from bin.find_files import find_folder
 from bin.export import program_info
@@ -10,7 +11,14 @@ from bin.export import eula
 from bin.export import log
 from bin.export import examin_json_argument
 from bin.download import server_core
+from bin.export import get_time
 def add_server(server_path, server_name, rewrite):
+    """
+    添加服务器
+    :param server_path: 服务器路径
+    :param server_name: 服务器名称
+    :param rewrite: 是否覆盖同名服务器
+    """
     server_core = find_file.find_files_with_extension(server_path, '.jar')
     log.logger.info('找到服务器核心文件：' + str(server_core))
     log.logger.info('总共' + str(len(server_core)) + '个文件')
@@ -26,7 +34,7 @@ def add_server(server_path, server_name, rewrite):
                     'it', 'org', 'trove', 'java', 'jodah', 'mincraftforge',
                     'minecrell', 'sf'
                 }
-    
+
     # 筛选不包含任意关键词的元素
                 server_core = [
                     item for item in server_core
@@ -76,7 +84,7 @@ def add_server(server_path, server_name, rewrite):
                 log.logger.error('创建服务器启动批处理文件失败!')
                 log.logger.error(e)
                 return
-            
+
             if find_file.find_files_with_existence(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json'):
                 if rewrite == True:
                     log.logger.warning('已存在同名服务器，尝试覆盖原信息！')
@@ -129,6 +137,10 @@ def add_server(server_path, server_name, rewrite):
                     log.logger.error('创建服务器信息文件失败!')
 
 def start_server(server_name):
+    """
+    启动服务器
+    :param server_name: 服务器名称
+    """
     if find_file.find_files_with_existence(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json'):
         try:
             with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r') as f:
@@ -148,7 +160,7 @@ def start_server(server_name):
         log.logger.info('当前启动服务器:' + server_name)
         if server_info['start_count'] == 0:
             log.logger.info("服务器第一次启动，请等待服务器启动完成！")
-            time.sleep(15)
+            time.sleep(program_info.wait_server_eula_generate_time)
             if find_file.find_files_with_existence(server_info['server_path'] + program_info.server_eula):
                 log.logger.info('eula协议存在')
                 server_info = eula.examine_eula(server_info)
@@ -169,35 +181,41 @@ def start_server(server_name):
     else:
         log.logger.error('未找到服务器，请检查服务器名称是否正确！')
         return
-    
+
 def server_list():
-    server_list = os.listdir(program_info.work_path + program_info.server_save_path)
+    """
+    列出服务器列表
+    """
+    server_list = find_file.find_files_with_extension(program_info.work_path + program_info.server_save_path, '.json')
     if len(server_list) == 0:
         log.logger.error('未找到服务器，请添加服务器！')
         return
     else:
+        server_lists = []
         log.logger.info('当前服务器列表：')
         for server in server_list:
-            if server == '.DS_Store':
-                continue
-            if server == '__pycache__':
-                continue
-            if server == '__init__.py':
-                continue
-            if server == '__init__.pyc':
-                continue
-            if server == '__init__.pyo':
-                continue
-            
-            with open(program_info.work_path + program_info.server_save_path + '/' + server, 'r', encoding='utf-8') as f:
-                server_info = json.load(f)
-                now_server_name = server_info['server_name']
-                f.close()
+            try:
+                with open(server, 'r', encoding='utf-8') as f:
+                    server_info = json.load(f)
+                    now_server_name = server_info['server_name']
+                    f.close()
 
-            log.logger.info(now_server_name)
+                log.logger.info(now_server_name)
+                server_lists.append(now_server_name)
+            except Exception as e:
+                log.logger.error('读取服务器信息文件失败!')
+                log.logger.error(e)
+                return
         log.logger.info('当前服务器数量：' + str(len(server_list)))
+        return server_lists
 
 def change_server_properties(server_name, keyword, argument):
+    """
+    修改服务器属性
+    :param server_name: 服务器名称
+    :param keyword: 关键字
+    :param argument: 参数
+    """
     try:
         with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r', encoding='utf-8') as f:
             server_info = json.load(f)
@@ -208,6 +226,10 @@ def change_server_properties(server_name, keyword, argument):
         log.logger.error(e)
 
 def open_server_mod_and_plugins_folder(server_name):
+    """
+    打开服务器模组&插件文件夹
+    :param server_name: 服务器名称
+    """
     try:
         with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r', encoding='utf-8') as f:
             server_info = json.load(f)
@@ -216,7 +238,7 @@ def open_server_mod_and_plugins_folder(server_name):
         log.logger.error('打开服务器模组&插件文件夹失败！')
         log.logger.error(e)
         return
-    
+
     if find_folder.find_folders_with_existence(server_info['server_path'] + program_info.server_mods_folder) or find_folder.find_folders_with_existence(server_info['server_path'] + program_info.server_plugins_folder):
         try:
             start.start_file(server_info['server_path'] + program_info.server_mods_folder)
@@ -232,6 +254,12 @@ def open_server_mod_and_plugins_folder(server_name):
         log.logger.error('服务器模组或插件文件夹不存在，请检查服务器是否启动过一次以上！')
 
 def server_start_batch_rewrite_run_memories(server_name, memory_min, memory_max):
+    """
+    修改服务器启动内存
+    :param server_name: 服务器名称
+    :param memory_min: 最小内存
+    :param memory_max: 最大内存
+    """
     server_info = examin_json_argument.examin_saves_json_argument(server_name)
     if server_info == False:
         log.logger.error('未找到服务器，请检查服务器名称是否正确！')
@@ -252,8 +280,14 @@ def server_start_batch_rewrite_run_memories(server_name, memory_min, memory_max)
             log.logger.error('读取服务器启动批处理文件失败！')
             log.logger.error(e)
             return
-        
+
 def download_server_core(server_name, core_type, core_support_version):
+    """
+    下载服务器核心
+    :param server_name: 服务器名称
+    :param core_type: 核心类型
+    :param core_support_version: 核心支持版本
+    """
     try:
         server_info = examin_json_argument.examin_saves_json_argument(server_name)
         find_folder.find_folders_with_existence_and_create(server_info['server_path'])
@@ -278,8 +312,12 @@ def download_server_core(server_name, core_type, core_support_version):
             log.logger.error('创建服务器失败！')
             return
         return
-    
+
 def delete_server(server_name):
+    """
+    删除服务器
+    :param server_name: 服务器名称
+    """
     try:
         server_info = examin_json_argument.examin_saves_json_argument(server_name)
         if server_info == False:
@@ -294,7 +332,7 @@ def delete_server(server_name):
                     ensure_delete_server = True
                     while ensure_delete_server:
                         ensure = input('真的要删除服务器吗？这将会永久删除,无法恢复.(y/n)\n').strip().lower()
-    
+
                         if ensure in ['y', 'yes']:
                             try_count = 0
                             break
@@ -322,8 +360,12 @@ def delete_server(server_name):
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)
         return
-    
+
 def search_server(server_name):
+    """
+    搜索服务器
+    :param server_name: 服务器名称
+    """
     try:
         log.logger.info('正在搜索服务器...')
         server_info = examin_json_argument.examin_saves_json_argument(server_name)
@@ -340,6 +382,100 @@ def search_server(server_name):
             log.logger.info('服务器路径: ' + server_info['server_path'])
             log.logger.info('服务器启动批处理路径: ' + server_info['server_start_batch_path'])
             return
+    except Exception as e:
+        log.logger.error('读取服务器信息文件失败！')
+        log.logger.error(e)
+        return
+
+def banned_player(server_name, player_name):
+    """
+    封禁玩家
+    :param server_name: 服务器名称
+    :param player_name: 玩家名称
+    """
+    log.logger.info('查找服务器...')
+    try:
+        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        if server_info == False:
+            log.logger.error('未找到服务器，请检查服务器名称是否正确！')
+            return
+        else:
+            log.logger.info('已找到服务器:' + server_info['server_path'])
+            log.logger.info("尝试获取玩家UUID...")
+            try:
+                response = requests.get('https://api.mojang.com/users/profiles/minecraft/' + player_name)
+                player_uuid = response.json()['id']
+                log.logger.info('获取到玩家UUID:' + player_uuid)
+            except Exception as e:
+                log.logger.error('获取玩家UUID失败！')
+                log.logger.error(e)
+                return
+            log.logger.info('尝试读取' + program_info.banned_player + '文件...')
+            try:
+                with open(server_info['server_path'] + program_info.banned_player, 'r', encoding='utf-8') as f:
+                    banned_players = json.load(f)
+                    program_info.banned_players['uuid'] = player_uuid
+                    program_info.banned_players['name'] = player_name
+                    program_info.banned_players['created'] = str(get_time.today) + ' ' + str(get_time.now_time()) + ' +0800'
+                    banned_players.append(program_info.banned_players)
+                    log.logger.info('读取并写入信息:' + json.dumps(program_info.banned_players, indent=4))
+                    log.logger.info('尝试写入' + program_info.banned_player + '文件...')
+                    try:
+                        with open(server_info['server_path'] + program_info.banned_player, 'w', encoding='utf-8') as f:
+                            json.dump(banned_players, f, indent=4)
+                            log.logger.info('写入成功！')
+                            return
+                    except Exception as e:
+                        log.logger.error('写入失败！')
+                        log.logger.error(e)
+                        return
+                    f.close()
+            except Exception as e:
+                log.logger.error('读取服务器信息文件失败！')
+                log.logger.error(e)
+                return
+    except Exception as e:
+        log.logger.error('读取服务器信息文件失败！')
+        log.logger.error(e)
+        return
+
+def banned_ip(server_name, player_ip):
+    """
+    封禁玩家
+    :param server_name: 服务器名称
+    :param player_ip: IP地址
+    """
+    log.logger.info('查找服务器...')
+    try:
+        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        if server_info == False:
+            log.logger.error('未找到服务器，请检查服务器名称是否正确！')
+            return
+        else:
+            log.logger.info('已找到服务器:' + server_info['server_path'])
+            log.logger.info('尝试读取' + program_info.banned_ip + '文件...')
+            try:
+                with open(server_info['server_path'] + program_info.banned_ip, 'r', encoding='utf-8') as f:
+                    banned_ips = json.load(f)
+                    program_info.banned_ips['ip'] = player_ip
+                    program_info.banned_ips['created'] = str(get_time.today) + ' ' + str(get_time.now_time()) + ' +0800'
+                    banned_ips.append(program_info.banned_ips)
+                    log.logger.info('读取并写入信息:' + json.dumps(program_info.banned_ips, indent=4))
+                    log.logger.info('尝试写入' + program_info.banned_ip + '文件...')
+                    try:
+                        with open(server_info['server_path'] + program_info.banned_ip, 'w', encoding='utf-8') as f:
+                            json.dump(banned_ips, f, indent=4)
+                            log.logger.info('写入成功！')
+                            return
+                    except Exception as e:
+                        log.logger.error('写入失败！')
+                        log.logger.error(e)
+                        return
+                    f.close()
+            except Exception as e:
+                log.logger.error('读取服务器信息文件失败！')
+                log.logger.error(e)
+                return
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)

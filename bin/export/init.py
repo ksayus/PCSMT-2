@@ -7,6 +7,9 @@ from bin.download import update
 import json
 
 def init_program():
+    """
+    初始化程序
+    """
     result = update.update_program_github()
     if result == 0:
         log.logger.info("GitHub 更新失败,尝试 Gitee 更新...")
@@ -20,6 +23,12 @@ def init_program():
     introduction.Homepage()
 
 def read_config_json():
+    """
+    读取config.json文件
+    检查config.json文件是否存在,不存在则创建,存在则读取
+    读取后检查config.json文件中的信息,如果信息不匹配则更新config.json文件
+    :return: config_read
+    """
     if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
         log.logger.info('已存在config文件')
         try:
@@ -101,12 +110,12 @@ def read_config_json():
                         log.logger.error('写入config文件失败')
                         log.logger.error(e)
                         f.close()
-                                
+
         except Exception as e:
             log.logger.error('读取config文件失败')
             log.logger.error(e)
-    
-    
+
+
     else:
         if find_file.find_files_with_existence_and_create(program_info.work_path + program_info.program_config):
                 with open(program_info.work_path + program_info.program_config, "w") as f:

@@ -2,12 +2,17 @@ from bin.export import program_info
 from bin.export import log
 
 def examine_eula(server_info):
+    """
+    检查eula协议
+    :param server_info: 服务器信息
+    """
     try:
         with open(server_info['server_path'] + program_info.server_eula, 'r') as f:
             lines = f.readlines()
         with open(server_info['server_path'] + program_info.server_eula, 'w') as f:
             for line in lines:
                 if 'eula=true' in line:
+                    f.write(line)
                     log.logger.info('eula协议已同意')
                     server_info['start_count'] += 1
                     break

@@ -18,18 +18,22 @@ class PCSMT2(Cmd):
     intro = "欢迎使用PCSMT2"
     prompt = "PCSMT2>"
 
+    # 版本号
     def do_version(self, arg):
         """查看版本号\nCommand: version"""
         introduction.Version()
 
+    # 关于
     def do_about(self, arg):
         """查看介绍\nCommand: about"""
         introduction.Homepage()
 
+    # 打开文件或目录
     def do_sta(self, file_path):
         """打开文件或目录\nCommand: sta <file_path>"""
         start.start_file(file_path)
 
+    # 添加服务器
     def do_add_server(self, arg):
         """添加服务器\nCommand: add_server <server_path> <server_name>"""
         try:
@@ -39,6 +43,7 @@ class PCSMT2(Cmd):
             return
         server.add_server(server_path, server_name, False)
 
+    # 启动服务器
     def do_start_server(self, arg):
         """启动服务器\nCommand: start_server <server_name>"""
         try:
@@ -48,10 +53,12 @@ class PCSMT2(Cmd):
             return
         server.start_server(server_name)
 
+    # 查看服务器列表
     def do_server_list(self, arg):
         """查看服务器列表\nCommand: server_list"""
         server.server_list()
 
+    # 修改服务器属性
     def do_change_server_properties(self, arg):
         """修改服务器属性\nCommand: change_server_properties <server_name> <keyword> <argument>"""
         try:
@@ -61,6 +68,7 @@ class PCSMT2(Cmd):
             return
         server.change_server_properties(server_name, keyword, argument)
 
+    # 修改服务器启动内存
     def do_change_server_run_memories_config(self, arg):
         """修改写入服务器启动脚本默认使用运行内存\nCommand: change_server_run_memories_config <memories_min> <memories_max>"""
         try:
@@ -78,6 +86,7 @@ class PCSMT2(Cmd):
             return
         program.change_server_run_memories_config(argument_min, argument_max)
 
+    # 查看服务器插件列表
     def do_server_mods(self, arg):
         """查看服务器插件列表\nCommand: server_mods <server_name>"""
         try:
@@ -87,6 +96,7 @@ class PCSMT2(Cmd):
             return
         server.open_server_mod_and_plugins_folder(server_name)
 
+    # 重写服务器启动脚本
     def do_server_start_batch_rewrite_run_memories(self, arg):
         """重写服务器启动脚本\nCommand: server_start_batch_rewrite_run_memories <server_name> <memories_min> <memories_max>"""
         try:
@@ -103,6 +113,7 @@ class PCSMT2(Cmd):
             return
         server.server_start_batch_rewrite_run_memories(server_name, memories_min, memories_max)
 
+    # 修改服务器启动nogui
     def do_change_server_start_nogui(self, arg):
         """修改服务器启动nogui\nCommand: change_server_start_nogui <true/false>"""
         try:
@@ -115,6 +126,7 @@ class PCSMT2(Cmd):
             return
         program.change_server_start_nogui(argument)
 
+    # 下载服务器核心
     def do_download_server_core(self, arg):
         """下载服务器核心\nCommand: download_server_core <server_name> <core_type> <game_version>"""
         try:
@@ -124,6 +136,7 @@ class PCSMT2(Cmd):
             return
         server.download_server_core(server_name, core_type, core_support_version)
 
+    # 修改等待服务器eula生成时间
     def do_change_wait_server_eula_generate_time(self, arg):
         """修改等待服务器eula生成时间\nCommand: change_wait_server_eula_generate_time <time>"""
         try:
@@ -136,6 +149,7 @@ class PCSMT2(Cmd):
             return
         program.change_wait_server_eula_generate_time(argument)
 
+    # 删除服务器
     def do_delete_server(self, arg):
         """删除服务器\nCommand: delete_server <server_name>"""
         try:
@@ -145,6 +159,7 @@ class PCSMT2(Cmd):
             return
         server.delete_server(server_name)
 
+    # 搜索服务器
     def do_search_server(self, arg):
         """搜索服务器\nCommand: search_server <server_name>"""
         try:
@@ -154,6 +169,29 @@ class PCSMT2(Cmd):
             return
         server.search_server(server_name)
 
+    # 封禁玩家或ip
+    def do_banned(self, arg):
+        """封禁玩家或ip\nCommand: banned <players / ips> <server_name> <player_name / ip>"""
+        try:
+            players_or_ips, server_name, player_name_or_ip = arg.split()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        if players_or_ips == "ips":
+            server.banned_ip(server_name, player_name_or_ip)
+        if players_or_ips == "players":
+            server.banned_player(server_name, player_name_or_ip)
+    def complete_banned(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+
+        if arg_counts == 1:
+            types = ['ips', 'players']
+            return [type for type in types if type.startswith(text)]
+        elif arg_counts == 2:
+            return [list for list in program_info.server_list if list.startswith(text)]
+
+    # 退出控制台
     def do_exit(self, arg):
         """退出控制台\nCommand: exit"""
         log.logger.info("再见！")
