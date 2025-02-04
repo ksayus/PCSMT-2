@@ -2,14 +2,21 @@ import json
 import requests
 import os
 import sys
+import certifi
+import urllib3
 from bin.export import log
 from bin.export import program_info
-from packaging import version  
+from packaging import version
 def update_program_github():
+    """
+    检查更新-github
+    :return: bool
+    """
     # 检查更新
     log.logger.info("正在检查更新...")
     try:
-        response = requests.get(program_info.github_repository)
+        urllib3.disable_warnings()
+        response = requests.get(program_info.github_repository, verify=False)
         response_json = response.json()
         latest_version_str = response_json['tag_name']
         latest_version = response_json['name']
@@ -50,22 +57,26 @@ def update_program_github():
                     log.logger.error("获取更新信息失败，请检查网络连接。")
                     log.logger.error(e)
                     return False
-                    
+
             else:
                 log.logger.info("当前版本已是最新版本，无需更新。")
                 return
-            
+
         except Exception as e:
             log.logger.error("版本号解析失败，请检查版本号格式。")
             log.logger.error(e)
             return False
-            
+
     except requests.exceptions.RequestException as e:
         log.logger.error("网络连接失败，请检查网络连接。")
         log.logger.error(e)
         return False
-    
+
 def update_program_gitee():
+    """
+    检查更新-gitee
+    :return: bool
+    """
     # 检查更新
     log.logger.info("正在检查更新...")
     try:
@@ -83,7 +94,7 @@ def update_program_gitee():
 
             v1 = version.parse(program_info.config['PCSMTVersion'])
             v2 = version.parse(latest_version_str)
-        
+
             if v1 == v2:
                 log.logger.info("当前版本已是最新版本，无需更新。")
                 return
@@ -102,7 +113,7 @@ def update_program_gitee():
                     if download_url is None:
                         log.logger.error("未找到匹配的 .exe 文件，请检查版本信息。")
                         return False
-                    
+
                     log.logger.info("尝试更新...")
                     log.logger.info("正在下载文件...")
                     log.logger.debug("下载url:" + download_url)
@@ -120,16 +131,16 @@ def update_program_gitee():
                     log.logger.error("获取更新信息失败，请检查网络连接。")
                     log.logger.error(e)
                     return False
-                
+
             else:
                 log.logger.info("当前版本已是最新版本，无需更新。")
                 return
-            
+
         except Exception as e:
             log.logger.error("版本号解析失败，请检查版本号格式。")
             log.logger.error(e)
             return False
-            
+
     except requests.exceptions.RequestException as e:
         log.logger.error("网络连接失败，请检查网络连接。")
         log.logger.error(e)
