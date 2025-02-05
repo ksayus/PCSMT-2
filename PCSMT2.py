@@ -42,6 +42,14 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.add_server(server_path, server_name, False)
+    def complete_delete_server(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+
+        if arg_counts == 1:
+            return self.path_complete(text, line, begidx, endidx)
+        elif arg_counts == 2:
+            return [list for list in program_info.server_list if list.startswith(text)]
 
     # 启动服务器
     def do_start_server(self, arg):
@@ -52,6 +60,12 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.start_server(server_name)
+    def complete_start_server(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
 
     # 查看服务器列表
     def do_server_list(self, arg):
@@ -67,6 +81,14 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.change_server_properties(server_name, keyword, argument)
+    def complete_change_server_properties(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
+        elif arg_counts == 2:
+            return [list for list in program_info.properties_keyword if list.startswith(text)]
 
     # 修改服务器启动内存
     def do_change_server_run_memories_config(self, arg):
@@ -95,6 +117,12 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.open_server_mod_and_plugins_folder(server_name)
+    def complete_server_mods(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
 
     # 重写服务器启动脚本
     def do_server_start_batch_rewrite_run_memories(self, arg):
@@ -112,6 +140,12 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.server_start_batch_rewrite_run_memories(server_name, memories_min, memories_max)
+    def complete_server_start_batch_rewrite_run_memories(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
 
     # 修改服务器启动nogui
     def do_change_server_start_nogui(self, arg):
@@ -125,6 +159,12 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         program.change_server_start_nogui(argument)
+    def complete_change_server_start_nogui(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_count = len(arg)
+
+        if arg_count == 1:
+            return ['true', 'false']
 
     # 下载服务器核心
     def do_download_server_core(self, arg):
@@ -135,6 +175,17 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.download_server_core(server_name, core_type, core_support_version)
+    def complete_download_server_core(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_count = len(arg)
+
+        if arg_count == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
+        elif arg_count == 2:
+            return ['fabric', 'forge', 'official', 'mohist']
+        elif arg_count == 3:
+            return [list for list in program_info.minecraft_version if list.startswith(text)]
+
 
     # 修改等待服务器eula生成时间
     def do_change_wait_server_eula_generate_time(self, arg):
@@ -158,6 +209,12 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.delete_server(server_name)
+    def complete_delete_server(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
 
     # 搜索服务器
     def do_search_server(self, arg):
@@ -168,6 +225,12 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.search_server(server_name)
+    def complete_search_server(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
 
     # 封禁玩家或ip
     def do_banned(self, arg):
@@ -190,6 +253,59 @@ class PCSMT2(Cmd):
             return [type for type in types if type.startswith(text)]
         elif arg_counts == 2:
             return [list for list in program_info.server_list if list.startswith(text)]
+
+    # 解封玩家或ip
+    def do_unban(self, arg):
+        """解封玩家或ip\nCommand: unban <players / ips> <server_name> <player_name / ip>"""
+        try:
+            players_or_ips, server_name, player_name_or_ip = arg.split()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        if players_or_ips == "ips":
+            server.unban_ip(server_name, player_name_or_ip)
+        elif players_or_ips == "players":
+            server.unban_player(server_name, player_name_or_ip)
+    def complete_unban(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+
+        if arg_counts == 1:
+            types = ['ips', 'players']
+            return [type for type in types if type.startswith(text)]
+        elif arg_counts == 2:
+            return [list for list in program_info.server_list if list.startswith(text)]
+
+    # 添加OP玩家
+    def do_op(self, arg):
+        """添加OP玩家\nCommand: op <server_name> <player_name>"""
+        try:
+            server_name, player_name = arg.split()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        server.op(server_name, player_name)
+    def complete_op(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
+
+    # 删除OP玩家
+    def do_deop(self, arg):
+        """删除OP玩家\nCommand: deop <server_name> <player_name>"""
+        try:
+            server_name, player_name = arg.split()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        server.deop(server_name, player_name)
+    def complete_deop(self,text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
+
 
     # 退出控制台
     def do_exit(self, arg):

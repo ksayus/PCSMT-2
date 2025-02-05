@@ -5,6 +5,7 @@ from bin.find_files import find_file
 from bin.find_files import find_folder
 from bin.export import log
 from bin.export import init
+from bin.export import get
 
 server_start_batch = '\start.bat'
 server_save_path = '\saves'
@@ -18,6 +19,7 @@ program_server_folder = '\servers'
 
 banned_player = '/banned-players.json'
 banned_ip = '/banned-ips.json'
+op = '/ops.json'
 
 forge_server_start_batch_default_name = '/run.bat'
 forge_server_JVM_args = '@user_jvm_args.txt'
@@ -38,6 +40,8 @@ work_path = os.getcwd()
 
 
 server_list = server.server_list()
+minecraft_version = get.get_minecraft_version()
+properties_keyword = get.get_properties_keyword()
 
 
 banned_players ={
@@ -57,8 +61,15 @@ banned_ips = {
     "reason": "Banned by PCSMT-2"
 }
 
+ops = {
+    "uuid": "",
+    "name": "",
+    "level": 4,
+    "bypassesPlayerLimit": False
+}
+
 config = {
-            "PCSMTVersion": "1.0.5",
+            "PCSMTVersion": "1.0.6",
             "default_server_run_memories_min": 1024,
             "default_server_run_memories_max": 2048,
             "server_start_nogui": True,
