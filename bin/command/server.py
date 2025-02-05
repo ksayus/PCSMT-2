@@ -75,7 +75,11 @@ def add_server(server_path, server_name, rewrite):
                             f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
                     else:
                         f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
+<<<<<<< HEAD
                     if program_info.server_start_nogui == "true":
+=======
+                    if program_info.server_start_nogui == "false":
+>>>>>>> 376e9cb (updated20250206_xk)
                         f.write(' -nogui')
                     else:
                         f.write('')
@@ -308,6 +312,10 @@ def download_server_core(server_name, core_type, core_support_version):
             log.logger.info('创建服务器成功！')
             log.logger.info('正在添加服务器...')
             add_server(save_core_path, server_name, True)
+<<<<<<< HEAD
+=======
+            program_info.server_list = server_list()
+>>>>>>> 376e9cb (updated20250206_xk)
         else:
             log.logger.error('创建服务器失败！')
             return
