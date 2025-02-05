@@ -1,4 +1,19 @@
+<<<<<<< HEAD
 from bin.export import log
+=======
+#检查Java是否安装
+import os
+from bin.export import examin
+from bin.export import log
+java_exist = examin.examin_java_exist()
+if java_exist:
+    log.logger.info('Java已安装')
+else:
+    log.logger.error('Java未安装')
+    log.logger.info('请安装Java!')
+    os.exit()
+
+>>>>>>> 376e9cb (updated20250206_xk)
 from bin.export import program_info
 from bin.introduction import introduction
 from bin.command import start
@@ -42,7 +57,11 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.add_server(server_path, server_name, False)
+<<<<<<< HEAD
     def complete_delete_server(self, text, line, begidx, endidx):
+=======
+    def complete_add_server(self, text, line, begidx, endidx):
+>>>>>>> 376e9cb (updated20250206_xk)
         arg = line.split()[1:]
         arg_counts = len(arg)
 
