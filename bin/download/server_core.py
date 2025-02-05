@@ -20,7 +20,7 @@ def download_server_core(server_name, core_type, core_support_version):
             time.sleep(3)
             try:
                 log.logger.info('正在下载Fabric核心...')
-                os.system('java -jar ' + program_info.work_path + program_info.fabric_core_installation + ' server -mcversion ' + core_support_version + ' -downloadMinecraft -dir "' + program_info.work_path + program_info.program_server_folder + '\\' + server_name + '"')
+                os.system('powershell java -jar ' + program_info.work_path + program_info.fabric_core_installation + ' server -mcversion ' + core_support_version + ' -downloadMinecraft -dir "' + program_info.work_path + program_info.program_server_folder + '\\' + server_name + '"')
                 core_path_default = Path(program_info.work_path + program_info.program_server_folder + '\\' + server_name + program_info.fabric_core_default_name)
                 if core_path_default.exists():
                     core_path_default.rename(program_info.work_path + program_info.program_server_folder + '\\' + server_name + '\\' + server_name + '.jar')

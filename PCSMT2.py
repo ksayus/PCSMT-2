@@ -179,10 +179,9 @@ class PCSMT2(Cmd):
         arg = line.split()[1:]
         arg_count = len(arg)
 
-        if arg_count == 1:
-            return [list for list in program_info.server_list if list.startswith(text)]
-        elif arg_count == 2:
-            return ['fabric', 'forge', 'official', 'mohist']
+        if arg_count == 2:
+            core_type = ['fabric', 'forge', 'official', 'mohist']
+            return [list for list in core_type if list.startswith(text)]
         elif arg_count == 3:
             return [list for list in program_info.minecraft_version if list.startswith(text)]
 

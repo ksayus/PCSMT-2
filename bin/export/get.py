@@ -1,4 +1,6 @@
 import requests
+import json
+import urllib3
 from bin.export import log
 
 def get_minecraft_version():
@@ -6,17 +8,18 @@ def get_minecraft_version():
     获取Minecraft所有版本
     :return: Minecraft所有版本
     """
-    url = "https://launchermeta.mojang.com/mc/game/version_manifest.json"
     log.logger.info("获取Minecraft版本...")
+    version_list = []
     try:
-        response = requests.get(url)
+        response = requests.get('https://launchermeta.mojang.com/mc/game/version_manifest.json')
         for version in response.json()["versions"]:
-            versions = version["id"]
-    except requests.exceptions.RequestException as e:
+            version_list.append(version["id"])
+        log.logger.debug('Minecraft版本:' + json.dumps(version_list))
+        return version_list
+    except Exception as e:
         log.logger.error("获取Minecraft版本失败，请检查网络连接！")
         log.logger.error(e)
         return
-    return versions
 
 def get_properties_keyword():
     """
