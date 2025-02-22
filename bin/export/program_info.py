@@ -7,6 +7,8 @@ from bin.export import log
 from bin.export import init
 from bin.export import get
 
+program_name = 'PCSMT2'
+
 server_start_batch = '\start.bat'
 server_save_path = '\saves'
 server_eula = '\eula.txt'
@@ -84,16 +86,22 @@ config = {
 
 program_config_read = {
     "PCSMTVersion": "",
+    "Release_Version": "",
     "default_server_run_memories_min": 0,
     "default_server_run_memories_max": 0,
     "server_start_nogui": False,
-    "wait_server_eula_generate_time": 0
+    "wait_server_eula_generate_time": 0,
+    "Automatic_startup": False,
+    "Auto_Update_Source": ""
 }
 
 program_config_read = init.read_config_json()
 
 PCSMTVersion = program_config_read['PCSMTVersion']
+Release_Version = program_config_read['Release_Version']
 default_server_run_memories_min = program_config_read['default_server_run_memories_min']
 default_server_run_memories_max = program_config_read['default_server_run_memories_max']
 server_start_nogui = program_config_read['server_start_nogui']
 wait_server_eula_generate_time = program_config_read['wait_server_eula_generate_time']
+Automatic_startup = program_config_read['Automatic_startup']
+Auto_Update_Source = program_config_read['Auto_Update_Source']

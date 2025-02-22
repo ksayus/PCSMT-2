@@ -4,23 +4,34 @@ from bin.export import program_info
 from bin.export import get_time
 from bin.export import log
 from bin.download import update
+from bin.command import program
 import json
+import sys
 
 def init_program():
     """
     初始化程序
     """
-    result = update.update_program_github()
-    if result == 0:
-        log.logger.info("GitHub 更新失败,尝试 Gitee 更新...")
-        result = update.update_program_gitee()
+    try:
+        result = update.update_program_github()
         if result == 0:
-            log.logger.info("无法完成自动更新,请手动更新!")
-    find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.server_save_path)
-    find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_logs)
-    find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_server_folder)
+            log.logger.info("GitHub 更新失败,尝试 Gitee 更新...")
+            result = update.update_program_gitee()
+            if result == 0:
+                log.logger.info("无法完成自动更新,请手动更新!")
+        if program_info.Automatic_startup == True:
+            program.add_to_startup(program_info.program_name)
+        elif program_info.Automatic_startup == False:
+            program.remove_from_startup(program_info.program_name)
+        find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.server_save_path)
+        find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_logs)
+        find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_server_folder)
 
-    introduction.Homepage()
+        introduction.Homepage()
+    except Exception as e:
+        log.logger.error('初始化程序失败！')
+        log.logger.error(e)
+        sys.exit()
 
 def read_config_json():
     """
@@ -58,12 +69,19 @@ def read_config_json():
 
                     #Release_Version
                     if not 'Release_Version' in config_read:
-                        log.logger.warning('config文件已存在，但发布版本关键字不存在')
-                        log.logger.info('写入发布版本')
+                        log.logger.warning('config文件已存在，但不存在版本号关键字')
+                        log.logger.info('写入版本号')
                         config_read['Release_Version'] = program_info.config['Release_Version']
                     else:
                         if config_read['Release_Version'] == None:
-                            log.logger.warning('config文件已存在，但发布版本未设置')
+                            log.logger.warning('config文件已存在，但版本号未设置')
+                            log.logger.info('写入版本号')
+                            config_read['Release_Version'] = program_info.config['Release_Version']
+                        else:
+                            if config_read['Release_Version'] != program_info.config['Release_Version']:
+                                log.logger.warning('config文件已存在，但版本号不匹配')
+                                log.logger.info('写入版本号')
+                                config_read['Release_Version'] = program_info.config['Release_Version']
 
                     #default_server_run_memories_min
                     if not 'default_server_run_memories_min' in config_read:

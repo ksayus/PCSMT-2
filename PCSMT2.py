@@ -175,7 +175,8 @@ class PCSMT2(Cmd):
         arg_count = len(arg)
 
         if arg_count == 1:
-            return ['true', 'false']
+            types = ['true', 'false']
+            return [type for type in types if type.startswith(text)]
 
     # 下载服务器核心
     def do_download_server_core(self, arg):
@@ -317,7 +318,7 @@ class PCSMT2(Cmd):
             return [list for list in program_info.server_list if list.startswith(text)]
 
     def do_stop_server(self, arg):
-        """停止服务器\nCommand: stop_server <server_name>"""        
+        """停止服务器\nCommand: stop_server <server_name>"""
         try:
             server_name = arg.strip()
         except ValueError:
@@ -329,6 +330,21 @@ class PCSMT2(Cmd):
         arg_counts = len(arg)
         if arg_counts == 1:
             return [list for list in program_info.server_list if list.startswith(text)]
+
+    def do_change_program_auto_startup(self, arg):
+        """修改程序自动启动\nCommand: change_program_auto_startup <True / False>"""
+        try:
+            argument = arg.strip()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        program.change_program_auto_startup(argument)
+    def complete_change_program_auto_startup(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+        if arg_counts == 1:
+            types = ['true', 'false']
+            return [type for type in types if type.startswith(text)]
 
     # 退出控制台
     def do_exit(self, arg):
