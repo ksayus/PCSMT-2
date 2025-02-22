@@ -56,6 +56,18 @@ def read_config_json():
                                 log.logger.info('写入版本号')
                                 config_read['PCSMTVersion'] = program_info.config['PCSMTVersion']
 
+<<<<<<< HEAD
+                    #Release_Version
+                    if not 'Release_Version' in config_read:
+                        log.logger.warning('config文件已存在，但发布版本关键字不存在')
+                        log.logger.info('写入发布版本')
+                        config_read['Release_Version'] = program_info.config['Release_Version']
+                    else:
+                        if config_read['Release_Version'] == None:
+                            log.logger.warning('config文件已存在，但发布版本未设置')
+
+=======
+>>>>>>> 1103e69 (updated20250206_xk)
                     #default_server_run_memories_min
                     if not 'default_server_run_memories_min' in config_read:
                         log.logger.warning('config文件已存在，但最小内存关键字不存在')
@@ -100,6 +112,32 @@ def read_config_json():
                             log.logger.info('写入等待eula生成时间参数为默认值')
                             config_read['wait_server_eula_generate_time'] = program_info.config['wait_server_eula_generate_time']
 
+<<<<<<< HEAD
+                    #Automatic_startup
+                    if not 'Automatic_startup' in config_read:
+                        log.logger.warning('config文件已存在，但自动启动关键字不存在')
+                        log.logger.info('写入自动启动参数为True')
+                        config_read['Automatic_startup'] = program_info.config['Automatic_startup']
+                    else:
+                        if config_read['Automatic_startup'] == None:
+                            log.logger.warning('config文件已存在，但自动启动未设置')
+                            log.logger.info('写入自动启动参数为True')
+                            config_read['Automatic_startup'] = program_info.config['Automatic_startup']
+
+                    #Auto_Update_Source
+                    if not 'Auto_Update_Source' in config_read:
+                        log.logger.warning('config文件已存在，但自动更新源关键字不存在')
+                        log.logger.info('写入自动更新源参数为Github')
+                        config_read['Auto_Update_Source'] = program_info.config['Auto_Update_Source']
+                    else:
+                        if config_read['Auto_Update_Source'] == None:
+                            log.logger.warning('config文件已存在，但自动更新源未设置')
+                            log.logger.info('写入自动更新源参数为Github')
+                            config_read['Auto_Update_Source'] = program_info.config['Auto_Update_Source']
+
+
+=======
+>>>>>>> 1103e69 (updated20250206_xk)
 
                     try:
                         with open(program_info.work_path + program_info.program_config, "w") as f:

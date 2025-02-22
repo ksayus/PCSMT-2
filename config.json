@@ -1,7 +1,10 @@
 {
-    "PCSMTVersion": "1.0.6",
+    "PCSMTVersion": "1.0.7",
     "default_server_run_memories_min": 1024,
     "default_server_run_memories_max": 2048,
-    "server_start_nogui": "false",
-    "wait_server_eula_generate_time": 15
+    "server_start_nogui": "true",
+    "wait_server_eula_generate_time": 15,
+    "Release_Version": "Debug",
+    "Automatic_startup": true,
+    "Auto_Update_Source": "Github"
 }

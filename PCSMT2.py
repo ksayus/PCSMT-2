@@ -1,8 +1,6 @@
-<<<<<<< HEAD
-from bin.export import log
-=======
 #检查Java是否安装
 import os
+import sys
 from bin.export import examin
 from bin.export import log
 java_exist = examin.examin_java_exist()
@@ -11,9 +9,8 @@ if java_exist:
 else:
     log.logger.error('Java未安装')
     log.logger.info('请安装Java!')
-    os.exit()
+    sys.exit(0)
 
->>>>>>> 376e9cb (updated20250206_xk)
 from bin.export import program_info
 from bin.introduction import introduction
 from bin.command import start
@@ -25,7 +22,6 @@ from bin.command import program
 from bin.export import init
 from cmd2 import Cmd
 import json
-import sys
 
 init.init_program()
 
@@ -57,11 +53,7 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.add_server(server_path, server_name, False)
-<<<<<<< HEAD
-    def complete_delete_server(self, text, line, begidx, endidx):
-=======
     def complete_add_server(self, text, line, begidx, endidx):
->>>>>>> 376e9cb (updated20250206_xk)
         arg = line.split()[1:]
         arg_counts = len(arg)
 
@@ -318,12 +310,25 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         server.deop(server_name, player_name)
-    def complete_deop(self,text, line, begidx, endidx):
+    def complete_deop(self, text, line, begidx, endidx):
         arg = line.split()[1:]
         arg_counts = len(arg)
         if arg_counts == 1:
             return [list for list in program_info.server_list if list.startswith(text)]
 
+    def do_stop_server(self, arg):
+        """停止服务器\nCommand: stop_server <server_name>"""        
+        try:
+            server_name = arg.strip()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        server.stop_server(server_name)
+    def complete_stop_server(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
 
     # 退出控制台
     def do_exit(self, arg):

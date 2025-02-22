@@ -12,6 +12,7 @@ from bin.export import log
 from bin.export import examin_json_argument
 from bin.download import server_core
 from bin.export import get_time
+from bin.export import rcon
 def add_server(server_path, server_name, rewrite):
     """
     添加服务器
@@ -75,14 +76,11 @@ def add_server(server_path, server_name, rewrite):
                             f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
                     else:
                         f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
-<<<<<<< HEAD
-                    if program_info.server_start_nogui == "true":
-=======
                     if program_info.server_start_nogui == "false":
->>>>>>> 376e9cb (updated20250206_xk)
                         f.write(' -nogui')
                     else:
                         f.write('')
+                    f.write('\n' + 'exit')
                     f.close()
             except Exception as e:
                 log.logger.error('创建服务器启动批处理文件失败!')
@@ -154,6 +152,19 @@ def start_server(server_name):
             log.logger.error('读取服务器信息文件失败!')
             log.logger.error(e)
             return
+        #设置服务器rcon端口
+        try:
+            if server_info['start_count'] == 0:
+                log.logger.warning('服务器从未启动,无法找到server.properties文件！')
+            elif server_info['start_count'] == 1:
+                if find_file.find_files_with_existence(server_info['server_path'] + program_info.server_properties):
+                    log.logger.info('已找到server.properties文件！')
+                    log.logger.info('正在设置rcon端口...')
+                    port = rcon.set_rcon(server_info)
+        except Exception as e:
+            log.logger.error('设置rcon端口失败!')
+            log.logger.error(e)
+            return
         try:
             start.start_file(server_info['server_start_batch_path'])
         except Exception as e:
@@ -162,6 +173,7 @@ def start_server(server_name):
             return
         log.logger.info('启动服务器成功！')
         log.logger.info('当前启动服务器:' + server_name)
+        time.sleep(20)
         if server_info['start_count'] == 0:
             log.logger.info("服务器第一次启动，请等待服务器启动完成！")
             time.sleep(program_info.wait_server_eula_generate_time)
@@ -312,10 +324,7 @@ def download_server_core(server_name, core_type, core_support_version):
             log.logger.info('创建服务器成功！')
             log.logger.info('正在添加服务器...')
             add_server(save_core_path, server_name, True)
-<<<<<<< HEAD
-=======
             program_info.server_list = server_list()
->>>>>>> 376e9cb (updated20250206_xk)
         else:
             log.logger.error('创建服务器失败！')
             return
@@ -678,6 +687,43 @@ def deop(server_name, player_name):
                 log.logger.error('读取服务器信息文件失败！')
                 log.logger.error(e)
                 return
+    except Exception as e:
+        log.logger.error('读取服务器信息文件失败！')
+        log.logger.error(e)
+        return
+
+def stop_server(server_name):
+    """
+    停止服务器
+    :param server_name: 服务器名称
+    """
+    log.logger.info('查找服务器...')
+    try:
+        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        if server_info == False:
+            log.logger.error('未找到服务器，请检查服务器名称是否正确！')
+            return
+        else:
+            log.logger.info('已找到服务器:' + server_info['server_path'])
+            port = rcon.rcon_port(server_info)
+            if port != None:
+                try:
+                    server_command = rcon.connect_rcon(port)
+                except Exception as e:
+                    log.logger.error('链接rcon失败!')
+                    log.logger.error(e)
+                    return
+                time.sleep(1)
+                try:
+                    server_command.connect()
+                    response = server_command.command('/stop')
+                    log.logger.info('发送命令：stop')
+                    log.logger.info(response)
+                    server_command.disconnect()
+                except Exception as e:
+                    log.logger.error('发送命令失败！')
+                    log.logger.error(e)
+                    return
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)

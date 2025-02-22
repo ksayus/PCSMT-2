@@ -9,7 +9,11 @@ from bin.export import program_info
 from packaging import version
 def update_program_github():
     """
+<<<<<<< HEAD
+    检查更新 github
+=======
     检查更新-github
+>>>>>>> 1103e69 (updated20250206_xk)
     :return: bool
     """
     # 检查更新
@@ -74,7 +78,11 @@ def update_program_github():
 
 def update_program_gitee():
     """
+<<<<<<< HEAD
+    检查更新 gitee
+=======
     检查更新-gitee
+>>>>>>> 1103e69 (updated20250206_xk)
     :return: bool
     """
     # 检查更新
