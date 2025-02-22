@@ -56,7 +56,6 @@ def read_config_json():
                                 log.logger.info('写入版本号')
                                 config_read['PCSMTVersion'] = program_info.config['PCSMTVersion']
 
-<<<<<<< HEAD
                     #Release_Version
                     if not 'Release_Version' in config_read:
                         log.logger.warning('config文件已存在，但发布版本关键字不存在')
@@ -66,8 +65,6 @@ def read_config_json():
                         if config_read['Release_Version'] == None:
                             log.logger.warning('config文件已存在，但发布版本未设置')
 
-=======
->>>>>>> 1103e69 (updated20250206_xk)
                     #default_server_run_memories_min
                     if not 'default_server_run_memories_min' in config_read:
                         log.logger.warning('config文件已存在，但最小内存关键字不存在')
@@ -112,7 +109,6 @@ def read_config_json():
                             log.logger.info('写入等待eula生成时间参数为默认值')
                             config_read['wait_server_eula_generate_time'] = program_info.config['wait_server_eula_generate_time']
 
-<<<<<<< HEAD
                     #Automatic_startup
                     if not 'Automatic_startup' in config_read:
                         log.logger.warning('config文件已存在，但自动启动关键字不存在')
@@ -136,8 +132,6 @@ def read_config_json():
                             config_read['Auto_Update_Source'] = program_info.config['Auto_Update_Source']
 
 
-=======
->>>>>>> 1103e69 (updated20250206_xk)
 
                     try:
                         with open(program_info.work_path + program_info.program_config, "w") as f:

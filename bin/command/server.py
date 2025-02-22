@@ -617,7 +617,7 @@ def unban_ip(server_name, player_ip):
                             log.logger.info('删除信息:' + json.dumps(banned_ip, indent=4))
                             banned_ips.remove(banned_ip)
                             log.logger.info('读取并写入信息')
-                            log.logger.info('尝试写入' + program_info.banned_ip + '文件...')    
+                            log.logger.info('尝试写入' + program_info.banned_ip + '文件...')
                             try:
                                 with open(server_info['server_path'] + program_info.banned_ip, 'w', encoding='utf-8') as f:
                                     json.dump(banned_ips, f, indent=4)

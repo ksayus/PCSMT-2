@@ -36,12 +36,9 @@ mohist_core_default_name = '/mohist-server.jar'
 github_repository = "https://api.github.com/repos/ksayus/PCSMT-2/releases/latest"
 gitee_repository = "https://gitee.com/api/v5/repos/ksayus/PCSMT-2/releases/latest?access_token=7a91263148087aa5e2c9447297fa04b1"
 
-<<<<<<< HEAD
 rcon_password = 'pcsmt2'
 rcon_localhost = 'localhost'
 
-=======
->>>>>>> 1103e69 (updated20250206_xk)
 work_path = os.getcwd()
 
 
@@ -75,7 +72,6 @@ ops = {
 }
 
 config = {
-<<<<<<< HEAD
             "PCSMTVersion": "1.0.7",
             "Release_Version": "Beta",
             "default_server_run_memories_min": 1024,
@@ -84,13 +80,6 @@ config = {
             "wait_server_eula_generate_time": 15,
             "Automatic_startup": True,
             "Auto_Update_Source": "Github"
-=======
-            "PCSMTVersion": "1.0.6",
-            "default_server_run_memories_min": 1024,
-            "default_server_run_memories_max": 2048,
-            "server_start_nogui": True,
-            "wait_server_eula_generate_time": 15
->>>>>>> 1103e69 (updated20250206_xk)
 }
 
 program_config_read = {
