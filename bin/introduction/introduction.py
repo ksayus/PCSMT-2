@@ -2,9 +2,9 @@ from bin.export import program_info
 
 ProgramName = "PCSMT (Plain Craft Server Management Terminal)"
 PowerBy = "Power by Ksayus"
-GithubPage = "--Github:\t\thttps://github.com/Ksayus/PCSMT"
-GiteePage = "--Gitee:\t\thttps://gitee.com/Ksayus/PCSMT"
-KsayusPage = "--Ksayus:\t\thttps://ksayus.github.io/2024/10/19/PCSMT/"
+GithubPage = "--Github:\t\thttps://github.com/Ksayus/PCSMT-2"
+GiteePage = "--Gitee:\t\thttps://gitee.com/Ksayus/PCSMT-2"
+KsayusPage = "--Ksayus:\t\thttps://ksayus.github.io/2025/01/30/PCSMT-2/"
 AuthorBilibiliPage = "--Bilibili:\t\thttps://space.bilibili.com/558271819"
 PersonalWebsite = "--Personal Website:\thttps://ksayus.github.io"
 

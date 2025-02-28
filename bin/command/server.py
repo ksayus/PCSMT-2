@@ -8,12 +8,29 @@ from bin.command import start
 from bin.export import eula
 from bin.export import log
 from bin.export import examin_json_argument
-def add_server(server_path, server_name):
+from bin.download import server_core
+def add_server(server_path, server_name, rewrite):
     server_core = find_file.find_files_with_extension(server_path, '.jar')
+    log.logger.info('找到服务器核心文件：' + str(server_core))
+    log.logger.info('总共' + str(len(server_core)) + '个文件')
     if len(server_core) == 0:
         log.logger.error('未找到服务器核心文件，请检查文件路径是否正确！')
         return
     else:
+        #若找到多个核心文件，排除server.jar文件,填入其他核心
+        if len(server_core) > 1:
+            for i in range(len(server_core)):
+                exclude_keywords = {
+                    'server.jar', 'com', 'commons-io', 'cpw', 'de', 'io',
+                    'it', 'org', 'trove', 'java', 'jodah', 'mincraftforge',
+                    'minecrell', 'sf'
+                }
+    
+    # 筛选不包含任意关键词的元素
+                server_core = [
+                    item for item in server_core
+                    if not any(keyword in item for keyword in exclude_keywords)
+                ]
         server_core = server_core[0]
         log.logger.info('找到服务器核心文件：' + server_core)
         if find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.server_save_path):
@@ -26,7 +43,29 @@ def add_server(server_path, server_name):
             try:
                 with open(server_path + program_info.server_start_batch, 'w') as f:
                     f.write('cd ' + server_path + '\n')
-                    f.write('java -Xmx' + str(program_info.default_server_run_memories_min) + 'M -Xms' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core + ' nogui')
+                    if find_file.find_files_with_existence(server_path + program_info.server_start_batch):
+                        try:
+                            with open(server_path + program_info.forge_server_start_batch_default_name, 'r') as fi:
+                                log.logger.info('发现run.bat文件,开始读取...')
+                                server_start_command = None
+                                for line in fi:
+                                    if 'java' in line:
+                                        server_start_command = line.strip()
+                                        break
+                                if server_start_command is None:
+                                    log.logger.warning('未找到包含java的命令,请检查run.bat文件是否正确！')
+                                    f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core + ' nogui')
+                                else:
+                                    log.logger.info('读取服务器启动批处理文件成功!')
+                                    log.logger.info('服务器启动核心命令:' + server_start_command + '\n')
+                                    server_start_command = server_start_command.replace(program_info.forge_server_JVM_args, '-Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M')
+                                    f.write(server_start_command)
+                        except Exception as e:
+                            log.logger.error('服务器启动批处理文件读取失败!')
+                            log.logger.error(e)
+                            f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core + ' nogui')
+                        else:
+                            f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core + ' nogui')
                     if program_info.server_start_nogui == "true":
                         f.write(' -nogui')
                     else:
@@ -38,8 +77,35 @@ def add_server(server_path, server_name):
                 return
             
             if find_file.find_files_with_existence(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json'):
-                log.logger.warning('已存在同名服务器，请更换服务器名称！')
-                return
+                if rewrite == True:
+                    log.logger.warning('已存在同名服务器，尝试覆盖原信息！')
+                    try:
+                        with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r') as f:
+                            server_info = json.load(f)
+                            server_info_rewrite = {
+                                'server_name': server_info['server_name'],
+                                'start_count': server_info['start_count'],
+                                'server_core': server_core,
+                                'server_path': server_path,
+                                'server_start_batch_path': server_absolute_path
+                            }
+                            try:
+                                with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'w') as f:
+                                    json.dump(server_info, f, indent=4)
+                                    f.close()
+                            except Exception as e:
+                                log.logger.error('创建服务器信息文件失败!')
+                                log.logger.error(e)
+                                return
+                            f.close()
+                            log.logger.info('覆盖服务器信息成功！')
+                    except Exception as e:
+                        log.logger.error('读取服务器信息文件失败!')
+                        log.logger.error(e)
+                        return
+                else:
+                    log.logger.error('已存在同名服务器，请更换服务器名称！')
+                    return
             else:
                 if find_file.find_files_with_existence_and_create(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json'):
                     start_count = 0
@@ -81,7 +147,7 @@ def start_server(server_name):
         log.logger.info('当前启动服务器:' + server_name)
         if server_info['start_count'] == 0:
             log.logger.info("服务器第一次启动，请等待服务器启动完成！")
-            time.sleep(5)
+            time.sleep(15)
             if find_file.find_files_with_existence(server_info['server_path'] + program_info.server_eula):
                 log.logger.info('eula协议存在')
                 server_info = eula.examine_eula(server_info)
@@ -185,3 +251,29 @@ def server_start_batch_rewrite_run_memories(server_name, memory_min, memory_max)
             log.logger.error('读取服务器启动批处理文件失败！')
             log.logger.error(e)
             return
+        
+def download_server_core(server_name, core_type, core_support_version):
+    try:
+        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        find_folder.find_folders_with_existence_and_create(server_info['server_path'])
+        if server_core.download_server_core(server_name, core_type, core_support_version):
+            log.logger.info('下载服务器核心成功！')
+            log.logger.info('正在修改服务器信息文件...')
+            add_server(server_info['server_path'], server_name, True)
+            return
+        else:
+            log.logger.error('下载服务器核心失败！')
+    except Exception as e:
+        log.logger.error('读取服务器信息文件失败！')
+        log.logger.error(e)
+        log.logger.warning('检测到服务器并未创建,创建服务器...')
+        save_core_path = program_info.work_path + program_info.program_server_folder + '/' + server_name
+        find_folder.find_folders_with_existence_and_create(save_core_path)
+        if server_core.download_server_core(server_name, core_type, core_support_version):
+            log.logger.info('创建服务器成功！')
+            log.logger.info('正在添加服务器...')
+            add_server(save_core_path, server_name, True)
+        else:
+            log.logger.error('创建服务器失败！')
+            return
+        return

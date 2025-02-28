@@ -13,6 +13,18 @@ server_properties = '\server.properties'
 program_config = '\config.json'
 server_mods_folder = '\mods'
 server_plugins_folder = '\plugins'
+program_server_folder = '\servers'
+
+forge_server_start_batch_default_name = '/run.bat'
+forge_server_JVM_args = '@user_jvm_args.txt'
+
+fabric_core_installation = '/bin/source/core_installation/fabric-installer.jar'
+forge_core_installation = '/bin/source/core_installation/forge-installer.jar'
+
+fabric_core_default_name = '/fabric-server-launch.jar'
+forge_core_default_name = '/forge-installer.jar'
+official_core_default_name = '/official_server_core.jar'
+
 work_path = os.getcwd()
 
 config = {

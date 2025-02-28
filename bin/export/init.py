@@ -6,8 +6,9 @@ from bin.export import log
 import json
 
 def init_program():
-    find_folder.find_folders_with_existence_and_create(program_info.work_path + "/saves")
+    find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.server_save_path)
     find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_logs)
+    find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_server_folder)
 
     find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_logs + '/' + str(get_time.this_year))
     find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_logs + '/' + str(get_time.this_year) + '/' + str(get_time.this_month))

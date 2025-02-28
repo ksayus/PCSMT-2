@@ -37,7 +37,7 @@ class PCSMT2(Cmd):
         except ValueError:
             log.logger.error('参数错误，请输入正确的参数！')
             return
-        server.add_server(server_path, server_name)
+        server.add_server(server_path, server_name, False)
 
     def do_start_server(self, arg):
         """启动服务器"""
@@ -114,12 +114,21 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             return
         program.change_server_start_nogui(argument)
+
+    def do_download_server_core(self, arg):
+        """下载服务器核心"""
+        try:
+            server_name, core_type, core_support_version = arg.split()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        server.download_server_core(server_name, core_type, core_support_version)
+
     def do_exit(self, arg):
         """退出控制台"""
         log.logger.info("再见！")
         log.logger.info("欢迎再次使用PCSMT 2")
         return True  # 返回True会退出命令行循环
-
 
 if __name__ == "__main__":
     console = PCSMT2()
