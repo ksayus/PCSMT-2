@@ -75,7 +75,7 @@ ops = {
 }
 
 config = {
-            "PCSMTVersion": "1.0.9",
+            "PCSMTVersion": "1.1.0",
             "Release_Version": "Beta",
             "default_server_run_memories_min": 1024,
             "default_server_run_memories_max": 2048,
