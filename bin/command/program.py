@@ -284,7 +284,7 @@ def Restart_Program(program_name):
         find_file.find_files_with_existence_and_create(program_info.work_path + program_info.delete_old_program)
         with open(program_info.work_path + program_info.delete_old_program, "w") as f:
             f.write("cd " + program_info.work_path + "\n")
-            f.write("rm " + program_info.program_name + '-v' + program_info.PCSMTVersion + ".exe" + "\n")
+            f.write("rmdir " + program_info.program_name + '-v' + program_info.PCSMTVersion + ".exe" + "\n")
             f.write("start " + program_name + ".exe" + "\n")
             f.write("exit")
             f.close()
