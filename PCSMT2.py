@@ -1,29 +1,39 @@
+from bin.export import Is_program_running
+
+Is_program_running.Is_program_running()
+
 #检查Java是否安装
 import os
 import sys
 from bin.export import examin
 from bin.export import log
+from bin.command import program
+
 java_exist = examin.examin_java_exist()
 if java_exist:
     log.logger.info('Java已安装')
 else:
     log.logger.error('Java未安装')
     log.logger.info('请安装Java!')
+    os.system('pause')
     sys.exit(0)
 
 from bin.export import program_info
+from bin.export import init
+
+init.init_program()
+
 from bin.introduction import introduction
 from bin.command import start
 from bin.command import server
 from bin.find_files import find_file
 from bin.find_files import find_folder
 from bin.export import numbers
-from bin.command import program
-from bin.export import init
+
 from cmd2 import Cmd
 import json
 
-init.init_program()
+
 
 class PCSMT2(Cmd):
     intro = "欢迎使用PCSMT2"

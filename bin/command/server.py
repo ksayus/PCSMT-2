@@ -87,6 +87,11 @@ def add_server(server_path, server_name, rewrite):
                 log.logger.error(e)
                 return
 
+            # 创建eula.txt文件
+            if find_file.find_files_with_existence_and_create(server_path + program_info.eula):
+                with open(server_path + program_info.eula, 'w') as f:
+                    f.write('eula=true')
+
             if find_file.find_files_with_existence(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json'):
                 if rewrite == True:
                     log.logger.warning('已存在同名服务器，尝试覆盖原信息！')
@@ -173,10 +178,10 @@ def start_server(server_name):
             return
         log.logger.info('启动服务器成功！')
         log.logger.info('当前启动服务器:' + server_name)
-        time.sleep(20)
+        time.sleep(2)
         if server_info['start_count'] == 0:
             log.logger.info("服务器第一次启动，请等待服务器启动完成！")
-            time.sleep(program_info.wait_server_eula_generate_time)
+            # time.sleep(program_info.wait_server_eula_generate_time)
             if find_file.find_files_with_existence(server_info['server_path'] + program_info.server_eula):
                 log.logger.info('eula协议存在')
                 server_info = eula.examine_eula(server_info)

@@ -7,6 +7,7 @@ import urllib3
 from bin.export import log
 from bin.export import program_info
 from packaging import version
+from bin.command import program
 def update_program_github():
     """
     检查更新 github
@@ -33,7 +34,7 @@ def update_program_github():
 
             if v1 == v2:
                 log.logger.info("当前版本已是最新版本，无需更新。")
-                return
+                return True
             elif v1 < v2:
                 log.logger.info("检测到新版本!")
                 log.logger.info("最新版本为：" + latest_version)
@@ -48,7 +49,9 @@ def update_program_github():
                         os.system('powershell curl -o "' + program_info.work_path + '/' + latest_version + '.exe' '" ' + download_url)
                         log.logger.info("文件下载成功。")
                         log.logger.info("请重启程序以完成更新。")
-                        sys.exit()
+                        program.Create_ShortCut(latest_version)
+                        program.Restart_Program(latest_version)
+                        return
                     except Exception as e:
                         log.logger.error("文件下载失败，请检查网络连接。")
                         log.logger.error(e)
@@ -74,11 +77,7 @@ def update_program_github():
 
 def update_program_gitee():
     """
-<<<<<<< HEAD
     检查更新 gitee
-=======
-    检查更新-gitee
->>>>>>> 1103e69 (updated20250206_xk)
     :return: bool
     """
     # 检查更新
@@ -101,7 +100,7 @@ def update_program_gitee():
 
             if v1 == v2:
                 log.logger.info("当前版本已是最新版本，无需更新。")
-                return
+                return True
             elif v1 < v2:
                 log.logger.info("检测到新版本!")
                 log.logger.info("最新版本为：" + latest_version)
@@ -126,7 +125,9 @@ def update_program_gitee():
                         os.system('powershell curl -o ' + program_info.work_path + '/' + latest_version + '.exe ' + download_url)
                         log.logger.info("文件下载成功。")
                         log.logger.info("请重启程序以完成更新。")
-                        sys.exit()
+                        program.Create_ShortCut(latest_version)
+                        program.Restart_Program(latest_version)
+                        return
                     except Exception as e:
                         log.logger.error("文件下载失败，请检查网络连接。")
                         log.logger.error(e)

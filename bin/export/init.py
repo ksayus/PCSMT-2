@@ -13,12 +13,21 @@ def init_program():
     初始化程序
     """
     try:
-        result = update.update_program_github()
-        if result == 0:
-            log.logger.info("GitHub 更新失败,尝试 Gitee 更新...")
+        program.Delete_old_program()
+        if program_info.Auto_Update_Source == "Github":
+            result = update.update_program_github()
+            if result == 0:
+                log.logger.info("GitHub 更新失败,尝试 Gitee 更新...")
+                result = update.update_program_gitee()
+                if result == 0:
+                    log.logger.info("无法完成自动更新,请手动更新!")
+        elif program_info.Auto_Update_Source == "Gitee":
             result = update.update_program_gitee()
             if result == 0:
-                log.logger.info("无法完成自动更新,请手动更新!")
+                log.logger.info("Gitee 更新失败,尝试 Github 更新...")
+                result = update.update_program_github()
+                if result == 0:
+                    log.logger.info("无法完成自动更新,请手动更新!")
         if program_info.Automatic_startup == True:
             program.add_to_startup(program_info.program_name)
         elif program_info.Automatic_startup == False:
@@ -148,6 +157,11 @@ def read_config_json():
                             log.logger.warning('config文件已存在，但自动更新源未设置')
                             log.logger.info('写入自动更新源参数为Github')
                             config_read['Auto_Update_Source'] = program_info.config['Auto_Update_Source']
+                        else:
+                            if config_read['Auto_Update_Source'] != 'Github' and config_read['Auto_Update_Source'] != 'Gitee':
+                                log.logger.warning('config文件已存在，但自动更新源设置错误')
+                                log.logger.info('写入自动更新源参数为Github')
+                                config_read['Auto_Update_Source'] = program_info.config['Auto_Update_Source']
 
 
 

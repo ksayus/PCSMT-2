@@ -18,10 +18,12 @@ program_config = '\config.json'
 server_mods_folder = '\mods'
 server_plugins_folder = '\plugins'
 program_server_folder = '\servers'
+delete_old_program = '\delete_old_program.bat'
 
 banned_player = '/banned-players.json'
 banned_ip = '/banned-ips.json'
 op = '/ops.json'
+eula = '/eula.txt'
 
 forge_server_start_batch_default_name = '/run.bat'
 forge_server_JVM_args = '@user_jvm_args.txt'
@@ -42,7 +44,6 @@ rcon_password = 'pcsmt2'
 rcon_localhost = 'localhost'
 
 work_path = os.getcwd()
-
 
 server_list = server.server_list()
 minecraft_version = get.get_minecraft_version()
@@ -74,7 +75,7 @@ ops = {
 }
 
 config = {
-            "PCSMTVersion": "1.0.7",
+            "PCSMTVersion": "1.0.9",
             "Release_Version": "Beta",
             "default_server_run_memories_min": 1024,
             "default_server_run_memories_max": 2048,

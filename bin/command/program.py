@@ -4,9 +4,13 @@ from bin.find_files import find_file
 from bin.find_files import find_folder
 from bin.export import log
 from bin.export import init
+from win32com.client import Dispatch
 import sys
 import os
 import winreg
+import winshell
+import time
+import atexit
 
 def change_server_run_memories_config(argument_min, argument_max):
     """
@@ -97,12 +101,6 @@ def change_wait_server_eula_generate_time(argument):
         except Exception as e:
             log.logger.error('读取程序配置文件失败！')
             log.logger.error(e)
-import json
-from bin.export import program_info
-from bin.find_files import find_file
-from bin.find_files import find_folder
-from bin.export import log
-from bin.export import init
 
 def change_server_run_memories_config(argument_min, argument_max):
     """
@@ -194,7 +192,7 @@ def change_wait_server_eula_generate_time(argument):
             log.logger.error('读取程序配置文件失败！')
             log.logger.error(e)
             return
-    
+
 def change_program_auto_startup(argument):
     """
     修改程序自动启动
@@ -225,6 +223,7 @@ def change_program_auto_startup(argument):
             return
 
 def add_to_startup(name,file_path=""):
+    """添加程序到自启动"""
 	#By IvanHanloth
     if file_path == "":
         file_path = os.path.realpath(sys.argv[0])
@@ -235,6 +234,10 @@ def add_to_startup(name,file_path=""):
     log.logger.info("自动启动开启成功!")
 
 def remove_from_startup(name):
+    """
+    取消程序自启动
+    :param name: 程序名称
+    """
     auth="IvanHanloth"
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Software\Microsoft\Windows\CurrentVersion\Run", winreg.KEY_SET_VALUE, winreg.KEY_ALL_ACCESS|winreg.KEY_WRITE|winreg.KEY_CREATE_SUB_KEY)#By IvanHanloth
     try:
@@ -244,3 +247,62 @@ def remove_from_startup(name):
     else:
         print(f"{name} removed from startup.")
     winreg.CloseKey(key)
+
+def Create_ShortCut(program_version, icon=True, description=True):
+    """
+    自动更新后创建快捷方式
+    :param program_version: 程序版本
+    """
+    try:
+        Desktop_Path = os.path.join(os.path.expanduser("~"), "Desktop")
+        if find_file.find_files_with_existence(Desktop_Path + '/' + program_info.program_name + ".lnk") == False:
+            shell = Dispatch('WScript.Shell')
+            shortcut = shell.CreateShortCut(os.path.join(winshell.desktop(), program_info.program_name + ".lnk"))
+            shortcut.Targetpath = program_info.work_path + '/' + program_version + ".exe"
+            #快捷方式起始位置
+            shortcut.WorkingDirectory = os.path.dirname(program_info.work_path + '/' + program_version + ".exe")
+            if icon:
+                shortcut.IconLocation = program_info.work_path + '/' + program_version + ".exe"
+            if description:
+                shortcut.Description = "我的世界服务器管理终端"
+            shortcut.save()
+        else:
+            log.logger.info('快捷方式已经存在')
+        log.logger.info('创建快捷方式成功')
+        return
+    except Exception as e:
+        log.logger.error('创建快捷方式失败！')
+        log.logger.error(e)
+        return
+
+def Restart_Program(program_name):
+    """
+    自动更新结束后自动重启程序
+    :param program_name: 程序名称
+    """
+    try:
+        find_file.find_files_with_existence_and_create(program_info.work_path + program_info.delete_old_program)
+        with open(program_info.work_path + program_info.delete_old_program, "w") as f:
+            f.write("cd " + program_info.work_path + "\n")
+            f.write("rm " + program_info.program_name + '-v' + program_info.PCSMTVersion + ".exe" + "\n")
+            f.write("start " + program_name + ".exe" + "\n")
+            f.write("exit")
+            f.close()
+        time.sleep(2)
+        os.system("start " + program_info.work_path + program_info.delete_old_program)
+        time.sleep(1)
+        sys.exit()
+    except Exception as e:
+        log.logger.error('重启程序失败！')
+        log.logger.error(e)
+        return
+
+def Delete_old_program():
+    """删除程序自动更新时生成的脚本"""
+    try:
+        if find_file.find_files_with_existence(program_info.work_path + program_info.delete_old_program):
+            os.remove(program_info.work_path + program_info.delete_old_program)
+    except Exception as e:
+        log.logger.error('删除旧脚本失败！')
+        log.logger.error(e)
+        return
