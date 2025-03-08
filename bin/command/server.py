@@ -156,7 +156,7 @@ def start_server(server_name):
         except Exception as e:
             log.logger.error('读取服务器信息文件失败!')
             log.logger.error(e)
-            return
+            return False
         #设置服务器rcon端口
         try:
             port = None
@@ -171,13 +171,13 @@ def start_server(server_name):
         except Exception as e:
             log.logger.error('设置rcon端口失败!')
             log.logger.error(e)
-            return
+            return False
         try:
             start.start_file(server_info['server_start_batch_path'])
         except Exception as e:
             log.logger.error('启动服务器失败！')
             log.logger.error(e)
-            return
+            return False
         log.logger.info('启动服务器成功！')
         log.logger.info('当前启动服务器:' + server_name)
         time.sleep(2)
@@ -189,7 +189,7 @@ def start_server(server_name):
                 server_info = eula.examine_eula(server_info)
             else:
                 log.logger.error('eula协议不存在, 服务器未正常启动, 请重新启动服务器！')
-                return
+                return False
         else:
             if server_info['start_count'] >= 1:
                 server_info = eula.examine_eula(server_info)
@@ -200,7 +200,7 @@ def start_server(server_name):
         except Exception as e:
             log.logger.error('修改服务器信息文件失败!')
             log.logger.error(e)
-            return
+            return False
 
         # 获取端口
         with open(server_info['server_path'] + program_info.server_properties, 'r', encoding='utf-8') as f:
@@ -234,7 +234,7 @@ def start_server(server_name):
         log.logger.info('服务器本地连接地址:127.0.0.1:{0}'.format(server_port))
     else:
         log.logger.error('未找到服务器，请检查服务器名称是否正确！')
-        return
+        return False
 
 def server_list():
     """
@@ -436,7 +436,7 @@ def search_server(server_name):
             log.logger.info('服务器核心: ' + server_info['server_core'])
             log.logger.info('服务器路径: ' + server_info['server_path'])
             log.logger.info('服务器启动批处理路径: ' + server_info['server_start_batch_path'])
-            return
+            return server_info
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)
@@ -848,3 +848,26 @@ def redirected_server_path(server_name, new_path):
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)
         return
+
+def start_latest_server():
+    try:
+        server_lists = find_file.find_files_with_existence(program_info.work_path + program_info.program_resource + program_info.latest_start_server_json)
+        if server_lists == False:
+            log.logger.error('未找到服务器，请检查服务器名称是否正确！')
+            return False
+        else:
+            with open(program_info.work_path + program_info.program_resource + program_info.latest_start_server_json, 'r', encoding='utf-8') as f:
+                server_info = json.load(f)
+                f.close()
+            log.logger.info('已找到服务器:' + server_info['server_name'])
+            log.logger.info('启动服务器...')
+            inspection_server_started = start_server(server_info['server_name'])
+            if inspection_server_started == False:
+                log.logger.error('启动服务器失败！')
+            else:
+                log.logger.info('启动服务器成功！')
+                return server_info
+    except Exception as e:
+        log.logger.error('读取服务器信息文件失败！')
+        log.logger.error(e)
+        return False

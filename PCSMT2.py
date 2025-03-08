@@ -51,6 +51,14 @@ from cmd2 import Cmd
 import json
 
 
+from bin.api import server_api
+import threading
+from multiprocessing import Process
+
+# server_api.app.run()
+flask_thread = threading.Thread(target=server_api.run_flask, daemon=True)
+flask_thread.start()
+
 
 class PCSMT2(Cmd):
     intro = "欢迎使用PCSMT2"
@@ -402,6 +410,10 @@ class PCSMT2(Cmd):
             return [list for list in program_info.server_list if list.startswith(text)]
         if arg_counts == 2:
             return self.path_complete(text, line, begidx, endidx)
+
+    def do_latest_started_server(self, arg):
+        """启动最新服务器\nCommand: latest_started_server"""
+        server.start_latest_server()
 
     # 退出控制台
     def do_exit(self, arg):
