@@ -11,14 +11,14 @@ def init_core_installer(core_type, core_support_version):
     :param core_support_version: 核心支持版本
     """
     if core_type == 'fabric':
-        if find_file.find_files_with_existence(program_info.work_path + program_info.fabric_core_installation):
+        if find_file.find_files_with_existence(program_info.work_path + program_info.fabric_core_installation_save):
             log.logger.info('Fabric核心下载器已存在')
             return True
         else:
             try:
                 log.logger.warning('Fabric核心下载器不存在')
                 log.logger.info('正在下载Fabric核心下载器...')
-                os.system('powershell curl -o '+ program_info.work_path + program_info.fabric_core_installation + ' https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.1/fabric-installer-1.0.1.jar')
+                os.system('powershell curl -o '+ program_info.work_path + program_info.fabric_core_installation_save + ' https://maven.fabricmc.net/net/fabricmc/fabric-installer/1.0.1/fabric-installer-1.0.1.jar')
                 log.logger.info('下载完成')
                 return True
             except Exception as e:
@@ -38,7 +38,7 @@ def init_core_installer(core_type, core_support_version):
                 return False
             log.logger.info('正在下载Forge核心...')
             try:
-                os.system('powershell curl -o '+ program_info.work_path + program_info.forge_core_installation + ' https://maven.minecraftforge.net/net/minecraftforge/forge/'+ core_support_version + '-' + forge_core_version + '/forge-' + core_support_version + '-' + forge_core_version + '-installer.jar')
+                os.system('powershell curl -o '+ program_info.work_path + program_info.forge_core_installation_save + ' https://maven.minecraftforge.net/net/minecraftforge/forge/'+ core_support_version + '-' + forge_core_version + '/forge-' + core_support_version + '-' + forge_core_version + '-installer.jar')
                 log.logger.info('下载完成')
                 return True
             except Exception as e:

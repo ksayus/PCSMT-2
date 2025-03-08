@@ -13,10 +13,27 @@ java_exist = examin.examin_java_exist()
 if java_exist:
     log.logger.info('Java已安装')
 else:
+    from bin.export import java
     log.logger.error('Java未安装')
-    log.logger.info('请安装Java!')
-    os.system('pause')
-    sys.exit(0)
+    log.logger.info('自动安装Java...')
+
+    versions = [8, 17, 21]
+    installed = False
+
+    for ver in versions:
+        try:
+            if java.install_java_windows(ver):
+                installed = True
+                break
+            else:
+                log.logger.error('Java安装失败')
+                log.logger.info(f'请手动安装Java {ver}')
+        except Exception as e:
+            log.logger.error(f'安装过程中发生异常: {str(e)}')
+
+    if not installed:
+        log.logger.error('所有Java版本安装尝试均失败')
+
 
 from bin.export import program_info
 from bin.export import init
@@ -355,6 +372,36 @@ class PCSMT2(Cmd):
         if arg_counts == 1:
             types = ['true', 'false']
             return [type for type in types if type.startswith(text)]
+
+    def do_rename_server(self, arg):
+        """重命名服务器\nCommand: rename_server <server_name> <new_name>"""
+        try:
+            server_name, new_name = arg.split()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        server.rename_server(server_name, new_name)
+    def complete_rename_server(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
+
+    def do_redirected_server_path(self, arg):
+        """重定向服务器路径\nCommand: redirected_server_path <server_name> <new_path>"""
+        try:
+            server_name, new_path = arg.split()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        server.redirected_server_path(server_name, new_path)
+    def complete_redirected_server_path(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+        if arg_counts == 1:
+            return [list for list in program_info.server_list if list.startswith(text)]
+        if arg_counts == 2:
+            return self.path_complete(text, line, begidx, endidx)
 
     # 退出控制台
     def do_exit(self, arg):

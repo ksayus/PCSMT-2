@@ -7,6 +7,7 @@ from bin.download import update
 from bin.command import program
 import json
 import sys
+import time
 
 def init_program():
     """
@@ -32,9 +33,12 @@ def init_program():
             program.add_to_startup(program_info.program_name)
         elif program_info.Automatic_startup == False:
             program.remove_from_startup(program_info.program_name)
+        find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_resource)
+        find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_resource + program_info.resource_core_installation)
         find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.server_save_path)
         find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_logs)
         find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.program_server_folder)
+
 
         introduction.Homepage()
     except Exception as e:

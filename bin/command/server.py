@@ -159,6 +159,8 @@ def start_server(server_name):
             return
         #设置服务器rcon端口
         try:
+            port = None
+
             if server_info['start_count'] == 0:
                 log.logger.warning('服务器从未启动,无法找到server.properties文件！')
             elif server_info['start_count'] == 1:
@@ -199,6 +201,37 @@ def start_server(server_name):
             log.logger.error('修改服务器信息文件失败!')
             log.logger.error(e)
             return
+
+        # 获取端口
+        with open(server_info['server_path'] + program_info.server_properties, 'r', encoding='utf-8') as f:
+            log.logger.info('正在获取服务器端口...')
+            lines = f.readlines()
+            matched_lines = []
+            for line_number, line in enumerate(lines, start=1):
+                if 'server-port' in line:
+                    matched_lines.append((line_number, line))
+                    server_port = int(lines[line_number - 1].split('=')[1].strip())
+        # 输出latest文件
+        try:
+            if find_file.find_files_with_existence_and_create(program_info.work_path + program_info.latest_start_server):
+                with open(program_info.work_path + program_info.latest_start_server, 'w', encoding='utf-8') as f:
+                    f.write('服务器名称:' + server_name + '\n')
+                    f.write(str(server_info) + '\n')
+                    f.write('服务器端口:' + str(server_port) + '\n')
+                    f.write('RCON端口:' + (str(port) if port else "未启用") + '\n')
+                    f.close()
+                    log.logger.info('已输出latest.txt文件！')
+            if find_file.find_files_with_existence_and_create(program_info.work_path + program_info.program_resource + program_info.latest_start_server_json):
+                with open(program_info.work_path + program_info.program_resource + program_info.latest_start_server_json, 'w', encoding='utf-8') as f:
+                    json.dump(server_info, f, indent=4)
+                    log.logger.info('已输出latest.json文件！')
+        except Exception as e:
+            log.logger.error('写入latest文件失败!')
+            log.logger.error(e)
+
+        log.logger.info('启动服务器成功！')
+        log.logger.info('服务器端口号:' + str(server_port))
+        log.logger.info('服务器本地连接地址:127.0.0.1:{0}'.format(server_port))
     else:
         log.logger.error('未找到服务器，请检查服务器名称是否正确！')
         return
@@ -729,6 +762,88 @@ def stop_server(server_name):
                     log.logger.error('发送命令失败！')
                     log.logger.error(e)
                     return
+    except Exception as e:
+        log.logger.error('读取服务器信息文件失败！')
+        log.logger.error(e)
+        return
+
+def rename_server(server_name, new_name):
+    """
+    重命名服务器
+    :param server_name: 服务器名称
+    :param new_name: 新服务器名称
+    """
+    log.logger.info('查找服务器...')
+    try:
+        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        if server_info == False:
+            log.logger.error('未找到服务器，请检查服务器名称是否正确！')
+        else:
+            log.logger.info('已找到服务器:' + server_info['server_path'])
+            log.logger.info('重命名服务器...')
+            try:
+                server_info['server_name'] = new_name
+                log.logger.info('重命名成功！')
+                log.logger.info('修改服务器信息文件...')
+                try:
+                    with open(program_info.work_path + program_info.server_save_path + '/' + new_name + '.json','w', encoding='utf-8') as f:
+                        json.dump(server_info, f, indent=4)
+                        f.close()
+                        os.remove(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json')
+                        log.logger.info('修改服务器信息文件成功！')
+                except Exception as e:
+                    log.logger.error('修改服务器信息文件失败！')
+                    log.logger.error(e)
+                    return
+            except Exception as e:
+                log.logger.error('重命名失败！')
+                log.logger.error(e)
+                return
+    except Exception as e:
+        log.logger.error('读取服务器信息文件失败！')
+        log.logger.error(e)
+
+def redirected_server_path(server_name, new_path):
+    """
+    重定向服务器路径
+    :param server_name: 服务器名称
+    """
+    log.logger.info('查找服务器...')
+    try:
+        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        if server_info == False:
+            log.logger.error('未找到服务器，请检查服务器名称是否正确！')
+            return
+        else:
+            log.logger.info('已找到服务器:' + server_info['server_path'])
+            log.logger.info('重定向服务器路径...')
+            try:
+                log.logger.info('尝试重定向启动脚本和启动批处理文件...')
+                try:
+                    server_info['server_core'] = server_info['server_core'].replace(server_info['server_path'], new_path)
+                    log.logger.info('重定向服务器核心成功！')
+                    server_info['server_start_batch_path'] = server_info['server_start_batch_path'].replace(server_info['server_path'], new_path)
+                    log.logger.info('重定向服务器启动批处理文件成功！')
+                    server_info['server_path'] =   new_path
+                    log.logger.info('重定向服务器路径成功！')
+                    log.logger.info('重定向成功！')
+                except Exception as e:
+                    log.logger.error('重定向失败！')
+                    log.logger.error(e)
+                log.logger.info('修改服务器信息文件...')
+                try:
+                    with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json','w', encoding='utf-8') as f:
+                        json.dump(server_info, f, indent=4)
+                        f.close()
+                        log.logger.info('修改服务器信息文件成功！')
+                except Exception as e:
+                    log.logger.error('修改服务器信息文件失败！')
+                    log.logger.error(e)
+                    return
+            except Exception as e:
+                log.logger.error('重定向失败！')
+                log.logger.error(e)
+                return
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)

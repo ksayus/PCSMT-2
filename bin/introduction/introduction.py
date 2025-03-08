@@ -26,7 +26,7 @@ def Homepage():
     print(KsayusPage)
     print(AuthorBilibiliPage)
     print(PersonalWebsite)
-    print("\nVersion:" + program_info.PCSMTVersion)
+    print("\nVersion:" + program_info.PCSMTVersion + '-' + program_info.config['Release_Version'])
     print("-------------------------------")
 
 # def Homepage_GUI():

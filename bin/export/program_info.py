@@ -19,6 +19,10 @@ server_mods_folder = '\mods'
 server_plugins_folder = '\plugins'
 program_server_folder = '\servers'
 delete_old_program = '\delete_old_program.bat'
+program_resource = '/resource'
+resource_core_installation = '/core_installation'
+latest_start_server = '/latest.txt'
+latest_start_server_json = '/latest.json'
 
 banned_player = '/banned-players.json'
 banned_ip = '/banned-ips.json'
@@ -28,9 +32,15 @@ eula = '/eula.txt'
 forge_server_start_batch_default_name = '/run.bat'
 forge_server_JVM_args = '@user_jvm_args.txt'
 
+# Debug
 fabric_core_installation = '/bin/source/core_installation/fabric-installer.jar'
 forge_core_installation = '/bin/source/core_installation/forge-installer.jar'
 spigot_core_installation = '/bin/source/core_installation/spigot-installer.exe'
+
+# Release
+fabric_core_installation_save = '/resource/core_installation/fabric-installer.jar'
+forge_core_installation_save = '/resource/core_installation/forge-installer.jar'
+spigot_core_installation_save = '/resource/core_installation/spigot-installer.exe'
 
 fabric_core_default_name = '/fabric-server-launch.jar'
 forge_core_default_name = '/forge-installer.jar'
@@ -75,8 +85,8 @@ ops = {
 }
 
 config = {
-            "PCSMTVersion": "1.1.0",
-            "Release_Version": "Beta",
+            "PCSMTVersion": "1.1.1",
+            "Release_Version": "Release",
             "default_server_run_memories_min": 1024,
             "default_server_run_memories_max": 2048,
             "server_start_nogui": True,
