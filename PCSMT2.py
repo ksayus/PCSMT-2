@@ -49,7 +49,7 @@ from cmd2 import Cmd
 from bin.api import server_api
 import threading
 
-program.Create_ShortCut(program_info.PCSMTVersion, False)
+program.Create_ShortCut('PCSMT2-v' + program_info.PCSMTVersion, False)
 
 # server_api.app.run()
 flask_thread = threading.Thread(target=server_api.run_flask, daemon=True)

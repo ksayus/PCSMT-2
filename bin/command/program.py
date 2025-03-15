@@ -275,6 +275,7 @@ def Create_ShortCut(program_version, recoverage):
                 ShortCut(program_version)
             else:
                 log.logger.info('快捷方式已经存在')
+                return
         log.logger.info('创建快捷方式成功')
         return
     except Exception as e:
@@ -290,9 +291,11 @@ def Restart_Program(program_name):
     try:
         find_file.find_files_with_existence_and_create(program_info.work_path + program_info.delete_old_program)
         with open(program_info.work_path + program_info.delete_old_program, "w") as f:
+            f.write("timeout /t 5\n")
             f.write("cd " + program_info.work_path + "\n")
-            f.write("rmdir " + program_info.program_name + '-v' + program_info.PCSMTVersion + ".exe" + "\n")
+            f.write("powershell rm " + program_info.work_path + '/' + program_info.program_name + '-v' + program_info.PCSMTVersion + ".exe" + "\n")
             f.write("start " + program_name + ".exe" + "\n")
+            # f.write("pause")
             f.write("exit")
             f.close()
         time.sleep(2)

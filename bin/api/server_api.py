@@ -8,13 +8,13 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def api_root():
-    return 'Welcome to PCSMT2 API!'
+    return '<h1>Welcome to PCSMT2 API!</h1>'
 
 
 # server
 @app.route('/server', methods=['GET'])
 def server_api_root():
-    return 'Welcome to PCSMT2 Server API!'
+    return '<h1>Welcome to PCSMT2 Server API!</h1>'
 
 @app.route('/server/list', methods=['GET'])
 def server_lists():
@@ -63,7 +63,7 @@ def start_latest_server():
 # program
 @app.route('/program', methods=['GET'])
 def program_api_root():
-    return 'Welcome to PCSMT2 Program API!'
+    return '<h1>Welcome to PCSMT2 Program API!</h1>'
 
 @app.route('/program/version', methods=['GET'])
 def program_version_api():
