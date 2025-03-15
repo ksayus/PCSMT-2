@@ -3,14 +3,15 @@ from bin.export import program_info
 from bin.find_files import find_file
 from bin.find_files import find_folder
 from bin.export import log
-from bin.export import init
+from bin.command import server
 from win32com.client import Dispatch
+from bin.export import get_time
 import sys
 import os
 import winreg
 import winshell
 import time
-import atexit
+import shutil
 
 def change_server_run_memories_config(argument_min, argument_max):
     """
@@ -248,26 +249,32 @@ def remove_from_startup(name):
         print(f"{name} removed from startup.")
     winreg.CloseKey(key)
 
-def Create_ShortCut(program_version, icon=True, description=True):
+def ShortCut(program_version,icon=True,description=True):
+    shell = Dispatch('WScript.Shell')
+    shortcut = shell.CreateShortCut(os.path.join(winshell.desktop(), program_info.program_name + ".lnk"))
+    shortcut.Targetpath = program_info.work_path + '/' + program_version + ".exe"
+    #快捷方式起始位置
+    shortcut.WorkingDirectory = os.path.dirname(program_info.work_path + '/' + program_version + ".exe")
+    if icon:
+        shortcut.IconLocation = program_info.work_path + '/' + program_version + ".exe"
+    if description:
+        shortcut.Description = "我的世界服务器管理终端"
+    shortcut.save()
+
+def Create_ShortCut(program_version, recoverage):
     """
     自动更新后创建快捷方式
     :param program_version: 程序版本
     """
     try:
         Desktop_Path = os.path.join(os.path.expanduser("~"), "Desktop")
-        if find_file.find_files_with_existence(Desktop_Path + '/' + program_info.program_name + ".lnk") == False:
-            shell = Dispatch('WScript.Shell')
-            shortcut = shell.CreateShortCut(os.path.join(winshell.desktop(), program_info.program_name + ".lnk"))
-            shortcut.Targetpath = program_info.work_path + '/' + program_version + ".exe"
-            #快捷方式起始位置
-            shortcut.WorkingDirectory = os.path.dirname(program_info.work_path + '/' + program_version + ".exe")
-            if icon:
-                shortcut.IconLocation = program_info.work_path + '/' + program_version + ".exe"
-            if description:
-                shortcut.Description = "我的世界服务器管理终端"
-            shortcut.save()
+        if recoverage:
+            ShortCut(program_version)
         else:
-            log.logger.info('快捷方式已经存在')
+            if find_file.find_files_with_existence(Desktop_Path + '/' + program_info.program_name + ".lnk") == False:
+                ShortCut(program_version)
+            else:
+                log.logger.info('快捷方式已经存在')
         log.logger.info('创建快捷方式成功')
         return
     except Exception as e:
@@ -304,5 +311,76 @@ def Delete_old_program():
             os.remove(program_info.work_path + program_info.delete_old_program)
     except Exception as e:
         log.logger.error('删除旧脚本失败！')
+        log.logger.error(e)
+        return
+
+def output_program_info():
+    """输出程序信息"""
+    try:
+        log.logger.info('程序名称: ' + program_info.program_name)
+        log.logger.info(program_info.program_config_read)
+    except Exception as e:
+        log.logger.error('输出程序信息失败！')
+        log.logger.error(e)
+        return
+
+def format_program():
+    """格式化程序"""
+    try:
+        if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
+            with open(program_info.work_path + program_info.program_config, "w") as f:
+                json.dump(program_info.config, f, indent=4)
+                f.close()
+        if find_folder.find_folders_with_existence(program_info.work_path + program_info.server_save_path):
+            all_jsons = os.listdir(program_info.work_path + program_info.server_save_path)
+            try:
+                for json_file in all_jsons:  # 修改变量名
+                    with open(program_info.work_path + program_info.server_save_path + '/' + json_file, "r") as f:
+                        server_info = json.load(f)  # 正确使用json模块
+                    server.delete_server(server_info['server_name'], False)
+                    log.logger.info(f'删除服务器: {json_file}')
+            except Exception as e:
+                log.logger.error('删除服务器失败！')
+                log.logger.error(e)
+        if find_file.find_files_with_existence(program_info.work_path + program_info.latest_start_server):
+            with open(program_info.work_path + program_info.latest_start_server, "w") as f:
+                f.write("")
+                f.close()
+        if find_file.find_files_with_existence(program_info.work_path + program_info.latest_start_server_json):
+            with open(program_info.work_path + program_info.latest_start_server_json, "w") as f:
+                f.write("")
+                f.close()
+        if find_folder.find_folders_with_existence(program_info.work_path + program_info.program_logs):
+            all_folders = os.listdir(program_info.work_path + program_info.program_logs)
+            log.logger.debug(all_folders)
+            try:
+                for folder in all_folders:
+                    # 获取月份文件夹
+                    all_folders_years_months = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder)
+                    log.logger.debug(all_folders_years_months)
+                    for all__folders_year_month in all_folders_years_months:
+                        # 获取日期文件夹
+                        all_folders_years_months_days = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month)
+                        log.logger.debug(all_folders_years_months_days)
+                        for all_folders_year_month_day in all_folders_years_months_days:
+                            # 获取日志文件
+                            all_folders_years_months_days_logs = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day)
+                            log.logger.debug(all_folders_years_months_days_logs)
+                            for all_folders_year_month_day_log in all_folders_years_months_days_logs:
+                                if all_folders_year_month_day_log != f"{log.now_time}.log":
+                                    os.remove(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day + '/' + all_folders_year_month_day_log)
+                                    log.logger.info(f'删除日志文件: {all_folders_year_month_day_log}')
+
+                            if all_folders_year_month_day != str(get_time.this_day):
+                                shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day)
+                        if all__folders_year_month != str(get_time.this_month):
+                            shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month)
+                    if folder != str(get_time.this_year):
+                        shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder)
+            except Exception as e:
+                log.logger.error('删除日志文件失败！')
+                log.logger.error(e)
+    except Exception as e:
+        log.logger.error('格式化程序失败！')
         log.logger.error(e)
         return

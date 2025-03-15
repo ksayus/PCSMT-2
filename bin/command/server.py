@@ -344,11 +344,26 @@ def download_server_core(server_name, core_type, core_support_version):
     """
     try:
         server_info = examin_json_argument.examin_saves_json_argument(server_name)
-        find_folder.find_folders_with_existence_and_create(server_info['server_path'])
-        if server_core.download_server_core(server_name, core_type, core_support_version):
+        if find_folder.find_folders_with_existence(server_info['server_path']):
+            while(1):
+                all_files = find_file.find_files_with_extension(server_info['server_path'], '')
+                if len(all_files) != 0:
+                    log.logger.error('文件夹已有文件')
+                    log.logger.info('为服务器文件夹添加 -repeat 字样')
+                    server_info['server_name'] += '-repeat'
+                    server_info['server_path'] = server_info['server_path'].rstrip('\\') + '-repeat'
+                    log.logger.debug(server_info)
+                    if find_folder.find_folders_with_existence_and_create(server_info['server_path']):
+                        log.logger.info('创建文件夹:' + server_info['server_path'])
+                    else:
+                        log.logger.error('创建文件夹失败！')
+                        return
+                else:
+                    break
+        if server_core.download_server_core(server_info['server_name'], core_type, core_support_version):
             log.logger.info('下载服务器核心成功！')
             log.logger.info('正在修改服务器信息文件...')
-            add_server(server_info['server_path'], server_name, True)
+            add_server(server_info['server_path'], server_info['server_name'], True)
             return
         else:
             log.logger.error('下载服务器核心失败！')
@@ -358,20 +373,21 @@ def download_server_core(server_name, core_type, core_support_version):
         log.logger.warning('检测到服务器并未创建,创建服务器...')
         save_core_path = program_info.work_path + program_info.program_server_folder + '/' + server_name
         find_folder.find_folders_with_existence_and_create(save_core_path)
-        if server_core.download_server_core(server_name, core_type, core_support_version):
+        if server_core.download_server_core(server_info['server_name'], core_type, core_support_version):
             log.logger.info('创建服务器成功！')
             log.logger.info('正在添加服务器...')
-            add_server(save_core_path, server_name, True)
+            add_server(save_core_path, server_info['server_name'], True)
             program_info.server_list = server_list()
         else:
             log.logger.error('创建服务器失败！')
             return
         return
 
-def delete_server(server_name):
+def delete_server(server_name, double_check):
     """
     删除服务器
     :param server_name: 服务器名称
+    :param double_check: 是否二次确认
     """
     try:
         server_info = examin_json_argument.examin_saves_json_argument(server_name)
@@ -380,32 +396,35 @@ def delete_server(server_name):
             return
         else:
             log.logger.info('已找到服务器:' + server_info['server_path'])
-            try_count = 3
-            while try_count:
-                input_str = input('输入服务器名称以二次确认删除服务器:')
-                if input_str == server_name:
-                    ensure_delete_server = True
-                    while ensure_delete_server:
-                        ensure = input('真的要删除服务器吗？这将会永久删除,无法恢复.(y/n)\n').strip().lower()
+            if double_check:
+                try_count = 3
+                while try_count:
+                    input_str = input('输入服务器名称以二次确认删除服务器:')
+                    if input_str == server_name:
+                        ensure_delete_server = True
+                        while ensure_delete_server:
+                            ensure = input('真的要删除服务器吗？这将会永久删除,无法恢复.(y/n)\n').strip().lower()
 
-                        if ensure in ['y', 'yes']:
-                            try_count = 0
-                            break
-                        elif ensure in ['n', 'no']:
-                            log.logger.info('已取消删除服务器！')
+                            if ensure in ['y', 'yes']:
+                                try_count = 0
+                                break
+                            elif ensure in ['n', 'no']:
+                                log.logger.info('已取消删除服务器！')
+                                return
+                            else:
+                                log.logger.warning('输入错误，请输入 y 或 n！')
+                    else:
+                        log.logger.warning('服务器名称错误！')
+                        try_count -= 1
+                        log.logger.warning('您还有' + str(try_count) + '次机会！')
+                        if try_count == 0:
+                            log.logger.error('错误过多，删除服务器失败！')
                             return
-                        else:
-                            log.logger.warning('输入错误，请输入 y 或 n！')
-                else:
-                    log.logger.warning('服务器名称错误！')
-                    try_count -= 1
-                    log.logger.warning('您还有' + str(try_count) + '次机会！')
-                    if try_count == 0:
-                        log.logger.error('错误过多，删除服务器失败！')
-                        return
             log.logger.info('正在删除服务器...')
             if find_folder.find_folders_with_existence(server_info['server_path']):
+                # 删除服务器文件夹
                 shutil.rmtree(server_info['server_path'])
+
                 log.logger.info('删除服务器成功！')
                 log.logger.info('正在删除服务器信息文件...')
                 os.remove(program_info.work_path + program_info.server_save_path + '/' + server_name +'.json')

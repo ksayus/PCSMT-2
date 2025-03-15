@@ -15,10 +15,11 @@ find_folder.find_folders_with_existence_and_create(work_path + '/logs/' + str(ge
 find_folder.find_folders_with_existence_and_create(work_path + '/logs/' + str(get_time.this_year) + '/' + str(get_time.this_month))
 find_folder.find_folders_with_existence_and_create(work_path + '/logs/' + str(get_time.this_year) + '/' + str(get_time.this_month) + '/' + str(get_time.this_day))
 
+now_time = get_time.now_time()
+
 if find_folder.find_folders_with_existence("logs"):
     if find_folder.find_folders_with_existence(now_work_path + '/logs' + '/' + str(get_time.this_year) + '/' + str(get_time.this_month) + '/' + str(get_time.this_day)):
 
-        now_time = get_time.now_time()
         file_handler = logging.FileHandler(now_work_path + '/logs' + '/' + str(get_time.this_year) + '/' + str(get_time.this_month) + '/' + str(get_time.this_day) + '/' + now_time + ".log", encoding='utf-8')
         file_handler.setLevel(logging.DEBUG)
 

@@ -49,7 +49,7 @@ def update_program_github():
                         os.system('powershell curl -o "' + program_info.work_path + '/' + latest_version + '.exe' '" ' + download_url)
                         log.logger.info("文件下载成功。")
                         log.logger.info("请重启程序以完成更新。")
-                        program.Create_ShortCut(latest_version)
+                        program.Create_ShortCut(latest_version, True)
                         program.Restart_Program(latest_version)
                         return
                     except Exception as e:
@@ -125,7 +125,7 @@ def update_program_gitee():
                         os.system('powershell curl -o ' + program_info.work_path + '/' + latest_version + '.exe ' + download_url)
                         log.logger.info("文件下载成功。")
                         log.logger.info("请重启程序以完成更新。")
-                        program.Create_ShortCut(latest_version)
+                        program.Create_ShortCut(latest_version, True)
                         program.Restart_Program(latest_version)
                         return
                     except Exception as e:

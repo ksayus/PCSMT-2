@@ -3,7 +3,6 @@ from bin.export import Is_program_running
 Is_program_running.Is_program_running()
 
 #检查Java是否安装
-import os
 import sys
 from bin.export import examin
 from bin.export import log
@@ -43,17 +42,14 @@ init.init_program()
 from bin.introduction import introduction
 from bin.command import start
 from bin.command import server
-from bin.find_files import find_file
-from bin.find_files import find_folder
 from bin.export import numbers
 
 from cmd2 import Cmd
-import json
-
 
 from bin.api import server_api
 import threading
-from multiprocessing import Process
+
+program.Create_ShortCut(program_info.PCSMTVersion, False)
 
 # server_api.app.run()
 flask_thread = threading.Thread(target=server_api.run_flask, daemon=True)
@@ -128,13 +124,59 @@ class PCSMT2(Cmd):
             return
         server.change_server_properties(server_name, keyword, argument)
     def complete_change_server_properties(self, text, line, begidx, endidx):
+        """
+        服务器属性自动补全函数（用于命令行自动补全功能）
+
+        参数:
+            text: str - 当前输入的补全文本
+            line: str - 完整的命令行输入内容
+            begidx: int - 补全起始位置
+            endidx: int - 补全结束位置
+
+        返回值:
+            list - 包含匹配补全文本的建议值列表
+
+        功能说明:
+            根据输入参数数量提供不同层级的自动补全建议：
+            - 第1参数补全服务器名称
+            - 第2参数补全属性键
+            - 第3参数补全特定属性值
+        """
+        # 解析输入参数（跳过命令本身）
         arg = line.split()[1:]
         arg_counts = len(arg)
 
+        # 第1个参数：补全服务器名称
         if arg_counts == 1:
             return [list for list in program_info.server_list if list.startswith(text)]
+
+        # 第2个参数：补全属性键列表
         elif arg_counts == 2:
             return [list for list in program_info.properties_keyword if list.startswith(text)]
+
+        # 第3个参数：根据属性键补全特定值
+        elif arg_counts == 3:
+            # 游戏模式补全值
+            if arg[1] == "gamemode":
+                gamemode = ["survival","creative","adventure","spectator"]
+                return [list for list in gamemode if list.startswith(text)]
+
+            # 难度级别补全值
+            if arg[1] == "difficulty":
+                difficulty = ["peaceful","easy","normal","hard"]
+                return [list for list in difficulty if list.startswith(text)]
+
+            # 布尔类型属性统一处理（true/false）
+            bool_properties = {
+                "pvp": ["true","false"],
+                "allow-flight": ["true","false"],
+                "spawn-protection": ["true","false"],
+                "spawn-npcs": ["true","false"],
+                "spawn-animals": ["true","false"],
+                "spawn-monsters": ["true","false"],
+                "online-mode": ["true","false"]
+            }
+            return [val for val in bool_properties.get(arg[1], []) if val.startswith(text)]
 
     # 修改服务器启动内存
     def do_change_server_run_memories_config(self, arg):
@@ -254,7 +296,7 @@ class PCSMT2(Cmd):
         except ValueError:
             log.logger.error('参数错误，请输入正确的参数！')
             return
-        server.delete_server(server_name)
+        server.delete_server(server_name, True)
     def complete_delete_server(self, text, line, begidx, endidx):
         arg = line.split()[1:]
         arg_counts = len(arg)
@@ -414,6 +456,14 @@ class PCSMT2(Cmd):
     def do_latest_started_server(self, arg):
         """启动最新服务器\nCommand: latest_started_server"""
         server.start_latest_server()
+
+    def do_output_program_info(self, arg):
+        """输出程序信息\nCommand: out_program_info"""
+        program.output_program_info()
+
+    def do_format_program(self, arg):
+        """格式化程序\nCommand: format_program"""
+        program.format_program()
 
     # 退出控制台
     def do_exit(self, arg):
