@@ -394,6 +394,7 @@ class PCSMT2(Cmd):
         if arg_counts == 1:
             return [list for list in program_info.server_list if list.startswith(text)]
 
+    # 停止服务器
     def do_stop_server(self, arg):
         """停止服务器\nCommand: stop_server <server_name>"""
         try:
@@ -408,6 +409,7 @@ class PCSMT2(Cmd):
         if arg_counts == 1:
             return [list for list in program_info.server_list if list.startswith(text)]
 
+    # 修改服务器自启动
     def do_change_program_auto_startup(self, arg):
         """修改程序自动启动\nCommand: change_program_auto_startup <True / False>"""
         try:
@@ -423,6 +425,7 @@ class PCSMT2(Cmd):
             types = ['true', 'false']
             return [type for type in types if type.startswith(text)]
 
+    # 重命名服务器
     def do_rename_server(self, arg):
         """重命名服务器\nCommand: rename_server <server_name> <new_name>"""
         try:
@@ -437,6 +440,7 @@ class PCSMT2(Cmd):
         if arg_counts == 1:
             return [list for list in program_info.server_list if list.startswith(text)]
 
+    # 重定向服务器路径
     def do_redirected_server_path(self, arg):
         """重定向服务器路径\nCommand: redirected_server_path <server_name> <new_path>"""
         try:
@@ -453,17 +457,25 @@ class PCSMT2(Cmd):
         if arg_counts == 2:
             return self.path_complete(text, line, begidx, endidx)
 
+    # 启动最新服务器
     def do_latest_started_server(self, arg):
         """启动最新服务器\nCommand: latest_started_server"""
         server.start_latest_server()
 
+    # 输出程序信息
     def do_output_program_info(self, arg):
         """输出程序信息\nCommand: out_program_info"""
         program.output_program_info()
 
+    # 格式化程序
     def do_format_program(self, arg):
         """格式化程序\nCommand: format_program"""
         program.format_program()
+
+    # 清除缓存
+    def do_clear_cache(self, arg):
+        """清除缓存\nCommand: clear_cache"""
+        program.clear_cache()
 
     # 退出控制台
     def do_exit(self, arg):
