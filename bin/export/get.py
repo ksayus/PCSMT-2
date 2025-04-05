@@ -1,6 +1,6 @@
 import requests
 import json
-import urllib3
+import os
 from bin.export import log
 
 def get_minecraft_version():
@@ -14,6 +14,28 @@ def get_minecraft_version():
         response = requests.get('https://launchermeta.mojang.com/mc/game/version_manifest.json')
         for version in response.json()["versions"]:
             version_list.append(version["id"])
+        if len(version_list) > 1:
+            for i in range(len(version_list)):
+                exclude_keyword = {
+                    'w',
+                    'a',
+                    'b',
+                    'c',
+                    'rd',
+                    'rc',
+                    'craftmine',
+                    'inf',
+                    'pre',
+                    '1.RV-Pre1',
+                    '3D',
+                    'Shareware',
+                    'Pre-release',
+                }
+
+                version_list = [
+                    item for item in version_list
+                    if not any(keyword in item for keyword in exclude_keyword)
+                ]
         log.logger.debug('Minecraft版本:' + json.dumps(version_list))
         return version_list
     except Exception as e:
@@ -85,3 +107,13 @@ def get_properties_keyword():
         'white-list'
     ]
     return keyword
+
+def get_dir_size(path):
+    total = 0
+    with os.scandir(path) as it:
+        for entry in it:
+            if entry.is_file():
+                total += entry.stat().st_size
+            elif entry.is_dir():
+                total += get_dir_size(entry.path)
+    return total

@@ -299,7 +299,7 @@ def Restart_Program(program_name):
             f.write("exit")
             f.close()
         time.sleep(2)
-        os.system("start " + program_info.work_path + program_info.delete_old_program)
+        os.system("start " + program_info.work_path + program_info.delete_old_program + " -WindowStyle Hidden")
         time.sleep(1)
         sys.exit()
     except Exception as e:
@@ -327,6 +327,84 @@ def output_program_info():
         log.logger.error(e)
         return
 
+def Remove_logs():
+    """删除日志"""
+    try:
+        if find_folder.find_folders_with_existence(program_info.work_path + program_info.program_logs):
+            all_folders = os.listdir(program_info.work_path + program_info.program_logs)
+            log.logger.debug(all_folders)
+            try:
+                for folder in all_folders:
+                    # 获取月份文件夹
+                    all_folders_years_months = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder)
+                    log.logger.debug(all_folders_years_months)
+                    for all__folders_year_month in all_folders_years_months:
+                        # 获取日期文件夹
+                        all_folders_years_months_days = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month)
+                        log.logger.debug(all_folders_years_months_days)
+                        for all_folders_year_month_day in all_folders_years_months_days:
+                            # 获取日志文件
+                            all_folders_years_months_days_logs = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day)
+                            log.logger.debug(all_folders_years_months_days_logs)
+                            for all_folders_year_month_day_log in all_folders_years_months_days_logs:
+                                if all_folders_year_month_day_log != f"{log.now_time}.log":
+                                    os.remove(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day + '/' + all_folders_year_month_day_log)
+                                    log.logger.info(f'删除日志文件: {all_folders_year_month_day_log}')
+
+                            if all_folders_year_month_day != str(get_time.this_day):
+                                shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day)
+                        if all__folders_year_month != str(get_time.this_month):
+                            shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month)
+                    if folder != str(get_time.this_year):
+                        shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder)
+            except Exception as e:
+                log.logger.error('删除日志文件失败！')
+                log.logger.error(e)
+    except Exception as e:
+        log.logger.error('删除日志文件夹失败！')
+        log.logger.error(e)
+        return
+
+def Reset_settings():
+    """重置设置"""
+    try:
+        if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
+            with open(program_info.work_path + program_info.program_config, "w") as f:
+                json.dump(program_info.config, f, indent=4)
+                f.close()
+    except Exception as e:
+        log.logger.error('重置设置失败！')
+        log.logger.error(e)
+        return
+
+def Remove_all_servers():
+    """移除服务器"""
+    try:
+        if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
+            with open(program_info.work_path + program_info.program_config, "w") as f:
+                json.dump(program_info.config, f, indent=4)
+                f.close()
+    except Exception as e:
+        log.logger.error('移除服务器失败！')
+        log.logger.error(e)
+        return
+
+def Clear_latest():
+    """清除最新启动的服务器"""
+    try:
+        if find_file.find_files_with_existence(program_info.work_path + program_info.latest_start_server):
+            with open(program_info.work_path + program_info.latest_start_server, "w") as f:
+                f.write("")
+                f.close()
+        if find_file.find_files_with_existence(program_info.work_path + program_info.latest_start_server_json):
+            with open(program_info.work_path + program_info.latest_start_server_json, "w") as f:
+                f.write("")
+                f.close()
+    except Exception as e:
+        log.logger.error('清除最新启动的服务器失败！')
+        log.logger.error(e)
+        return
+
 def format_program():
     """格式化程序"""
     ensure = input('是否格式化程序?(y/n): ')
@@ -337,97 +415,11 @@ def format_program():
         return False
 
     try:
-        if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
-            with open(program_info.work_path + program_info.program_config, "w") as f:
-                json.dump(program_info.config, f, indent=4)
-                f.close()
-        if find_folder.find_folders_with_existence(program_info.work_path + program_info.server_save_path):
-            all_jsons = os.listdir(program_info.work_path + program_info.server_save_path)
-            try:
-                for json_file in all_jsons:  # 修改变量名
-                    with open(program_info.work_path + program_info.server_save_path + '/' + json_file, "r") as f:
-                        server_info = json.load(f)  # 正确使用json模块
-                    server.delete_server(server_info['server_name'], False)
-                    log.logger.info(f'删除服务器: {json_file}')
-            except Exception as e:
-                log.logger.error('删除服务器失败！')
-                log.logger.error(e)
-        if find_file.find_files_with_existence(program_info.work_path + program_info.latest_start_server):
-            with open(program_info.work_path + program_info.latest_start_server, "w") as f:
-                f.write("")
-                f.close()
-        if find_file.find_files_with_existence(program_info.work_path + program_info.latest_start_server_json):
-            with open(program_info.work_path + program_info.latest_start_server_json, "w") as f:
-                f.write("")
-                f.close()
-        if find_folder.find_folders_with_existence(program_info.work_path + program_info.program_logs):
-            all_folders = os.listdir(program_info.work_path + program_info.program_logs)
-            log.logger.debug(all_folders)
-            try:
-                for folder in all_folders:
-                    # 获取月份文件夹
-                    all_folders_years_months = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder)
-                    log.logger.debug(all_folders_years_months)
-                    for all__folders_year_month in all_folders_years_months:
-                        # 获取日期文件夹
-                        all_folders_years_months_days = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month)
-                        log.logger.debug(all_folders_years_months_days)
-                        for all_folders_year_month_day in all_folders_years_months_days:
-                            # 获取日志文件
-                            all_folders_years_months_days_logs = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day)
-                            log.logger.debug(all_folders_years_months_days_logs)
-                            for all_folders_year_month_day_log in all_folders_years_months_days_logs:
-                                if all_folders_year_month_day_log != f"{log.now_time}.log":
-                                    os.remove(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day + '/' + all_folders_year_month_day_log)
-                                    log.logger.info(f'删除日志文件: {all_folders_year_month_day_log}')
-
-                            if all_folders_year_month_day != str(get_time.this_day):
-                                shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day)
-                        if all__folders_year_month != str(get_time.this_month):
-                            shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month)
-                    if folder != str(get_time.this_year):
-                        shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder)
-            except Exception as e:
-                log.logger.error('删除日志文件失败！')
-                log.logger.error(e)
+        Reset_settings()
+        Remove_all_servers()
+        Clear_latest()
+        Remove_logs()
     except Exception as e:
         log.logger.error('格式化程序失败！')
-        log.logger.error(e)
-        return
-
-def clear_cache():
-    try:
-        if find_folder.find_folders_with_existence(program_info.work_path + program_info.program_logs):
-            all_folders = os.listdir(program_info.work_path + program_info.program_logs)
-            log.logger.debug(all_folders)
-            try:
-                for folder in all_folders:
-                    # 获取月份文件夹
-                    all_folders_years_months = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder)
-                    log.logger.debug(all_folders_years_months)
-                    for all__folders_year_month in all_folders_years_months:
-                        # 获取日期文件夹
-                        all_folders_years_months_days = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month)
-                        log.logger.debug(all_folders_years_months_days)
-                        for all_folders_year_month_day in all_folders_years_months_days:
-                            # 获取日志文件
-                            all_folders_years_months_days_logs = os.listdir(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day)
-                            log.logger.debug(all_folders_years_months_days_logs)
-                            for all_folders_year_month_day_log in all_folders_years_months_days_logs:
-                                if all_folders_year_month_day_log != f"{log.now_time}.log":
-                                    os.remove(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day + '/' + all_folders_year_month_day_log)
-                                    log.logger.info(f'删除日志文件: {all_folders_year_month_day_log}')
-
-                            if all_folders_year_month_day != str(get_time.this_day):
-                                shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month + '/' + all_folders_year_month_day)
-                        if all__folders_year_month != str(get_time.this_month):
-                            shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder + '/' + all__folders_year_month)
-                    if folder != str(get_time.this_year):
-                        shutil.rmtree(program_info.work_path + program_info.program_logs + '/' + folder)
-            except Exception as e:
-                log.logger.error('删除日志文件失败！')
-                log.logger.error(e)
-    except Exception as e:
-        log.logger.error('删除日志文件失败！')
         log.logger.error(e)
         return

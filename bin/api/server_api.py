@@ -1,10 +1,14 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from bin.command import server
 from bin.export import program_info
 from bin.export import log
 from bin.find_files import find_file
 import json
+from bin.export import admin
+from flask import session, redirect, url_for
+
 app = Flask(__name__)
+app.secret_key = 'pcsmt2'
 
 @app.route('/', methods=['GET'])
 def api_root():
@@ -59,6 +63,40 @@ def start_latest_server():
         # 返回 JSON 格式的错误信息和 500 状态码
         log.logger.error('启动服务器时发生内部错误')
         return jsonify({"error": "启动服务器时发生内部错误"}), 500
+
+def admin_required(f):
+    def wrapper(*args, **kwargs):
+        if 'authenticated' not in session:  # 修改为登录时设置的键名
+            return jsonify({"error": "未认证, 请前往 http://127.0.0.1:5000/login 登录!"}), 401
+        return f(*args, **kwargs)
+    return wrapper
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        account = request.form.get('admin_account')
+        password = request.form.get('admin_password')
+
+        if admin.examin_admin_account(account, password):
+            session['authenticated'] = True  # 此处依赖secret_key
+            return redirect(url_for('server_api_root'))
+        else:
+            return render_template('login.html', error="账号或密码错误")
+    return render_template('login.html')
+
+
+@app.route('/server/<string:server_name>/start', methods=['GET'])
+@admin_required  # ✅ 添加认证装饰器
+def start_server(server_name):
+    try:
+        success = server.start_server(server_name)
+        if success:
+            return jsonify({"status": "启动成功"}), 200
+        else:
+            return jsonify({"error": "启动失败"}), 502
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "内部错误"}), 500
 
 # program
 @app.route('/program', methods=['GET'])

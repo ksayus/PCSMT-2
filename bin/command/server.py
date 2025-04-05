@@ -13,6 +13,8 @@ from bin.export import examin_json_argument
 from bin.download import server_core
 from bin.export import get_time
 from bin.export import rcon
+from bin.export import size_change
+from bin.export import get
 def add_server(server_path, server_name, rewrite):
     """
     添加服务器
@@ -31,9 +33,20 @@ def add_server(server_path, server_name, rewrite):
         if len(server_core) > 1:
             for i in range(len(server_core)):
                 exclude_keywords = {
-                    'server.jar', 'com', 'commons-io', 'cpw', 'de', 'io',
-                    'it', 'org', 'trove', 'java', 'jodah', 'mincraftforge',
-                    'minecrell', 'sf'
+                    'server.jar',
+                    'com',
+                    'commons-io',
+                    'cpw',
+                    'de',
+                    'io',
+                    'it',
+                    'org',
+                    'trove',
+                    'java',
+                    'jodah',
+                    'mincraftforge',
+                    'minecrell',
+                    'sf'
                 }
 
     # 筛选不包含任意关键词的元素
@@ -76,7 +89,7 @@ def add_server(server_path, server_name, rewrite):
                             f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
                     else:
                         f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
-                    if program_info.server_start_nogui == "false":
+                    if program_info.server_start_nogui == "true":
                         f.write(' -nogui')
                     else:
                         f.write('')
@@ -92,19 +105,15 @@ def add_server(server_path, server_name, rewrite):
                 with open(server_path + program_info.eula, 'w') as f:
                     f.write('eula=true')
 
+            if find_folder.find_folders_with_existence(server_path):
+                server_size = size_change.size_change(get.get_dir_size(server_path))
+
             if find_file.find_files_with_existence(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json'):
                 if rewrite == True:
                     log.logger.warning('已存在同名服务器，尝试覆盖原信息！')
                     try:
                         with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r') as f:
                             server_info = json.load(f)
-                            server_info_rewrite = {
-                                'server_name': server_info['server_name'],
-                                'start_count': server_info['start_count'],
-                                'server_core': server_core,
-                                'server_path': server_path,
-                                'server_start_batch_path': server_absolute_path
-                            }
                             try:
                                 with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'w') as f:
                                     json.dump(server_info, f, indent=4)
@@ -130,7 +139,8 @@ def add_server(server_path, server_name, rewrite):
                         'start_count': start_count,
                         'server_core': server_core,
                         'server_path': server_path,
-                        'server_start_batch_path': server_absolute_path
+                        'server_start_batch_path': server_absolute_path,
+                        'server_size': server_size
                     }
                     try:
                         with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'w') as f:
@@ -373,10 +383,10 @@ def download_server_core(server_name, core_type, core_support_version):
         log.logger.warning('检测到服务器并未创建,创建服务器...')
         save_core_path = program_info.work_path + program_info.program_server_folder + '/' + server_name
         find_folder.find_folders_with_existence_and_create(save_core_path)
-        if server_core.download_server_core(server_info['server_name'], core_type, core_support_version):
+        if server_core.download_server_core(server_name, core_type, core_support_version):
             log.logger.info('创建服务器成功！')
             log.logger.info('正在添加服务器...')
-            add_server(save_core_path, server_info['server_name'], True)
+            add_server(save_core_path, server_name, True)
             program_info.server_list = server_list()
         else:
             log.logger.error('创建服务器失败！')
@@ -455,6 +465,7 @@ def search_server(server_name):
             log.logger.info('服务器核心: ' + server_info['server_core'])
             log.logger.info('服务器路径: ' + server_info['server_path'])
             log.logger.info('服务器启动批处理路径: ' + server_info['server_start_batch_path'])
+            log.logger.info('服务器大小: ' + str(server_info['server_size']))
             return server_info
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
@@ -844,11 +855,25 @@ def redirected_server_path(server_name, new_path):
                     server_info['server_start_batch_path'] = server_info['server_start_batch_path'].replace(server_info['server_path'], new_path)
                     log.logger.info('重定向服务器启动批处理文件成功！')
                     server_info['server_path'] =   new_path
+                    with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'w', encoding='utf-8') as f:
+                        json.dump(server_info, f, indent=4)
+                    with open(server_info['server_start_batch_path'], 'w') as f:
+                        f.write('cd ' + server_info['server_path'] + '\n')
+                        f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_info['server_core'])
+                        if program_info.server_start_nogui == 'true':
+                            f.write(' -nogui\n')
+                        else:
+                            f.write('\n')
+                        f.write('exit')
+                    log.logger.info('覆写服务器启动批处理文件成功！')
+                except Exception as e:
+                    log.logger.error('创建服务器启动批处理文件失败!')
+                    log.logger.error(e)
                     log.logger.info('重定向服务器路径成功！')
                     log.logger.info('重定向成功！')
-                except Exception as e:
-                    log.logger.error('重定向失败！')
-                    log.logger.error(e)
+            except Exception as e:
+                log.logger.error('重定向失败！')
+                log.logger.error(e)
                 log.logger.info('修改服务器信息文件...')
                 try:
                     with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json','w', encoding='utf-8') as f:

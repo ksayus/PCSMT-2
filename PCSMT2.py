@@ -4,34 +4,29 @@ Is_program_running.Is_program_running()
 
 #检查Java是否安装
 import sys
+from bin.export import java
 from bin.export import examin
 from bin.export import log
 from bin.command import program
 
-java_exist = examin.examin_java_exist()
-if java_exist:
-    log.logger.info('Java已安装')
-else:
-    from bin.export import java
-    log.logger.error('Java未安装')
-    log.logger.info('自动安装Java...')
-
-    versions = [8, 17, 21]
-    installed = False
-
-    for ver in versions:
+versions = [1.8, 16, 17, 21]
+for version in versions:
+    results = examin.examin_java_exist(version)
+    if results:
+        for path, ver in results.items():
+            log.logger.info(f"✔️ 版本: {ver}已安装")
+    else:
+        log.logger.error(f"❌ 未安装版本{version}版本")
+        log.logger.info('尝试安装Java...')
+        log.logger.info(f'版本: {version}')
         try:
-            if java.install_java_windows(ver):
+            if java.install_java_windows(version):
                 installed = True
-                break
             else:
                 log.logger.error('Java安装失败')
-                log.logger.info(f'请手动安装Java {ver}')
+                log.logger.info(f'请手动安装Java {version}')
         except Exception as e:
             log.logger.error(f'安装过程中发生异常: {str(e)}')
-
-    if not installed:
-        log.logger.error('所有Java版本安装尝试均失败')
 
 
 from bin.export import program_info
@@ -50,6 +45,21 @@ from bin.api import server_api
 import threading
 
 program.Create_ShortCut('PCSMT2-v' + program_info.PCSMTVersion, False)
+
+from bin.export import key
+from bin.export import admin
+
+key.generate_key_pair()
+
+if admin.examin_admin_account_is_exist():
+    pass
+else:
+    log.logger.info('未检测到管理员账户文件，正在创建...')
+
+    account_name = input("请输入管理员账号名称：")
+    password = input("请输入管理员密码：")
+
+    admin.set_admin_account(account_name, password)
 
 # server_api.app.run()
 flask_thread = threading.Thread(target=server_api.run_flask, daemon=True)
@@ -475,7 +485,12 @@ class PCSMT2(Cmd):
     # 清除缓存
     def do_clear_cache(self, arg):
         """清除缓存\nCommand: clear_cache"""
-        program.clear_cache()
+        program.Remove_logs()
+        program.Clear_latest()
+
+    def do_reset_settings(self, arg):
+        """重置设置\nCommand: reset_settings"""
+        program.Reset_settings()
 
     # 退出控制台
     def do_exit(self, arg):
