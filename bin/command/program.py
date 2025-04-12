@@ -240,7 +240,6 @@ def remove_from_startup(name):
     取消程序自启动
     :param name: 程序名称
     """
-    auth="IvanHanloth"
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Software\Microsoft\Windows\CurrentVersion\Run", winreg.KEY_SET_VALUE, winreg.KEY_ALL_ACCESS|winreg.KEY_WRITE|winreg.KEY_CREATE_SUB_KEY)#By IvanHanloth
     try:
         winreg.DeleteValue(key, name)

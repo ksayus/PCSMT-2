@@ -894,6 +894,9 @@ def redirected_server_path(server_name, new_path):
         return
 
 def start_latest_server():
+    """
+    启动上次启动的服务器
+    """
     try:
         server_lists = find_file.find_files_with_existence(program_info.work_path + program_info.program_resource + program_info.latest_start_server_json)
         if server_lists == False:
@@ -915,3 +918,20 @@ def start_latest_server():
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)
         return False
+
+def Restart_Server(server_name):
+    """
+    重启服务器
+    :param server_name: 服务器名称
+    """
+    try:
+        log.logger.info('尝试重启服务器...')
+        stop_server(server_name)
+        time.sleep(3)
+        start_server(server_name)
+        log.logger.info('重启服务器成功！')
+        return
+    except Exception as e:
+        log.logger.error('重启服务器失败！')
+        log.logger.error(e)
+        return
