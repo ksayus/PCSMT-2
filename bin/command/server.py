@@ -3,6 +3,7 @@ import json
 import time
 import shutil
 import requests
+import zipfile
 from bin.find_files import find_file
 from bin.find_files import find_folder
 from bin.export import program_info
@@ -15,7 +16,8 @@ from bin.export import get_time
 from bin.export import rcon
 from bin.export import size_change
 from bin.export import get
-def add_server(server_path, server_name, rewrite):
+from packaging import version
+def add_server(server_path, server_name, rewrite, server_version):
     """
     添加服务器
     :param server_path: 服务器路径
@@ -23,6 +25,7 @@ def add_server(server_path, server_name, rewrite):
     :param rewrite: 是否覆盖同名服务器
     """
     server_core = find_file.find_files_with_extension(server_path, '.jar')
+    print(server_path)
     log.logger.info('找到服务器核心文件：' + str(server_core))
     log.logger.info('总共' + str(len(server_core)) + '个文件')
     if len(server_core) == 0:
@@ -64,6 +67,22 @@ def add_server(server_path, server_name, rewrite):
             log.logger.info("找到服务器启动批处理文件,位置:" + server_absolute_path)
 
             try:
+                java_args: str = ''
+                v = version.parse(server_version)
+                with open('./java_versions.json', 'r', encoding='utf-8') as f:
+                    java_versions_address = json.load(f)
+
+                    # TODO: 添加按照版本使用不同版本的Java JDK
+                    # 获取Java版本
+                    if v < version.parse('1.17.0'):
+                        java_args = '"' f'{java_versions_address['1.8']}' '"'
+                    elif v > version.parse('1.17.0') and v <= version.parse('1.18.2'):
+                        java_args = '"' f'{java_versions_address['16']}' '"'
+                    elif v > version.parse('1.18.2') and v <= version.parse('1.20.1'):
+                        java_args = '"' f'{java_versions_address['17']}' '"'
+                    elif v > version.parse('1.20.1') and v <= version.parse('1.21.5'):
+                        java_args = '"' f'{java_versions_address['21']}' '"'
+
                 with open(server_path + program_info.server_start_batch, 'w') as f:
                     f.write('cd ' + server_path + '\n')
                     if find_file.find_files_with_existence(server_path + program_info.server_start_batch):
@@ -76,8 +95,10 @@ def add_server(server_path, server_name, rewrite):
                                         server_start_command = line.strip()
                                         break
                                 if server_start_command is None:
-                                    log.logger.warning('未找到包含java的命令,请检查run.bat文件是否正确！')
-                                    f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
+                                    log.logger.warning('未找到包含java的命令')
+                                    log.logger.info('使用默认启动核心命令:')
+
+                                    f.write(f'{java_args} -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
                                 else:
                                     log.logger.info('读取服务器启动批处理文件成功!')
                                     log.logger.info('服务器启动核心命令:' + server_start_command + '\n')
@@ -86,9 +107,9 @@ def add_server(server_path, server_name, rewrite):
                         except Exception as e:
                             log.logger.error('服务器启动批处理文件读取失败!')
                             log.logger.error(e)
-                            f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
+                            f.write(f'{java_args} -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
                     else:
-                        f.write('java -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
+                        f.write(f'{java_args} -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
                     if program_info.server_start_nogui == "true":
                         f.write(' -nogui')
                     else:
@@ -134,13 +155,15 @@ def add_server(server_path, server_name, rewrite):
             else:
                 if find_file.find_files_with_existence_and_create(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json'):
                     start_count = 0
+                    # server_version = "0.0.0"
                     server_info = {
                         'server_name': server_name,
                         'start_count': start_count,
                         'server_core': server_core,
                         'server_path': server_path,
                         'server_start_batch_path': server_absolute_path,
-                        'server_size': server_size
+                        'server_size': server_size,
+                        'server_version': server_version
                     }
                     try:
                         with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'w') as f:
@@ -152,6 +175,8 @@ def add_server(server_path, server_name, rewrite):
                         return
                 else:
                     log.logger.error('创建服务器信息文件失败!')
+
+        program_info.server_list.append(server_name)
 
 def start_server(server_name):
     """
@@ -203,6 +228,9 @@ def start_server(server_name):
         else:
             if server_info['start_count'] >= 1:
                 server_info = eula.examine_eula(server_info)
+
+        time.sleep(program_info.wait_server_eula_generate_time)
+
         try:
             with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'w') as f:
                 json.dump(server_info, f, indent=4)
@@ -373,7 +401,7 @@ def download_server_core(server_name, core_type, core_support_version):
         if server_core.download_server_core(server_info['server_name'], core_type, core_support_version):
             log.logger.info('下载服务器核心成功！')
             log.logger.info('正在修改服务器信息文件...')
-            add_server(server_info['server_path'], server_info['server_name'], True)
+            add_server(server_info['server_path'], server_info['server_name'], True, core_support_version)
             return
         else:
             log.logger.error('下载服务器核心失败！')
@@ -386,7 +414,7 @@ def download_server_core(server_name, core_type, core_support_version):
         if server_core.download_server_core(server_name, core_type, core_support_version):
             log.logger.info('创建服务器成功！')
             log.logger.info('正在添加服务器...')
-            add_server(save_core_path, server_name, True)
+            add_server(save_core_path, server_name, True, core_support_version)
             program_info.server_list = server_list()
         else:
             log.logger.error('创建服务器失败！')
@@ -935,3 +963,200 @@ def Restart_Server(server_name):
         log.logger.error('重启服务器失败！')
         log.logger.error(e)
         return
+
+def find_backup_file(server_name):
+    """
+    查找备份文件
+    :param server_name: 服务器名称
+    """
+    keywords = [
+        '.json'
+    ]
+
+    try:
+        # 优先查找/mods/ftbbackups2
+        # 文件名:ftbbackups2
+        if find_file.find_files_with_existence(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json'):
+            with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r', encoding='utf-8') as f:
+                server_info = json.load(f)
+                # mod
+                if find_folder.find_folders_with_existence(server_info['server_path'] + '/mods'):
+                    mod_list = os.listdir(server_info['server_path'] + '/mods')
+                    for mods in mod_list:
+                        if 'ftbbackups2' in mods:
+                            log.logger.info('已找到FTB Backups 2 模组！')
+                            log.logger.info('尝试获取备份列表...')
+                            try:
+                                log.logger.info('尝试获取FTB Backups 2 备份文件...')
+                                backup_list = os.listdir(server_info['server_path'] + '/backups')
+                                if len(backup_list) > 0:
+                                    log.logger.info('已找到FTB Backups 2 备份文件！')
+
+                                    backups = [
+                                        item for item in backup_list
+                                        if not any(keyword in item for keyword in keywords)
+                                    ]
+
+                                    backups.append('mod')
+                                    return backups
+                            except Exception as e:
+                                log.logger.error('获取FTB Backups 2 备份文件失败！')
+                                log.logger.error(e)
+                                return
+                # plugins
+                if find_folder.find_folders_with_existence(server_info['server_path'] + '/plugins'):
+                    plugin_list = os.listdir(server_info['server_path'] + '/plugins')
+                    for plusins in plugin_list:
+                        if 'ebackup' in plusins:
+                            log.logger.info('已找到 eBackup 插件!')
+                            log.logger.info('尝试获取备份列表...')
+                            try:
+                                log.logger.info('尝试获取 eBackup 备份文件...')
+                                backup_list = os.listdir(server_info['server_path'] + '/plugins/eBackup/backups')
+                                if len(backup_list) > 0:
+                                    log.logger.info('已获取到 eBackup 备份文件...')
+
+                                    backups = [
+                                        item for item in backup_list
+                                        if not any(keyword in item for keyword in keywords)
+                                    ]
+
+                                    backups.append('plugin')
+                                    return backups
+                            except Exception as e:
+                                log.logger.error('获取 eBackup 备份文件失败!')
+                                log.logger.error(e)
+                                return
+
+        else:
+            log.logger.error('未找到服务器信息文件！')
+            return
+    except Exception as e:
+        log.logger.error('获取服务器信息失败！')
+        log.logger.error(e)
+        return
+
+def get_top_level_dirs(zip_path):
+    top_dirs = set()  # 存储首级目录名称（自动去重）
+    with zipfile.ZipFile(zip_path, 'r') as zf:
+        # 遍历 ZIP 文件中的所有条目
+        for name in zf.namelist():
+            # 提取首级目录（第一个路径部分）
+            first_part = name.split('/')[0]
+            # 判断是否为文件夹：
+            # 1. 条目以 "/" 结尾（显式目录），或
+            # 2. 首级目录下有子内容（隐式目录）
+            if name.endswith('/') or '/' in name:
+                top_dirs.add(first_part)
+    # 过滤掉单独的文件名（无子内容的条目）
+    return [d for d in top_dirs if any(
+        entry.startswith(d + '/') or entry == d + '/'
+        for entry in zf.namelist()
+    )]
+
+import stat
+
+def remove_readonly(func, path, _):
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+def Retracement(server_name: str, backup_file_name = None):
+    """
+    回档服务器
+    :param server_name: 服务器名称
+    """
+
+    if backup_file_name is None:
+        log.logger.info('未指定回档文件名，将默认使用最新文件进行回档！')
+        try:
+            backups = find_backup_file(server_name)
+            log.logger.info(f'尝试回档文件：{backups[-2]}')
+            backup_file_name = backups[-2]
+
+            # mod
+            if backups[-1] == 'mod':
+                with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r', encoding='utf-8') as f:
+                    backup_file_content = json.load(f)
+                    backup_file_absolute_path = backup_file_content['server_path'] + '/backups/' + backup_file_name
+
+                    # 删除旧文件
+                    with zipfile.ZipFile(backup_file_absolute_path, 'r') as zip_ref:
+                        all_files = get_top_level_dirs(backup_file_absolute_path)
+                    for file in all_files:
+                        if find_folder.find_folders_with_existence(backup_file_content['server_path'] + '/' + file):
+                            log.logger.debug(f'删除文件路径{backup_file_content['server_path'] + '/' + file}')
+                            shutil.rmtree(backup_file_content['server_path'] + '/' + file, onerror=remove_readonly)
+                            log.logger.info(f'删除{file}！')
+
+                    # 解压文件
+                    with zipfile.ZipFile(backup_file_absolute_path, 'r') as zip_ref:
+                        zip_ref.extractall(backup_file_content['server_path'])
+                        log.logger.info('解压完成！')
+
+            # plugin
+            if backups[-1] == 'plugin':
+                with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r', encoding='utf-8') as f:
+                    backup_file_content = json.load(f)
+                    backup_file_absolute_path = backup_file_content['server_path'] + '/plugins/eBackup/backups/' + backup_file_name
+
+                    # 删除旧文件
+                    with zipfile.ZipFile(backup_file_absolute_path, 'r')as zip_ref:
+                        all_files = zip_ref.namelist()
+                    for file in all_files:
+                        if find_folder.find_folders_with_existence(backup_file_content['server_path'] + '/' + file):
+                            log.logger.debug(f'删除文件路径{backup_file_content['server_path'] + '/' + file}')
+                            shutil.rmtree(backup_file_content['server_path'] + '/' + file, onerror=remove_readonly)
+                            log.logger.info(f'删除{file}!')
+                    # 解压文件
+                    with zipfile.ZipFile(backup_file_absolute_path, 'r') as zip_ref:
+                        zip_ref.extractall(backup_file_content['server_path'])
+                        log.logger.info('解压完成！')
+        except Exception as e:
+            log.logger.error(f'解压文件失败!\n{e}')
+            return False
+    else:
+        try:
+            backups = find_backup_file(server_name)
+
+            # mod
+            if backups[-1] == 'mod':
+                with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r', encoding='utf-8') as f:
+                    backup_file_content = json.load(f)
+                    backup_file_absolute_path = backup_file_content['server_path'] + '/backups/' + backup_file_name
+
+                    # 删除旧文件
+                    with zipfile.ZipFile(backup_file_absolute_path, 'r') as zip_ref:
+                        all_files = get_top_level_dirs(backup_file_absolute_path)
+                    for file in all_files:
+                        if find_folder.find_folders_with_existence(backup_file_content['server_path'] + '/' + file):
+                            log.logger.debug(f'删除文件路径{backup_file_content['server_path'] + '/' + file}')
+                            shutil.rmtree(backup_file_content['server_path'] + '/' + file, onerror=remove_readonly)
+                            log.logger.info(f'删除{file}!')
+
+                    # 解压文件
+                    with zipfile.ZipFile(backup_file_absolute_path, 'r') as zip_ref:
+                        zip_ref.extractall(backup_file_content['server_path'])
+                        log.logger.info('解压完成！')
+
+            # plugin
+            if backups[-1] == 'plugin':
+                with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r', encoding='utf-8') as f:
+                    backup_file_content = json.load(f)
+                    backup_file_absolute_path = backup_file_content['server_path'] + '/plugins/eBackup/backups/' + backup_file_name
+
+                    # 删除旧文件
+                    with zipfile.ZipFile(backup_file_absolute_path, 'r') as zip_ref:
+                        all_files  = zip_ref.namelist()
+                    for file in all_files:
+                        if find_folder.find_folders_with_existence(backup_file_content['server_path'] + '/' + file):
+                            log.logger.debug(f'删除文件路径{backup_file_content['server_path'] + '/' + file}')
+                            shutil.rmtree(backup_file_content['server_path'] + '/' + file, onerror=remove_readonly)
+                            log.logger.info(f'删除{file}!')
+
+                    # 解压文件
+                    with zipfile.ZipFile(backup_file_absolute_path, 'r') as zip_ref:
+                        zip_ref.extractall(backup_file_content['server_path'])
+                        log.logger.info('解压完成！')
+        except Exception as e:
+            log.logger.error(f'解压文件失败!{e}')
+            return False
