@@ -4,7 +4,6 @@ import subprocess
 import os
 import sys
 import platform
-from pathlib import Path
 import time
 import ctypes
 from tqdm import tqdm
@@ -12,7 +11,7 @@ from bin.export import log
 
 def install_java_windows(version):
     try:
-        def set_java_environment(jdk_path):
+        def set_java_environment(jdk_path, version):
             try:
                 if platform.system() == "Windows":
                     subprocess.run(f'setx JAVA_HOME "{jdk_path}" /M', shell=True, check=True)
@@ -158,14 +157,14 @@ def install_java_windows(version):
             return False
 
         try:
-            if not set_java_environment(latest_jdk):
+            if not set_java_environment(latest_jdk, version):
                 log.logger.warning("环境变量配置失败，但安装验证已通过")
         except Exception as env_e:
             log.logger.error(f"环境变量配置异常: {env_e}")
 
         log.logger.info("Java安装及验证全部通过")
         log.logger.info("Java安装成功。请重新启动终端或以管理员身份运行命令提示符以使环境变量生效。")  # 新增提示信息
-        return True
+        return java_path
 
     except Exception as e:
         log.logger.error(f"安装失败: {e}", exc_info=True)

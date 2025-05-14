@@ -1,13 +1,31 @@
 from bin.export import Is_program_running
 
-Is_program_running.Is_program_running()
+import os
+
+counts = Is_program_running.exist_program_is_running()
+
+now_program_pid = os.getpid()
+
+if counts > 2:
+    print("程序已经运行，请勿重复运行")
+    cmd = "taskkill /f /pid " + str(now_program_pid)
+
+    os.system(cmd)
 
 #检查Java是否安装
 import sys
+import json
 from bin.export import java
 from bin.export import examin
 from bin.export import log
 from bin.command import program
+
+java_versions_address = {
+    "1.8": "",
+    "16": "",
+    "17": "",
+    "21": ""
+}
 
 versions = [1.8, 16, 17, 21]
 for version in versions:
@@ -20,14 +38,38 @@ for version in versions:
         log.logger.info('尝试安装Java...')
         log.logger.info(f'版本: {version}')
         try:
-            if java.install_java_windows(version):
-                installed = True
-            else:
+            result = java.install_java_windows(version)
+            if result == False:
                 log.logger.error('Java安装失败')
                 log.logger.info(f'请手动安装Java {version}')
+            else:
+                java_versions_address[f'{version}'] = version
+                installed = True
         except Exception as e:
             log.logger.error(f'安装过程中发生异常: {str(e)}')
 
+# for java_address in versions:
+#     if java_versions_address[f'{java_address}'] == "":
+#         log.logger.warning(f'尝试获取Java {version}版本地址...')
+#         java_versions_address[f'{java_address}'] = java.install_java_windows(java_address)
+
+try:
+    with open('java_versions.json', 'r', encoding='utf-8') as f:
+        java_versions_address = json.load(f)
+
+        for javas in versions:
+            if java_versions_address[f'{javas}'] == "":
+                log.logger.error(f'未检测到Java {javas}版本地址')
+                log.logger.info('自动获取Java版本地址...')
+
+                java_versions_address[f'{javas}'] = java.install_java_windows(javas)
+
+except FileNotFoundError:
+    log.logger.error('未找到java_versions.json文件，请检查文件是否存在！')
+    log.logger.info('正在创建java_versions.json文件...')
+
+with open('java_versions.json', 'w', encoding='utf-8') as f:
+    json.dump(java_versions_address, f, indent=4)
 
 from bin.export import program_info
 from bin.export import init
@@ -41,7 +83,7 @@ from bin.export import numbers
 
 from cmd2 import Cmd
 
-from bin.api import server_api
+from bin.api import main
 import threading
 
 program.Create_ShortCut('PCSMT2-v' + program_info.PCSMTVersion, False)
@@ -62,7 +104,7 @@ else:
     admin.set_admin_account(account_name, password)
 
 # server_api.app.run()
-flask_thread = threading.Thread(target=server_api.run_flask, daemon=True)
+flask_thread = threading.Thread(target=main.run_flask, daemon=True)
 flask_thread.start()
 
 
@@ -89,11 +131,12 @@ class PCSMT2(Cmd):
     def do_add_server(self, arg):
         """添加服务器\nCommand: add_server <server_path> <server_name>"""
         try:
-            server_path, server_name = arg.split()
+            server_path, server_name, server_version = arg.split()
+            print(server_path, server_name, server_version)
         except ValueError:
             log.logger.error('参数错误，请输入正确的参数！')
             return
-        server.add_server(server_path, server_name, False)
+        server.add_server(server_path, server_name, False, server_version)
     def complete_add_server(self, text, line, begidx, endidx):
         arg = line.split()[1:]
         arg_counts = len(arg)
@@ -506,6 +549,33 @@ class PCSMT2(Cmd):
         if arg_counts == 1:
             types = ['true', 'false']
             return [type for type in types if type.startswith(text)]
+
+    def do_retracement(self, arg):
+        """回档服务器\nCommand: retracement [server_name]"""
+        args = arg.strip().split(maxsplit=1)  # 允许带空格的服务器名称
+
+        # 参数验证
+        if not args or args[0] not in program_info.server_list:
+            log.logger.error(f"服务器不存在或参数错误: {args[0] if args else ''}")
+            return
+
+        server_name = args[0]
+        backup_file = args[1] if len(args) > 1 else None
+
+        # 执行回档操作
+        server.Retracement(server_name, backup_file)
+    def complete_retracement(self, text, line, begidx, endidx):
+        arg = line.split()[1:]
+        arg_counts = len(arg)
+        # 第一个参数补全服务器列表
+        if arg_counts == 1:
+            return [s for s in program_info.server_list if s.startswith(text)]
+        # 第二个参数补全备份文件
+        elif arg_counts == 2:
+            backups = server.find_backup_file(arg[0])
+            backups.append('None')
+            return [b for b in backups if b.startswith(text)]
+        return []
 
     # 退出控制台
     def do_exit(self, arg):
