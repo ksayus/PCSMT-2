@@ -1,21 +1,26 @@
 import os
-import atexit
-import sys
+import json
+import psutil
+def exist_program_is_running():
+    pids = psutil.pids()
+    pid_lists = []
+    counts = 0
+    try:
+        # 获取当前程序名称
+        program_pid = os.getpid() # pid
+        pName = psutil.Process(program_pid).name() #name
 
-Lock_File = os.getcwd() + '/Lock_File.lock'
+        for pid in pids:
+            p = psutil.Process(pid)
+            pid_lists.append(p.name())
+            s = str(p.name())
+            if s == pName:
+                print(psutil.Process(pid).name())
+                counts += 1
+    except Exception as e:
+        print(e)
 
-def Is_program_running():
-    """检查程序是否正在运行"""
-    if os.path.exists(Lock_File):
-        print("程序正在运行中，关闭程序！")
-        sys.exit()
-    else:
-        with open(Lock_File, "w") as f:
-            f.write("This file is used to prevent multiple instances.")
-            atexit.register(Remove_Lock_File)
-        print("程序已被锁定,不可多次启动！")
+    return counts
 
-def Remove_Lock_File():
-    """删除锁文件"""
-    if os.path.exists(Lock_File):
-        os.remove(Lock_File)
+if  __name__ == '__main__':
+    print(os.getpid())

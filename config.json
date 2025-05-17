@@ -1,11 +1,11 @@
 {
-    "PCSMTVersion": "1.1.6",
+    "PCSMTVersion": "1.1.8",
     "Release_Version": "Release",
-    "default_server_run_memories_min": "2000",
-    "default_server_run_memories_max": "3000",
+    "default_server_run_memories_min": "2048",
+    "default_server_run_memories_max": "4096",
     "server_start_nogui": true,
     "wait_server_eula_generate_time": 15,
-    "Automatic_startup": true,
+    "Automatic_startup": "false",
     "Auto_Update_Source": "Github",
     "Minecraft_Test_Version": "false"
 }
