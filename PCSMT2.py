@@ -1,16 +1,23 @@
 from bin.export import Is_program_running
 
 import os
+import psutil
 
 counts = Is_program_running.exist_program_is_running()
 
 now_program_pid = os.getpid()
+if psutil.Process(now_program_pid).name() == "python.exe":
+    if counts > 1:
+        print("程序已经运行，请勿重复运行")
+        cmd = "taskkill /f /pid " + str(now_program_pid)
 
-if counts > 2:
-    print("程序已经运行，请勿重复运行")
-    cmd = "taskkill /f /pid " + str(now_program_pid)
+        os.system(cmd)
+else:
+    if counts > 2:
+        print("程序已经运行，请勿重复运行")
+        cmd = "taskkill /f /pid " + str(now_program_pid)
 
-    os.system(cmd)
+        os.system(cmd)
 
 #检查Java是否安装
 import sys
