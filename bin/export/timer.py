@@ -1,4 +1,3 @@
-from bin.command import program
 from bin.export import log
 from bin.export import program_info
 from bin.find_files import find_folder
@@ -8,6 +7,7 @@ from bin.export import get
 from bin.export import get_time
 import json
 from time import sleep
+import threading
 
 class Timer:
  # 现在self是Timer实例
@@ -53,4 +53,21 @@ class Timer:
         while True:
             sleep(a_loop)
             Timer.every_time_update_server_storage_size(self, server_name)
+
+    @classmethod  # 添加类方法装饰器
+    def thread(cls):  # 修改第一个参数为cls
+        if program_info.server_list is not None:
+            # 为每一个服务器创建定时任务
+            # 每个定时任务都单独为一个线程
+            server_timer_thread = []  # 初始化为空列表
+            i = 0
+            for server in program_info.server_list:
+                i += 1
+                # 修改：创建Timer实例并正确传递参数
+                timer_instance = Timer()
+                server_timer_thread.append(threading.Thread(target=timer_instance.start_timer, args=(server,), daemon=True))
+
+            # 新增：确保线程对象正确启动
+            for thread in server_timer_thread:
+                thread.start()
 

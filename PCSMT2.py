@@ -113,19 +113,22 @@ from bin.export import init
 from bin.export import timer
 import threading
 
-# 为每一个服务器创建定时任务
-# 每个定时任务都单独为一个线程
-server_timer_thread = []  # 初始化为空列表
-i = 0
-for server in program_info.server_list:
-    i += 1
-    # 修改：创建Timer实例并正确传递参数
-    timer_instance = timer.Timer()
-    server_timer_thread.append(threading.Thread(target=timer_instance.start_timer, args=(server,), daemon=True))
+# if program_info.program_version is not None:
+#     # 为每一个服务器创建定时任务
+#     # 每个定时任务都单独为一个线程
+#     server_timer_thread = []  # 初始化为空列表
+#     i = 0
+#     for server in program_info.server_list:
+#         i += 1
+#         # 修改：创建Timer实例并正确传递参数
+#         timer_instance = timer.Timer()
+#         server_timer_thread.append(threading.Thread(target=timer_instance.start_timer, args=(server,), daemon=True))
 
-# 新增：确保线程对象正确启动
-for thread in server_timer_thread:
-    thread.start()
+#     # 新增：确保线程对象正确启动
+#     for thread in server_timer_thread:
+#         thread.start()
+
+timer.Timer.thread()
 
 init.init_program()
 
