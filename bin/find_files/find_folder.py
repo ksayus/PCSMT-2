@@ -8,10 +8,10 @@ def find_folders_with_existence_and_create(directory):
     :return: bool
     """
     if os.path.exists(directory):
-        log.logger.info("文件夹存在:" + directory)
+        # log.logger.info("文件夹存在:" + directory)
         return True
     else:
-        log.logger.info("文件夹不存在，创建文件夹:" + directory)
+        # log.logger.info("文件夹不存在，创建文件夹:" + directory)
         try:
             os.mkdir(directory)
             return True
@@ -26,7 +26,7 @@ def find_folders_with_existence(directory):
     :return: bool
     """
     if os.path.exists(directory):
-        log.logger.info("文件夹存在:" + directory)
+        # log.logger.info("文件夹存在:" + directory)
         return True
     else:
         log.logger.error("文件夹不存在:" + directory)

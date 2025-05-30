@@ -2,6 +2,7 @@ from bin.export import Is_program_running
 
 import os
 import psutil
+import ctypes
 
 counts = Is_program_running.exist_program_is_running()
 
@@ -11,11 +12,29 @@ if psutil.Process(now_program_pid).name() == "python.exe":
         print("程序已经运行，请勿重复运行")
         cmd = "taskkill /f /pid " + str(now_program_pid)
 
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd != 0:
+                ctypes.windll.user32.SetWindowPos(
+                    hwnd,
+                    -1,  # HWND_TOPMOST
+                    0, 0, 0, 0,
+                    0x0001 | 0x0002  # SWP_NOMOVE | SWP_NOSIZE
+                )
+
         os.system(cmd)
 else:
     if counts > 2:
         print("程序已经运行，请勿重复运行")
         cmd = "taskkill /f /pid " + str(now_program_pid)
+
+        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
+        if hwnd != 0:
+                ctypes.windll.user32.SetWindowPos(
+                    hwnd,
+                    -1,  # HWND_TOPMOST
+                    0, 0, 0, 0,
+                    0x0001 | 0x0002  # SWP_NOMOVE | SWP_NOSIZE
+                )
 
         os.system(cmd)
 
@@ -60,6 +79,8 @@ for version in versions:
 #         log.logger.warning(f'尝试获取Java {version}版本地址...')
 #         java_versions_address[f'{java_address}'] = java.install_java_windows(java_address)
 
+from  bin.find_files import find_folder
+
 try:
     with open('java_versions.json', 'r', encoding='utf-8') as f:
         java_versions_address = json.load(f)
@@ -68,8 +89,17 @@ try:
             if java_versions_address[f'{javas}'] == "":
                 log.logger.error(f'未检测到Java {javas}版本地址')
                 log.logger.info('自动获取Java版本地址...')
-
-                java_versions_address[f'{javas}'] = java.install_java_windows(javas)
+                try:
+                    jdks = os.listdir(f'C:\\Program Files\\Java')
+                    for jdk in jdks:
+                        if f'jdk{javas}' in jdk.lower():
+                            log.logger.info(f'已获取Java {javas}版本地址：{jdk}')
+                            java_versions_address[f'{javas}'] = f'C:\\Program Files\\Java\\{jdk}\\bin\\java.exe'
+                            break
+                except  Exception as e:
+                    log.logger.error(f'未找到 {javas}版本地址: {e}')
+                    log.logger.info('正在安装Java...')
+                    java_versions_address[f'{javas}'] = java.install_java_windows(javas)
 
 except FileNotFoundError:
     log.logger.error('未找到java_versions.json文件，请检查文件是否存在！')
@@ -80,6 +110,22 @@ with open('java_versions.json', 'w', encoding='utf-8') as f:
 
 from bin.export import program_info
 from bin.export import init
+from bin.export import timer
+import threading
+
+# 为每一个服务器创建定时任务
+# 每个定时任务都单独为一个线程
+server_timer_thread = []  # 初始化为空列表
+i = 0
+for server in program_info.server_list:
+    i += 1
+    # 修改：创建Timer实例并正确传递参数
+    timer_instance = timer.Timer()
+    server_timer_thread.append(threading.Thread(target=timer_instance.start_timer, args=(server,), daemon=True))
+
+# 新增：确保线程对象正确启动
+for thread in server_timer_thread:
+    thread.start()
 
 init.init_program()
 
@@ -91,7 +137,6 @@ from bin.export import numbers
 from cmd2 import Cmd
 
 from bin.api import main
-import threading
 
 program.Create_ShortCut('PCSMT2-v' + program_info.PCSMTVersion, False)
 
@@ -136,7 +181,7 @@ class PCSMT2(Cmd):
 
     # 添加服务器
     def do_add_server(self, arg):
-        """添加服务器\nCommand: add_server <server_path> <server_name>"""
+        """添加服务器\nCommand: add_server <server_path> <server_name> <server_version>"""
         try:
             server_path, server_name, server_version = arg.split()
             print(server_path, server_name, server_version)
@@ -152,6 +197,8 @@ class PCSMT2(Cmd):
             return self.path_complete(text, line, begidx, endidx)
         elif arg_counts == 2:
             return [list for list in program_info.server_list if list.startswith(text)]
+        elif arg_counts == 3:
+            return [list for list in program_info.minecraft_version if list.startswith(text)]
 
     # 启动服务器
     def do_start_server(self, arg):

@@ -1083,6 +1083,8 @@ def Retracement(server_name: str, backup_file_name = None):
                     with zipfile.ZipFile(backup_file_absolute_path, 'r') as zip_ref:
                         all_files = get_top_level_dirs(backup_file_absolute_path)
                     for file in all_files:
+                        with zipfile.ZipFile(backup_file_content['server_path'] + '/' + 'old-save.zip', 'w', zipfile.ZIP_DEFLATED) as zip_ref:
+                            zip_ref.write(backup_file_content['server_path'] + '/' + file, arcname=backup_file_content['server_path'] + '/' + file)
                         if find_folder.find_folders_with_existence(backup_file_content['server_path'] + '/' + file):
                             log.logger.debug(f'删除文件路径{backup_file_content['server_path'] + '/' + file}')
                             shutil.rmtree(backup_file_content['server_path'] + '/' + file, onerror=remove_readonly)
@@ -1103,6 +1105,8 @@ def Retracement(server_name: str, backup_file_name = None):
                     with zipfile.ZipFile(backup_file_absolute_path, 'r')as zip_ref:
                         all_files = zip_ref.namelist()
                     for file in all_files:
+                        with zipfile.ZipFile(backup_file_content['server_path'] + '/' + 'old-save.zip', 'w', zipfile.ZIP_DEFLATED) as zip_ref:
+                            zip_ref.write(backup_file_content['server_path'] + '/' + file, arcname=backup_file_content['server_path'] + '/' + file)
                         if find_folder.find_folders_with_existence(backup_file_content['server_path'] + '/' + file):
                             log.logger.debug(f'删除文件路径{backup_file_content['server_path'] + '/' + file}')
                             shutil.rmtree(backup_file_content['server_path'] + '/' + file, onerror=remove_readonly)
@@ -1128,6 +1132,8 @@ def Retracement(server_name: str, backup_file_name = None):
                     with zipfile.ZipFile(backup_file_absolute_path, 'r') as zip_ref:
                         all_files = get_top_level_dirs(backup_file_absolute_path)
                     for file in all_files:
+                        with zipfile.ZipFile(backup_file_content['server_path'] + '/' + 'old-save.zip', 'w', zipfile.ZIP_DEFLATED) as zip_ref:
+                            zip_ref.write(backup_file_content['server_path'] + '/' + file, arcname=backup_file_content['server_path'] + '/' + file)
                         if find_folder.find_folders_with_existence(backup_file_content['server_path'] + '/' + file):
                             log.logger.debug(f'删除文件路径{backup_file_content['server_path'] + '/' + file}')
                             shutil.rmtree(backup_file_content['server_path'] + '/' + file, onerror=remove_readonly)
@@ -1148,6 +1154,8 @@ def Retracement(server_name: str, backup_file_name = None):
                     with zipfile.ZipFile(backup_file_absolute_path, 'r') as zip_ref:
                         all_files  = zip_ref.namelist()
                     for file in all_files:
+                        with zipfile.ZipFile(backup_file_content['server_path'] + '/' + 'old-save.zip', 'w', zipfile.ZIP_DEFLATED) as zip_ref:
+                            zip_ref.write(backup_file_content['server_path'] + '/' + file, arcname=backup_file_content['server_path'] + '/' + file)
                         if find_folder.find_folders_with_existence(backup_file_content['server_path'] + '/' + file):
                             log.logger.debug(f'删除文件路径{backup_file_content['server_path'] + '/' + file}')
                             shutil.rmtree(backup_file_content['server_path'] + '/' + file, onerror=remove_readonly)

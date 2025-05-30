@@ -23,10 +23,10 @@ def find_files_with_existence_and_create(directory):
     :return: 匹配的文件列表
     """
     if os.path.exists(directory):
-        log.logger.info("文件存在:" + directory)
+        # log.logger.info("文件存在:" + directory)
         return True
     else:
-        log.logger.info("文件不存在，创建文件:" + directory)
+        # log.logger.info("文件不存在，创建文件:" + directory)
         try:
             with open(directory, 'w') as file:
                 file.close()
@@ -41,7 +41,7 @@ def find_files_with_existence(directory):
     若不存在则返回False
     """
     if os.path.exists(directory):
-        log.logger.info("文件存在:" + directory)
+        # log.logger.info("文件存在:" + directory)
         return True
     else:
         log.logger.error("文件不存在:" + directory)

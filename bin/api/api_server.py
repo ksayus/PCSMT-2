@@ -9,6 +9,7 @@ from bin.export import admin
 from flask import session, redirect, url_for
 from flask import render_template
 from flask import request
+from bin.export import get
 
 # server
 @main.app.route('/api/server', methods=['GET'])
@@ -89,6 +90,49 @@ def start_server(server_name):
             return jsonify({"status": "启动成功"}), 200
         else:
             return jsonify({"error": "启动失败"}), 502
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "内部错误"}), 500
+
+@main.app.route('/api/server/<string:server_name>/storage_chart')
+def server_storage_chart(server_name):
+    """渲染存储图表页面"""
+    return render_template('chart_js.html', server_name=server_name)
+
+@main.app.route('/api/server/<string:server_name>/storage_info', methods=['GET'])
+def return_server_storage_info(server_name):
+    """
+    获取服务器存储信息
+    :param server_name: 服务器名称
+    """
+    try:
+        server_storage_size = get.get_server_storage_size(server_name)
+
+        # 修改：提取数值部分并转换为浮点数
+        numeric_values = []
+        for val in server_storage_size['storage_size']:
+            # 分离数值和单位（例如："5.2GB" -> 5.2）
+            numeric_part = ''.join(c for c in val if c.isdigit() or c == '.')
+            numeric_values.append(float(numeric_part))
+
+        if server_storage_size['storage_size'][0] is None or server_storage_size['time'][0] is None:
+            return jsonify({"error": "未找到信息"}), 400
+
+        title = f'{server_name}服务器存储情况'
+
+        types = ['TB', 'GB', 'MB', 'KB', 'B']
+        now_type = 'B'  # 默认值，确保变量始终有值
+        for this_type in types:
+            if this_type in server_storage_size['storage_size'][0]:
+                now_type = this_type
+                break
+
+        return jsonify({
+            'title': title,
+            'labels': server_storage_size['time'],
+            'values': numeric_values,  # 使用转换后的数值数组
+            'type': now_type
+        }), 200
     except Exception as e:
         log.logger.error(str(e))
         return jsonify({"error": "内部错误"}), 500
