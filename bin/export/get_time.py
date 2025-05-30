@@ -46,3 +46,11 @@ def now_time_except_hour_minute():
     01
     """
     return now.strftime("%S")
+
+def now_time_year_month_day_hour():
+    """
+    返回当前时间，包含年份、月份、日期、小时
+    示例:
+    2021Y - 01M - 01D - 01H
+    """
+    return now.strftime("%YY - %mM - %dD - %HH")

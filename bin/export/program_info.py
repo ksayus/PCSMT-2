@@ -11,6 +11,7 @@ program_name = 'PCSMT2'
 
 server_start_batch = '\start.bat'
 server_save_path = '\saves'
+server_storage_size = '\server_storage_size'
 server_eula = '\eula.txt'
 program_logs = '\logs'
 server_properties = '\server.properties'
@@ -85,7 +86,7 @@ ops = {
 }
 
 config = {
-            "PCSMTVersion": "1.1.6",
+            "PCSMTVersion": "1.1.9",
             "Release_Version": "Release",
             "default_server_run_memories_min": 1024,
             "default_server_run_memories_max": 2048,
