@@ -86,7 +86,7 @@ ops = {
 }
 
 config = {
-            "PCSMTVersion": "1.1.9",
+            "PCSMTVersion": "1.1.9.1",
             "Release_Version": "Release",
             "default_server_run_memories_min": 1024,
             "default_server_run_memories_max": 2048,
@@ -94,7 +94,8 @@ config = {
             "wait_server_eula_generate_time": 15,
             "Automatic_startup": True,
             "Auto_Update_Source": "Github",
-            "Minecraft_Test_Version": False
+            "Minecraft_Test_Version": False,
+            "Storage_Size_Update_Time": 3600,
 }
 
 program_config_read = {
@@ -106,7 +107,8 @@ program_config_read = {
     "wait_server_eula_generate_time": 0,
     "Automatic_startup": False,
     "Auto_Update_Source": "",
-    "Minecraft_Test_Version": False
+    "Minecraft_Test_Version": False,
+    "Storage_Size_Update_Time": 0,
 }
 
 program_config_read = init.read_config_json()

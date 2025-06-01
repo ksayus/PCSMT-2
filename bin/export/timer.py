@@ -10,7 +10,7 @@ from time import sleep
 import threading
 
 class Timer:
- # 现在self是Timer实例
+    # 现在self是Timer实例
     def start_timer(self, server_name):  # 保持实例方法签名
         self.timer(server_name)
 
@@ -40,7 +40,7 @@ class Timer:
 
                                 server_save_json['storage_size'].append(size_change.size_change(get.get_dir_size(server_info['server_path'])))
                                 server_save_json['time'].append(get_time.now_time_year_month_day_hour())
-                            with open(program_info.work_path + program_info.server_storage_size + '/' + server_name + '.json', 'w', encoding='utf-8') as f:  
+                            with open(program_info.work_path + program_info.server_storage_size + '/' + server_name + '.json', 'w', encoding='utf-8') as f:
                                 json.dump(server_save_json, f, indent=4)
 
         except Exception as e:
@@ -49,8 +49,11 @@ class Timer:
             return
 
     def timer(self, server_name):
-        a_loop = 3600
         while True:
+            if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
+                with open(program_info.work_path + program_info.program_config, 'r', encoding='utf-8') as f:
+                    config_read = json.load(f)
+            a_loop = config_read['Storage_Size_Update_Time']
             sleep(a_loop)
             Timer.every_time_update_server_storage_size(self, server_name)
 
@@ -63,11 +66,10 @@ class Timer:
             i = 0
             for server in program_info.server_list:
                 i += 1
-                # 修改：创建Timer实例并正确传递参数
+                # 创建Timer实例并正确传递参数
                 timer_instance = Timer()
                 server_timer_thread.append(threading.Thread(target=timer_instance.start_timer, args=(server,), daemon=True))
 
-            # 新增：确保线程对象正确启动
+            # 确保线程对象正确启动
             for thread in server_timer_thread:
                 thread.start()
-

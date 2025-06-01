@@ -1,11 +1,12 @@
 {
-    "PCSMTVersion": "1.1.9",
+    "PCSMTVersion": "1.1.9.1",
     "Release_Version": "Release",
-    "default_server_run_memories_min": "2048",
-    "default_server_run_memories_max": "4096",
-    "server_start_nogui": true,
+    "default_server_run_memories_min": 1024,
+    "default_server_run_memories_max": 2048,
+    "server_start_nogui": "false",
     "wait_server_eula_generate_time": 15,
     "Automatic_startup": "false",
     "Auto_Update_Source": "Github",
-    "Minecraft_Test_Version": "false"
+    "Minecraft_Test_Version": "false",
+    "Storage_Size_Update_Time": 3600
 }

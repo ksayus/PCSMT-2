@@ -634,6 +634,17 @@ class PCSMT2(Cmd):
             return [b for b in backups if b.startswith(text)]
         return []
 
+    def do_change_storage_size_update_time(self, arg):
+        try:
+            time = arg.strip()
+            if not time.isdigit():
+                log.logger.error('参数错误:请输入数字')
+                return
+        except ValueError as e:
+            log.logger.error('参数错误，请输入正确的参数！')
+            log.logger.error(e)
+        program.change_storage_size_update_time(time)
+
     # 退出控制台
     def do_exit(self, arg):
         """退出控制台\nCommand: exit"""

@@ -454,3 +454,32 @@ def change_get_minecraft_test_version(argument):
             log.logger.error('读取config文件失败！')
             log.logger.error(e)
             return
+
+def change_storage_size_update_time(time):
+    """
+    更改存储大小更新时间
+    参数：
+    time -> int 存储空间更新时间
+    单位 ：秒
+    """
+    if find_file.find_files_with_existence(program_info.work_path + program_info.program_config):
+        try:
+            with open(program_info.work_path + program_info.program_config, "r") as f:
+                config_read = json.load(f) # 读取json文件
+            if(config_read['Storage_Size_Update_Time'] == time):
+                log.logger.info('更改存储大小更新时间已为:' + time + '，无需修改')
+                return
+            else:
+                config_read['Storage_Size_Update_Time'] = int(time)
+                try:
+                    with open(program_info.work_path + program_info.program_config, "w") as f:
+                        json.dump(config_read, f, indent=4) # 写入json文件
+                    log.logger.info("修改更改存储大小更新时间设置成功")
+                except Exception as e:
+                    log.logger.error('写入程序配置文件失败！')
+                    log.logger.error(e)
+        except Exception as e:
+            log.logger.error('读取程序配置文件失败！')
+            log.logger.error(e)
+            return
+
