@@ -32,7 +32,8 @@
                         datasets: [{
                             label: `存储大小 (${data.type})`,
                             data: data.values,
-                            borderColor: 'rgb(75, 192, 192)',
+                            // 颜色: 蓝色
+                            borderColor: 'rgb(60, 143, 232)',
                             borderWidth: 2,
                             tension: 0
                         }]
@@ -50,7 +51,7 @@
                                 beginAtZero: true,
                                 ticks: {
                                     callback: function(value) {
-                                        // 修改：使用数值和单位组合
+                                        // 使用数值和单位组合
                                         return value + ' ' + data.type;
                                     }
                                 }

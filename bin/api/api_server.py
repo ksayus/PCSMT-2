@@ -20,14 +20,18 @@ def server_api_root():
 def server_lists():
     try:
         # 使用 jsonify 返回 JSON 格式的响应
-        return jsonify(program_info.server_list)
+        return jsonify(
+            {
+                "serverlist": program_info.server_list
+            }
+        )
     except Exception as e:
         # 记录错误日志（建议使用 logging 模块）
         # 返回 JSON 格式的错误信息和 500 状态码
         log.logger.error('获取服务器列表时发生内部错误')
         return jsonify({"error": "获取服务器列表时发生内部错误"}), 500
 
-@main.app.route('/api/server/<string:server_name>', methods=['GET'])
+@main.app.route('/api/server/info/<string:server_name>', methods=['GET'])
 def server_info(server_name):
     try:
         server_info = server.search_server(server_name)
@@ -35,7 +39,11 @@ def server_info(server_name):
             log.logger.error('服务器不存在')
             return jsonify({"error": "服务器不存在"}), 404
         else:
-            return jsonify(server_info)
+            return jsonify({
+                'version': server_info['server_version'],
+                'size': server_info['server_size'],
+                'startCount': server_info['start_count'],
+            }), 200
     except Exception as e:
         # 记录错误日志（建议使用 logging 模块）
         # 返回 JSON 格式的错误信息和 500 状态码
@@ -53,7 +61,14 @@ def start_latest_server():
             with open(program_info.work_path + program_info.program_resource + program_info.latest_start_server_json, 'r', encoding='utf-8') as f:
                 server_info = json.load(f)
                 f.close()
-        return jsonify(server_info)
+        return jsonify(
+            {
+                'name': server_info['server_name'],
+                'version': server_info['server_version'],
+                'size': server_info['server_size'],
+                'startCount': server_info['start_count'],
+            }
+        )
     except Exception as e:
         # 记录错误日志（建议使用 logging 模块）
         # 返回 JSON 格式的错误信息和 500 状态码

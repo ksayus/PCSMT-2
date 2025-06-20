@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PCSMT API Help</title>
+    <style>
+        /* 新增样式部分 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 2rem;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-collapse: collapse;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 1.2em;
+            font-size: 1.1em;
+            text-align: center;
+        }
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #f1f8ff;
+        }
+        td:first-child {
+            color: #e74c3c;
+            font-weight: 500;
+        }
+        a {
+            color: #2980b9;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>PCSMT API</h1>
+    <table>
+        <thead>
+            <tr>
+                <th colspan="2">API 列表</th>
+                <th colspan="2">描述</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>/api</td>
+                <td>这是API的首页</td>
+            </tr>
+            <tr>
+                <td>/api/server</td>
+                <td>这是API Server的首页</td>
+            </tr>
+            <tr>
+                <td>/api/server/list</td>
+                <td>服务器列表</td>
+            </tr>
+            <tr>
+                <td>/api/server/info/{string:server_name}</td>
+                <td>指定服务器信息</td>
+            </tr>
+            <tr>
+                <td>/api/server/latest</td>
+                <td>上次启动服务器</td>
+            </tr>
+            <tr>
+                <td>/login</td>
+                <td>登录界面</td>
+            </tr>
+            <tr>
+                <td>/api/server/{string:server_name}/start</td>
+                <td>启动服务器</td>
+            </tr>
+            <tr>
+                <td>/api/server/{string:server_name}/storage_chart</td>
+                <td>服务器存储占用大小变化图表</td>
+            </tr>
+            <tr>
+                <td>/api/server/{string:server_name}/storage_info</td>
+                <td>服务器存储占用大小变化信息</td>
+            </tr>
+            <tr>
+                <td>/api/program</td>
+                <td>这是API Program的首页</td>
+            </tr>
+            <tr>
+                <td>/api/program/version</td>
+                <td>程序版本</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

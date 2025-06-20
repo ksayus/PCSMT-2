@@ -79,8 +79,6 @@ for version in versions:
 #         log.logger.warning(f'尝试获取Java {version}版本地址...')
 #         java_versions_address[f'{java_address}'] = java.install_java_windows(java_address)
 
-from  bin.find_files import find_folder
-
 try:
     with open('java_versions.json', 'r', encoding='utf-8') as f:
         java_versions_address = json.load(f)
@@ -128,7 +126,7 @@ import threading
 #     for thread in server_timer_thread:
 #         thread.start()
 
-timer.Timer.thread()
+timer.TimerStorageSizeUpdate.thread()
 
 init.init_program()
 

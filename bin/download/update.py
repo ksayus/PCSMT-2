@@ -1,8 +1,5 @@
-import json
 import requests
 import os
-import sys
-import certifi
 import urllib3
 from bin.export import log
 from bin.export import program_info
@@ -88,10 +85,10 @@ def update_program_gitee():
         latest_version_str = response_json['tag_name']
         latest_version = response_json['name']
 
-        #latest_version_str = latest_version.replace('PCSMT-v', '')
+        # latest_version_str = latest_version.replace('PCSMT-v', '')
 
-        log.logger.debug(program_info.config['PCSMTVersion'])
-        log.logger.debug(latest_version_str)
+        # log.logger.debug(program_info.config['PCSMTVersion'])
+        # log.logger.debug(latest_version_str)
 
         try:
 

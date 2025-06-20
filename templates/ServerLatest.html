@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ServerInfo</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            align-self: center;
+        }
+        th {
+            background-color: #3165f1; /* 深蓝色表头 */
+            color: white;
+            text-align: left;
+            padding: 12px;
+            width: 30%;  /* 固定属性列宽度 */
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e2e8f0; /* 浅灰色边框 */
+            background-color: rgb(227, 247, 253);
+        }
+
+        /* 移除多余的边框样式 */
+        th, td {
+            border: none; /* 删除多余的边框样式 */
+        }
+        #Type-th {
+            width: 30%;  /* 添加属性列宽度 */
+            text-align: center;
+        }
+        #Info-td {
+            width: 70%;  /* 添加信息列宽度 */
+            text-align: center;
+        }
+        .server-card {
+            border: 1px solid rgba(255, 255, 255, 0.3); /* 半透明白色边框 */
+            border-radius: 8px;
+            overflow: hidden;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            margin-bottom: 20px;
+            background-color: rgba(255, 255, 255, 0.5); /* 半透明白色背景 */
+            backdrop-filter: blur(10px); /* 亚克力毛玻璃效果 */
+            -webkit-backdrop-filter: blur(10px); /* 兼容Webkit浏览器 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1),
+                        0 4px 6px rgba(0, 0, 0, 0.1); /* 双层阴影增强层次感 *
+        }
+        .server-card tr:nth-child(odd) {
+            background-color: rgba(255, 255, 255, 0.3); /* 半透明白色 */
+        }
+        .server-card tr:nth-child(even) {
+            background-color: rgba(240, 247, 255, 0.3); /* 半透明淡蓝色 */
+        }
+
+        /* 新增响应式布局 */
+        @media (max-width: 768px) {
+            .server-card {
+                width: 90%;
+                top: 60%;
+            }
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        /* 增强卡片视觉效果 */
+        .server-card {
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2),
+                        0 6px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .server-card:hover {
+            transform: translate(-50%, -51%);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25),
+                        0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 添加行悬停效果 */
+        tr {
+            transition: background-color 0.2s ease;
+        }
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        /* 添加加载动画 */
+        .loader {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #3165f1;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* 字体优化 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        th {
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- 添加加载动画 -->
+    <div class="loader" id="loader"></div>
+
+    <div class="server-card">
+        <table>
+            <tr>
+                <th id="Type-th">类型</th>
+                <td id="Info-td">信息</td>
+            </tr>
+            <tr>
+                <th>服务器名</th>
+                <td id="id-name"></td>
+            </tr>
+            <tr>
+                <th>服务器版本</th>
+                <td id="id-version"></td>
+            </tr>
+            <tr>
+                <th>服务器大小</th>
+                <td id="id-size"></td>
+            </tr>
+            <tr>
+                <th>服务器启动次数</th>
+                <td id="id-start-counts"></td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        // 显示加载动画
+        document.getElementById('loader').style.display = 'block';
+
+        // GET请求示例
+        fetch(`/api/server/latest`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                // 隐藏加载动画
+                document.getElementById('loader').style.display = 'none';
+
+                document.getElementById('id-name').innerText = data.name;
+                document.getElementById('id-version').innerText = data.version;
+                document.getElementById('id-size').innerText = data.size;
+                document.getElementById('id-start-counts').innerText = data.startCount;
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                // 隐藏加载动画
+                document.getElementById('loader').style.display = 'none';
+                alert('无法获取服务器信息');
+            });
+    </script>
+</body>
+</html>

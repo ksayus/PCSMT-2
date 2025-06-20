@@ -19,5 +19,5 @@ app = Flask(
 app.secret_key = 'pcsmt2'
 
 def run_flask():
-    from . import api, api_server, api_program
+    from . import api, api_server, api_program, PageServer, PageProgram
     app.run(port=5000)

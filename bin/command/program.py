@@ -6,12 +6,15 @@ from bin.export import log
 from win32com.client import Dispatch
 from bin.export import get_time
 from bin.export import get
+from bin.export import timer
+from time import sleep
 import sys
 import os
 import winreg
 import winshell
 import time
 import shutil
+import threading
 
 def change_server_run_memories_config(argument_min, argument_max):
     """
@@ -466,7 +469,7 @@ def change_storage_size_update_time(time):
         try:
             with open(program_info.work_path + program_info.program_config, "r") as f:
                 config_read = json.load(f) # 读取json文件
-            if(config_read['Storage_Size_Update_Time'] == time):
+            if(config_read['Storage_Size_Update_Time'] == int(time)):
                 log.logger.info('更改存储大小更新时间已为:' + time + '，无需修改')
                 return
             else:
@@ -475,6 +478,19 @@ def change_storage_size_update_time(time):
                     with open(program_info.work_path + program_info.program_config, "w") as f:
                         json.dump(config_read, f, indent=4) # 写入json文件
                     log.logger.info("修改更改存储大小更新时间设置成功")
+                    # 先关闭当前线程
+                    for thread in threading.enumerate():
+                        print(thread.name)
+                        if 'start_timer' in thread.name:
+                            if thread.is_alive(): # 判断线程是否存活
+                                timer.TimerStorageSizeUpdate.StopTimerStorageSizeUpdate.set()
+                                thread.join()
+                                # log.logger.info(f'已取消{thread.name}服务器存储空间更新任务！')
+
+                    # 然后再次启动以应用修改
+                    sleep(1)
+                    timer.TimerStorageSizeUpdate.thread()
+                    log.logger.info(f'已启动服务器存储空间更新任务！')
                 except Exception as e:
                     log.logger.error('写入程序配置文件失败！')
                     log.logger.error(e)

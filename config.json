@@ -1,5 +1,5 @@
 {
-    "PCSMTVersion": "1.1.9.1",
+    "PCSMTVersion": "1.1.9.2",
     "Release_Version": "Release",
     "default_server_run_memories_min": 1024,
     "default_server_run_memories_max": 2048,
@@ -8,5 +8,5 @@
     "Automatic_startup": "false",
     "Auto_Update_Source": "Github",
     "Minecraft_Test_Version": "false",
-    "Storage_Size_Update_Time": 3600
+    "Storage_Size_Update_Time": 2
 }

@@ -170,7 +170,7 @@ def add_server(server_path, server_name, rewrite, server_version):
                         with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'w') as f:
                             json.dump(server_info, f, indent=4)
                             f.close()
-                        timer.Timer.thread()
+                        timer.TimerStorageSizeUpdate.thread()
                     except Exception as e:
                         log.logger.error('创建服务器信息文件失败!')
                         log.logger.error(e)
@@ -418,7 +418,7 @@ def download_server_core(server_name, core_type, core_support_version):
             log.logger.info('正在添加服务器...')
             add_server(save_core_path, server_name, True, core_support_version)
             program_info.server_list = server_list()
-            timer.Timer.thread()
+            timer.TimerStorageSizeUpdate.thread()
         else:
             log.logger.error('创建服务器失败！')
             return

@@ -11,7 +11,11 @@ def program_api_root():
 @main.app.route('/api/program/version', methods=['GET'])
 def program_version_api():
     try:
-        return jsonify(program_info.PCSMTVersion + '-' + program_info.config['Release_Version'])
+        return jsonify(
+            {
+                'version': program_info.PCSMTVersion + '-' + program_info.config['Release_Version']
+            }
+        )
     except Exception as e:
         # 记录错误日志（建议使用 logging 模块）
         # 返回 JSON 格式的错误信息和 500 状态码
