@@ -42,7 +42,7 @@ def get_minecraft_version():
                         item for item in version_list
                         if not any(keyword in item for keyword in exclude_keyword)
                     ]
-        log.logger.debug('Minecraft版本:' + json.dumps(version_list))
+        log.Debug('Minecraft版本:' + json.dumps(version_list))
         return version_list
     except Exception as e:
         log.logger.error("获取Minecraft版本失败，请检查网络连接！")

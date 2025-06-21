@@ -2,6 +2,7 @@ import logging
 import os
 from bin.export import get_time
 from bin.find_files import find_folder
+from bin.export import Is_program_running
 
 now_work_path = os.getcwd()
 
@@ -34,3 +35,9 @@ if find_folder.find_folders_with_existence("logs"):
         logger.addHandler(console_handler)
     else:
         print("日志文件夹不存在")
+
+def Debug(message: str):
+    if Is_program_running.IsProgramExe():
+        pass
+    else:
+        logger.debug(message)

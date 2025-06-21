@@ -21,8 +21,8 @@ def update_program_github():
 
         #latest_version_str = latest_version.replace('PCSMT-v', '')
 
-        log.logger.debug(program_info.config['PCSMTVersion'])
-        log.logger.debug(latest_version_str)
+        log.Debug(program_info.config['PCSMTVersion'])
+        log.Debug(latest_version_str)
 
         try:
 
@@ -87,8 +87,8 @@ def update_program_gitee():
 
         # latest_version_str = latest_version.replace('PCSMT-v', '')
 
-        # log.logger.debug(program_info.config['PCSMTVersion'])
-        # log.logger.debug(latest_version_str)
+        log.Debug(program_info.config['PCSMTVersion'])
+        log.Debug(latest_version_str)
 
         try:
 
@@ -103,7 +103,7 @@ def update_program_gitee():
                 log.logger.info("最新版本为：" + latest_version)
                 # 获取最新版本号和下载地址
                 try:
-                    log.logger.debug("获取下载url")
+                    log.Debug("获取下载url")
                     latest_assets = response_json['assets']
                     for asset in latest_assets:
                         if asset['name'].endswith('.exe'):
@@ -116,7 +116,7 @@ def update_program_gitee():
 
                     log.logger.info("尝试更新...")
                     log.logger.info("正在下载文件...")
-                    log.logger.debug("下载url:" + download_url)
+                    log.Debug("下载url:" + download_url)
                     # 下载更新文件
                     try:
                         os.system('powershell curl -o ' + program_info.work_path + '/' + latest_version + '.exe ' + download_url)

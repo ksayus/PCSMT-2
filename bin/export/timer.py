@@ -5,6 +5,7 @@ from bin.find_files  import find_file
 from bin.export import size_change
 from bin.export import get
 from bin.export import get_time
+from bin.export import Is_program_running
 import json
 import threading
 
@@ -40,8 +41,22 @@ class TimerStorageSizeUpdate:
                                         'time': []
                                     }
 
-                                server_save_json['storage_size'].append(size_change.size_change(get.get_dir_size(server_info['server_path'])))
-                                server_save_json['time'].append(get_time.now_time_year_month_day_hour())
+                                StorageSize = size_change.size_change(get.get_dir_size(server_info['server_path']))
+                                NowTime = get_time.now_time_year_month_day_hour()
+
+                                # 判断是否与上次的存储大小一致
+                                # 先处理初次启动的情况
+                                with open(program_info.work_path + '/config.json', 'r', encoding='utf-8') as f:
+                                    config_read = json.load(f)
+                                StorageSizeUpdateTime = config_read['Storage_Size_Update_Time']
+
+                                if StorageSizeUpdateTime > 0 and StorageSizeUpdateTime < 1555200: # 小于18天时启用
+                                    if server_save_json['storage_size'][-1] == StorageSize:
+                                        log.Debug('存储大小无变化，不进行更新！')
+                                        return
+
+                                server_save_json['storage_size'].append(StorageSize)
+                                server_save_json['time'].append(NowTime)
                             with open(program_info.work_path + program_info.server_storage_size + '/' + server_name + '.json', 'w', encoding='utf-8') as f:
                                 json.dump(server_save_json, f, indent=4)
 

@@ -480,7 +480,7 @@ def change_storage_size_update_time(time):
                     log.logger.info("修改更改存储大小更新时间设置成功")
                     # 先关闭当前线程
                     for thread in threading.enumerate():
-                        print(thread.name)
+                        log.Debug(thread.name)
                         if 'start_timer' in thread.name:
                             if thread.is_alive(): # 判断线程是否存活
                                 timer.TimerStorageSizeUpdate.StopTimerStorageSizeUpdate.set()
@@ -490,7 +490,7 @@ def change_storage_size_update_time(time):
                     # 然后再次启动以应用修改
                     sleep(1)
                     timer.TimerStorageSizeUpdate.thread()
-                    log.logger.info(f'已启动服务器存储空间更新任务！')
+                    log.Debug('已启动服务器存储空间更新任务！')
                 except Exception as e:
                     log.logger.error('写入程序配置文件失败！')
                     log.logger.error(e)

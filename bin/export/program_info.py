@@ -56,7 +56,7 @@ rcon_localhost = 'localhost'
 
 work_path = os.getcwd()
 
-server_list = server.server_list()
+server_list = server.server_list(ShowMessage=False)
 minecraft_version = get.get_minecraft_version()
 properties_keyword = get.get_properties_keyword()
 
@@ -86,7 +86,7 @@ ops = {
 }
 
 config = {
-            "PCSMTVersion": "1.1.9.2",
+            "PCSMTVersion": "1.1.9.3",
             "Release_Version": "Release",
             "default_server_run_memories_min": 1024,
             "default_server_run_memories_max": 2048,

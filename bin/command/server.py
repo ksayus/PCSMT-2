@@ -12,7 +12,6 @@ from bin.export import eula
 from bin.export import log
 from bin.export import examin_json_argument
 from bin.download import server_core
-from bin.export import get_time
 from bin.export import rcon
 from bin.export import size_change
 from bin.export import get
@@ -73,7 +72,7 @@ def add_server(server_path, server_name, rewrite, server_version):
                 with open('./java_versions.json', 'r', encoding='utf-8') as f:
                     java_versions_address = json.load(f)
 
-                    # TODO: 添加按照版本使用不同版本的Java JDK
+                    # 按照版本使用不同版本的Java JDK
                     # 获取Java版本
                     if v < version.parse('1.17.0'):
                         java_args = '"' f'{java_versions_address['1.8']}' '"'
@@ -276,7 +275,7 @@ def start_server(server_name):
         log.logger.error('未找到服务器，请检查服务器名称是否正确！')
         return False
 
-def server_list():
+def server_list(ShowMessage = True):
     """
     列出服务器列表
     """
@@ -286,21 +285,23 @@ def server_list():
         return
     else:
         server_lists = []
-        log.logger.info('当前服务器列表：')
+        if ShowMessage:
+            log.logger.info('当前服务器列表：')
         for server in server_list:
             try:
                 with open(server, 'r', encoding='utf-8') as f:
                     server_info = json.load(f)
                     now_server_name = server_info['server_name']
                     f.close()
-
-                log.logger.info(now_server_name)
+                if ShowMessage:
+                    log.logger.info(now_server_name)
                 server_lists.append(now_server_name)
             except Exception as e:
                 log.logger.error('读取服务器信息文件失败!')
                 log.logger.error(e)
                 return
-        log.logger.info('当前服务器数量：' + str(len(server_list)))
+        if ShowMessage:
+            log.logger.info('当前服务器数量：' + str(len(server_list)))
         return server_lists
 
 def change_server_properties(server_name, keyword, argument):
@@ -517,39 +518,25 @@ def banned_player(server_name, player_name):
             return
         else:
             log.logger.info('已找到服务器:' + server_info['server_path'])
-            log.logger.info("尝试获取玩家UUID...")
-            try:
-                response = requests.get('https://api.mojang.com/users/profiles/minecraft/' + player_name)
-                player_uuid = response.json()['id']
-                log.logger.info('获取到玩家UUID:' + player_uuid)
-            except Exception as e:
-                log.logger.error('获取玩家UUID失败！')
-                log.logger.error(e)
-                return
-            log.logger.info('尝试读取' + program_info.banned_player + '文件...')
-            try:
-                with open(server_info['server_path'] + program_info.banned_player, 'r', encoding='utf-8') as f:
-                    banned_players = json.load(f)
-                    program_info.banned_players['uuid'] = player_uuid
-                    program_info.banned_players['name'] = player_name
-                    program_info.banned_players['created'] = str(get_time.today) + ' ' + str(get_time.now_time()) + ' +0800'
-                    banned_players.append(program_info.banned_players)
-                    log.logger.info('读取并写入信息:' + json.dumps(program_info.banned_players, indent=4))
-                    log.logger.info('尝试写入' + program_info.banned_player + '文件...')
-                    try:
-                        with open(server_info['server_path'] + program_info.banned_player, 'w', encoding='utf-8') as f:
-                            json.dump(banned_players, f, indent=4)
-                            log.logger.info('写入成功！')
-                            return
-                    except Exception as e:
-                        log.logger.error('写入失败！')
-                        log.logger.error(e)
-                        return
-                    f.close()
-            except Exception as e:
-                log.logger.error('读取服务器信息文件失败！')
-                log.logger.error(e)
-                return
+            port = rcon.rcon_port(server_info)
+            if port != None:
+                try:
+                    server_command = rcon.connect_rcon(port)
+                except Exception as e:
+                    log.logger.error('链接rcon失败!')
+                    log.logger.error(e)
+                    return
+                time.sleep(1)
+                try:
+                    server_command.connect()
+                    response = server_command.command(f'/ban {player_name}')
+                    log.logger.info(f'发送命令：ban {player_name}')
+                    log.logger.info(response)
+                    server_command.disconnect()
+                except Exception as e:
+                    log.logger.error('发送命令失败！')
+                    log.logger.error(e)
+                    return
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)
@@ -569,29 +556,25 @@ def banned_ip(server_name, player_ip):
             return
         else:
             log.logger.info('已找到服务器:' + server_info['server_path'])
-            log.logger.info('尝试读取' + program_info.banned_ip + '文件...')
-            try:
-                with open(server_info['server_path'] + program_info.banned_ip, 'r', encoding='utf-8') as f:
-                    banned_ips = json.load(f)
-                    program_info.banned_ips['ip'] = player_ip
-                    program_info.banned_ips['created'] = str(get_time.today) + ' ' + str(get_time.now_time()) + ' +0800'
-                    banned_ips.append(program_info.banned_ips)
-                    log.logger.info('读取并写入信息:' + json.dumps(program_info.banned_ips, indent=4))
-                    log.logger.info('尝试写入' + program_info.banned_ip + '文件...')
-                    try:
-                        with open(server_info['server_path'] + program_info.banned_ip, 'w', encoding='utf-8') as f:
-                            json.dump(banned_ips, f, indent=4)
-                            log.logger.info('写入成功！')
-                            return
-                    except Exception as e:
-                        log.logger.error('写入失败！')
-                        log.logger.error(e)
-                        return
-                    f.close()
-            except Exception as e:
-                log.logger.error('读取服务器信息文件失败！')
-                log.logger.error(e)
-                return
+            port = rcon.rcon_port(server_info)
+            if port != None:
+                try:
+                    server_command = rcon.connect_rcon(port)
+                except Exception as e:
+                    log.logger.error('链接rcon失败!')
+                    log.logger.error(e)
+                    return
+                time.sleep(1)
+                try:
+                    server_command.connect()
+                    response = server_command.command(f'/ban-ip {player_ip}')
+                    log.logger.info(f'发送命令：ban-ip {player_ip}')
+                    log.logger.info(response)
+                    server_command.disconnect()
+                except Exception as e:
+                    log.logger.error('发送命令失败！')
+                    log.logger.error(e)
+                    return
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)
@@ -611,38 +594,25 @@ def op(server_name, player_name):
             return
         else:
             log.logger.info('已找到服务器:' + server_info['server_path'])
-            log.logger.info("尝试获取玩家UUID...")
-            try:
-                response = requests.get('https://api.mojang.com/users/profiles/minecraft/' + player_name)
-                player_uuid = response.json()['id']
-                log.logger.info('获取到玩家UUID:' + player_uuid)
-            except Exception as e:
-                log.logger.error('获取玩家UUID失败！')
-                log.logger.error(e)
-                return
-            log.logger.info('尝试读取' + program_info.op + '文件...')
-            try:
-                with open(server_info['server_path'] + program_info.op, 'r', encoding='utf-8') as f:
-                    ops = json.load(f)
-                    program_info.ops['uuid'] = player_uuid
-                    program_info.ops['name'] = player_name
-                    ops.append(program_info.ops)
-                    log.logger.info('读取并写入信息:' + json.dumps(program_info.ops, indent=4))
-                    log.logger.info('尝试写入' + program_info.op + '文件...')
-                    try:
-                        with open(server_info['server_path'] + program_info.op, 'w', encoding='utf-8') as f:
-                            json.dump(ops, f, indent=4)
-                            log.logger.info('写入成功！')
-                            return
-                    except Exception as e:
-                        log.logger.error('写入失败！')
-                        log.logger.error(e)
-                        return
-                    f.close()
-            except Exception as e:
-                log.logger.error('读取服务器信息文件失败！')
-                log.logger.error(e)
-                return
+            port = rcon.rcon_port(server_info)
+            if port != None:
+                try:
+                    server_command = rcon.connect_rcon(port)
+                except Exception as e:
+                    log.logger.error('链接rcon失败!')
+                    log.logger.error(e)
+                    return
+                time.sleep(1)
+                try:
+                    server_command.connect()
+                    response = server_command.command(f'/op {player_name}')
+                    log.logger.info(f'发送命令：op {player_name}')
+                    log.logger.info(response)
+                    server_command.disconnect()
+                except Exception as e:
+                    log.logger.error('发送命令失败！')
+                    log.logger.error(e)
+                    return
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)
@@ -662,32 +632,25 @@ def unban_player(server_name, player_name):
             return
         else:
             log.logger.info('已找到服务器:' + server_info['server_path'])
-            log.logger.info('尝试读取' + program_info.banned_player + '文件...')
-            try:
-                with open(server_info['server_path'] + program_info.banned_player, 'r', encoding='utf-8') as f:
-                    banned_players = json.load(f)
-                    for banned_player in banned_players:
-                        if banned_player['name'] == player_name:
-                            log.logger.info('删除信息:' + json.dumps(banned_player, indent=4))
-                            banned_players.remove(banned_player)
-                            log.logger.info('读取并写入信息')
-                            log.logger.info('尝试写入' + program_info.banned_player + '文件...')    
-                            try:
-                                with open(server_info['server_path'] + program_info.banned_player, 'w', encoding='utf-8') as f:
-                                    json.dump(banned_players, f, indent=4)
-                                    log.logger.info('写入成功！')
-                                    return
-                            except Exception as e:
-                                log.logger.error('写入失败！')
-                                log.logger.error(e)
-                                return
-                        else:
-                            log.logger.info('未找到玩家:' + player_name)
-                            return
-            except Exception as e:
-                log.logger.error('读取服务器信息文件失败！')
-                log.logger.error(e)
-                return
+            port = rcon.rcon_port(server_info)
+            if port != None:
+                try:
+                    server_command = rcon.connect_rcon(port)
+                except Exception as e:
+                    log.logger.error('链接rcon失败!')
+                    log.logger.error(e)
+                    return
+                time.sleep(1)
+                try:
+                    server_command.connect()
+                    response = server_command.command(f'/pardon {player_name}')
+                    log.logger.info(f'发送命令：pardon {player_name}')
+                    log.logger.info(response)
+                    server_command.disconnect()
+                except Exception as e:
+                    log.logger.error('发送命令失败！')
+                    log.logger.error(e)
+                    return
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)
@@ -707,31 +670,25 @@ def unban_ip(server_name, player_ip):
             return
         else:
             log.logger.info('已找到服务器:' + server_info['server_path'])
-            log.logger.info('尝试读取' + program_info.banned_ip + '文件...')
-            try:
-                with open(server_info['server_path'] + program_info.banned_ip, 'r', encoding='utf-8') as f:
-                    banned_ips = json.load(f)
-                    for banned_ip in banned_ips:
-                        if banned_ip['ip'] == player_ip:
-                            log.logger.info('删除信息:' + json.dumps(banned_ip, indent=4))
-                            banned_ips.remove(banned_ip)
-                            log.logger.info('读取并写入信息')
-                            log.logger.info('尝试写入' + program_info.banned_ip + '文件...')
-                            try:
-                                with open(server_info['server_path'] + program_info.banned_ip, 'w', encoding='utf-8') as f:
-                                    json.dump(banned_ips, f, indent=4)
-                                    log.logger.info('写入成功！')
-                                    return
-                            except Exception as e:
-                                log.logger.error('写入失败！')
-                                log.logger.error(e)
-                                return
-                        else:
-                            log.logger.info('未找到IP地址:' + player_ip)
-            except Exception as e:
-                log.logger.error('读取服务器信息文件失败！')
-                log.logger.error(e)
-                return
+            port = rcon.rcon_port(server_info)
+            if port != None:
+                try:
+                    server_command = rcon.connect_rcon(port)
+                except Exception as e:
+                    log.logger.error('链接rcon失败!')
+                    log.logger.error(e)
+                    return
+                time.sleep(1)
+                try:
+                    server_command.connect()
+                    response = server_command.command(f'/pardon-ip {player_ip}')
+                    log.logger.info(f'发送命令：pardon-ip {player_ip}')
+                    log.logger.info(response)
+                    server_command.disconnect()
+                except Exception as e:
+                    log.logger.error('发送命令失败！')
+                    log.logger.error(e)
+                    return
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)
@@ -751,41 +708,25 @@ def deop(server_name, player_name):
             return
         else:
             log.logger.info('已找到服务器:' + server_info['server_path'])
-            log.logger.info('尝试获取玩家UUID...')
-            try:
-                response = requests.get('https://api.mojang.com/users/profiles/minecraft/' + player_name)
-                player_uuid = response.json()['id']
-                log.logger.info('获取到玩家uuid:' + player_uuid)
-            except Exception as e:
-                log.logger.error('获取玩家uuid失败！')
-                log.logger.error(e)
-                return
-            log.logger.info('尝试读取' + program_info.op + '文件...')
-            try:
-                with open(server_info['server_path'] + program_info.op, 'r', encoding='utf-8') as f:
-                    ops = json.load(f)
-                    for op in ops:
-                        if op['uuid'] == player_uuid:
-                            log.logger.info('删除信息:' + json.dumps(op, indent=4))
-                            ops.remove(op)
-                            log.logger.info('读取并写入信息')
-                            log.logger.info('尝试写入' + program_info.op + '文件...')
-                            try:
-                                with open(server_info['server_path'] + program_info.op, 'w', encoding='utf-8') as f:
-                                    json.dump(ops, f, indent=4)
-                                    log.logger.info('写入成功！')
-                                    return
-                            except Exception as e:
-                                log.logger.error('写入失败！')
-                                log.logger.error(e)
-                                return
-                        else:
-                            log.logger.info('未找到玩家:' + player_name)
-                            return
-            except Exception as e:
-                log.logger.error('读取服务器信息文件失败！')
-                log.logger.error(e)
-                return
+            port = rcon.rcon_port(server_info)
+            if port != None:
+                try:
+                    server_command = rcon.connect_rcon(port)
+                except Exception as e:
+                    log.logger.error('链接rcon失败!')
+                    log.logger.error(e)
+                    return
+                time.sleep(1)
+                try:
+                    server_command.connect()
+                    response = server_command.command(f'/deop {player_name}')
+                    log.logger.info(f'发送命令：deop {player_name}')
+                    log.logger.info(response)
+                    server_command.disconnect()
+                except Exception as e:
+                    log.logger.error('发送命令失败！')
+                    log.logger.error(e)
+                    return
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')
         log.logger.error(e)

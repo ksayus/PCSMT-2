@@ -1,7 +1,6 @@
 from bin.find_files import find_folder, find_file
 from bin.introduction import introduction
 from bin.export import program_info
-from bin.export import get_time
 from bin.export import log
 from bin.download import update
 from bin.command import program

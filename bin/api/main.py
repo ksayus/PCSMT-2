@@ -1,4 +1,6 @@
 from flask import Flask
+import logging
+from bin.export import Is_program_running
 import sys
 import os
 
@@ -18,6 +20,14 @@ app = Flask(
 )
 app.secret_key = 'pcsmt2'
 
+if Is_program_running.IsProgramExe():
+    log = logging.getLogger('werkzeug')
+    log.disabled = True  # 禁用请求日志
+
 def run_flask():
+    # TODO: 添加端口参数,以便用户自行配置
     from . import api, api_server, api_program, PageServer, PageProgram
-    app.run(port=5000)
+    if Is_program_running.IsProgramExe():
+        app.run(debug=True, port=5000)
+    else:
+        app.run(port=5000)
