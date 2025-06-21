@@ -27,7 +27,4 @@ if Is_program_running.IsProgramExe():
 def run_flask():
     # TODO: 添加端口参数,以便用户自行配置
     from . import api, api_server, api_program, PageServer, PageProgram
-    if Is_program_running.IsProgramExe():
-        app.run(debug=True, port=5000)
-    else:
-        app.run(port=5000)
+    app.run(port=5000)
