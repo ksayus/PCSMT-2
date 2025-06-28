@@ -2,7 +2,6 @@ import os
 import json
 import time
 import shutil
-import requests
 import zipfile
 from bin.find_files import find_file
 from bin.find_files import find_folder
@@ -17,6 +16,7 @@ from bin.export import size_change
 from bin.export import get
 from packaging import version
 from bin.export import timer
+from bin.export import get_time
 def add_server(server_path, server_name, rewrite, server_version):
     """
     添加服务器
@@ -24,10 +24,13 @@ def add_server(server_path, server_name, rewrite, server_version):
     :param server_name: 服务器名称
     :param rewrite: 是否覆盖同名服务器
     """
+    # 获取绝对路径
+    server_path = os.path.abspath(server_path)
+
     server_core = find_file.find_files_with_extension(server_path, '.jar')
-    print(server_path)
-    log.logger.info('找到服务器核心文件：' + str(server_core))
-    log.logger.info('总共' + str(len(server_core)) + '个文件')
+    log.Debug(server_path)
+    log.Debug('找到服务器核心文件：' + str(server_core))
+    log.Debug('总共' + str(len(server_core)) + '个文件')
     if len(server_core) == 0:
         log.logger.error('未找到服务器核心文件，请检查文件路径是否正确！')
         return
@@ -58,13 +61,13 @@ def add_server(server_path, server_name, rewrite, server_version):
                     if not any(keyword in item for keyword in exclude_keywords)
                 ]
         server_core = server_core[0]
-        log.logger.info('找到服务器核心文件：' + server_core)
+        log.Debug('找到服务器核心文件：' + server_core)
         if find_folder.find_folders_with_existence_and_create(program_info.work_path + program_info.server_save_path):
             find_file.find_files_with_existence_and_create(server_path + program_info.server_start_batch)
 
             server_absolute_path = server_path + program_info.server_start_batch
             os.path.abspath(server_absolute_path)
-            log.logger.info("找到服务器启动批处理文件,位置:" + server_absolute_path)
+            log.Debug("找到服务器启动批处理文件,位置:" + server_absolute_path)
 
             try:
                 java_args: str = ''
@@ -88,7 +91,7 @@ def add_server(server_path, server_name, rewrite, server_version):
                     if find_file.find_files_with_existence(server_path + program_info.server_start_batch):
                         try:
                             with open(server_path + program_info.forge_server_start_batch_default_name, 'r') as fi:
-                                log.logger.info('发现run.bat文件,开始读取...')
+                                log.Debug('发现run.bat文件,开始读取...')
                                 server_start_command = None
                                 for line in fi:
                                     if 'java' in line:
@@ -100,8 +103,8 @@ def add_server(server_path, server_name, rewrite, server_version):
 
                                     f.write(f'{java_args} -Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M -jar ' + server_core)
                                 else:
-                                    log.logger.info('读取服务器启动批处理文件成功!')
-                                    log.logger.info('服务器启动核心命令:' + server_start_command + '\n')
+                                    log.Debug('读取服务器启动批处理文件成功!')
+                                    log.Debug('服务器启动核心命令:' + server_start_command + '\n')
                                     server_start_command = server_start_command.replace(program_info.forge_server_JVM_args, '-Xms' + str(program_info.default_server_run_memories_min) + 'M -Xmx' + str(program_info.default_server_run_memories_max) + 'M')
                                     f.write(server_start_command)
                         except Exception as e:
@@ -163,7 +166,8 @@ def add_server(server_path, server_name, rewrite, server_version):
                         'server_path': server_path,
                         'server_start_batch_path': server_absolute_path,
                         'server_size': server_size,
-                        'server_version': server_version
+                        'server_version': server_version,
+                        'LatestStartedTime': 'N/A'
                     }
                     try:
                         with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'w') as f:
@@ -188,6 +192,8 @@ def start_server(server_name):
         try:
             with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r') as f:
                 server_info = json.load(f)
+                if not 'LatestStartedTime' in server_info:
+                    server_info['LatestStartedTime'] = get_time.DetailedTime()
                 f.close()
         except Exception as e:
             log.logger.error('读取服务器信息文件失败!')
@@ -252,12 +258,14 @@ def start_server(server_name):
                     server_port = int(lines[line_number - 1].split('=')[1].strip())
         # 输出latest文件
         try:
+            StartTime = get_time.DetailedTime()
             if find_file.find_files_with_existence_and_create(program_info.work_path + program_info.latest_start_server):
                 with open(program_info.work_path + program_info.latest_start_server, 'w', encoding='utf-8') as f:
                     f.write('服务器名称:' + server_name + '\n')
                     f.write(str(server_info) + '\n')
                     f.write('服务器端口:' + str(server_port) + '\n')
                     f.write('RCON端口:' + (str(port) if port else "未启用") + '\n')
+                    f.write('启动时间:' + StartTime)
                     f.close()
                     log.logger.info('已输出latest.txt文件！')
             if find_file.find_files_with_existence_and_create(program_info.work_path + program_info.program_resource + program_info.latest_start_server_json):
@@ -477,7 +485,7 @@ def delete_server(server_name, double_check):
         log.logger.error(e)
         return
 
-def search_server(server_name):
+def search_server(server_name, Output=False):
     """
     搜索服务器
     :param server_name: 服务器名称
@@ -489,15 +497,21 @@ def search_server(server_name):
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
         else:
-            log.logger.info('已找到服务器:' + server_info['server_path'])
-            log.logger.info('已读取服务器信息文件...')
-            log.logger.info('服务器信息:')
-            log.logger.info('服务器名称: ' + server_info['server_name'])
-            log.logger.info('服务器启动次数: ' + str(server_info['start_count']))
-            log.logger.info('服务器核心: ' + server_info['server_core'])
-            log.logger.info('服务器路径: ' + server_info['server_path'])
-            log.logger.info('服务器启动批处理路径: ' + server_info['server_start_batch_path'])
-            log.logger.info('服务器大小: ' + str(server_info['server_size']))
+            if not 'server_version' in server_info:
+                server_info['server_version'] = 'N/A'
+            log.Debug('已找到服务器:' + server_info['server_path'])
+            log.Debug('已读取服务器信息文件...')
+            # 当输出为False时，输出服务器信息
+            # 输出服务器信息
+            if not Output:
+                log.logger.info('服务器信息:')
+                log.logger.info('服务器名称: ' + server_info['server_name'])
+                log.logger.info('服务器启动次数: ' + str(server_info['start_count']))
+                log.logger.info('服务器核心: ' + server_info['server_core'])
+                log.logger.info('服务器路径: ' + server_info['server_path'])
+                log.logger.info('服务器启动批处理路径: ' + server_info['server_start_batch_path'])
+                log.logger.info('服务器大小: ' + str(server_info['server_size']))
+                log.logger.info('服务器核心版本: ' + str(server_info['server_version']))
             return server_info
     except Exception as e:
         log.logger.error('读取服务器信息文件失败！')

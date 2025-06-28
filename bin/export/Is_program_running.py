@@ -24,6 +24,13 @@ def exist_program_is_running():
     return counts
 
 def IsProgramExe():
+    """
+    判断程序是否为exe文件
+    True: 是exe文件
+    False: 不是exe文件
+
+    :return: True or False
+    """
     # 检查是否存在 '_MEIPASS' 属性（资源目录）或 'frozen' 属性
     return hasattr(sys, '_MEIPASS') or getattr(sys, 'frozen', False)
 

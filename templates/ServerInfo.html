@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ServerInfo</title>
+    <title>服务器信息</title>
     <style>
         table {
             width: 100%;
@@ -148,6 +148,10 @@
                 <th>服务器启动次数</th>
                 <td id="id-start-counts"></td>
             </tr>
+            <tr>
+                <th>上次启动时间</th>
+                <td id="id-latest-start-time"></td>
+            </tr>
         </table>
     </div>
 
@@ -172,6 +176,7 @@
                 document.getElementById('id-version').innerText = data.version;
                 document.getElementById('id-size').innerText = data.size;
                 document.getElementById('id-start-counts').innerText = data.startCount;
+                document.getElementById('id-latest-start-time').innerText = data.LatestStartedTime;
             })
             .catch(error => {
                 console.error('Error fetching data:', error);

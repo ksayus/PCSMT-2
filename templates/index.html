@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        img {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        p {
+            margin: 15px 0;
+            font-size: 16px;
+        }
+        a {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            img {
+                width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='PCSMT.ico') }}" alt="ico">
+        <h1 id="version">PCSMT2</h1>
+        <p id="UpdateTime"></p>
+        <p id="serverCount"></p>
+        <p id="github_url"></p>
+        <p id="api_url">本地连接api地址:{{api_url}}</p>
+        <a href="/api/help" target="_blank">点击打开帮助页面</a>
+        <p>作者:Ksayus</p>
+    </div>
+</body>
+<script>
+    fetch('/api/program/version')
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerText = data.error;
+            document.body.insertBefore(errorDiv, document.querySelector('.container'));
+        } else {
+            document.getElementById('version').innerHTML = data.version;
+        }
+    })
+    .catch(error => {
+        console.error('获取服务器列表时出错:', error);
+        alert('获取服务器列表失败，请稍后重试。');
+    });
+    fetch('https://api.github.com/repos/ksayus/PCSMT-2/releases/latest')
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerText = data.error;
+            document.body.insertBefore(errorDiv, document.querySelector('.container'));
+        } else {
+            document.getElementById('UpdateTime').innerText = `此版本更新时间:${data.published_at}`;
+        }
+    })
+    .catch(error => {
+        console.error('获取服务器列表时出错:', error);
+        alert('获取服务器列表失败，请稍后重试。');
+    });
+    fetch('/api/server/list')
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerText = data.error;
+            document.body.insertBefore(errorDiv, document.querySelector('.container'));
+        } else {
+            document.getElementById('serverCount').innerText = `服务器数量:${data.serverCount}`;
+        }
+    })
+    .catch(error => {
+        console.error('获取服务器列表时出错:', error);
+        alert('获取服务器列表失败，请稍后重试。');
+    });
+
+    const github_url = 'https://github.com/ksayus/PCSMT-2';
+    document.getElementById('github_url').innerText = `开源仓库地址:${github_url}`;
+
+    const api_url = '127.0.0.1:5000'
+    document.getElementById('api_url').innerText = `本地API地址:${api_url}`;
+</script>
+</html>

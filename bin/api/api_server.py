@@ -22,7 +22,8 @@ def server_lists():
         # 使用 jsonify 返回 JSON 格式的响应
         return jsonify(
             {
-                "serverlist": program_info.server_list
+                "serverlist": program_info.server_list,
+                "serverCount": str(len(program_info.server_list))
             }
         )
     except Exception as e:
@@ -34,7 +35,7 @@ def server_lists():
 @main.app.route('/api/server/info/<string:server_name>', methods=['GET'])
 def server_info(server_name):
     try:
-        server_info = server.search_server(server_name)
+        server_info = server.search_server(server_name, True)
         if server_info == False:
             log.logger.error('服务器不存在')
             return jsonify({"error": "服务器不存在"}), 404
@@ -43,6 +44,7 @@ def server_info(server_name):
                 'version': server_info['server_version'],
                 'size': server_info['server_size'],
                 'startCount': server_info['start_count'],
+                'LatestStartedTime': server_info['LatestStartedTime']
             }), 200
     except Exception as e:
         # 记录错误日志（建议使用 logging 模块）
@@ -61,12 +63,15 @@ def start_latest_server():
             with open(program_info.work_path + program_info.program_resource + program_info.latest_start_server_json, 'r', encoding='utf-8') as f:
                 server_info = json.load(f)
                 f.close()
+            if not 'LastStartTime' in server_info:
+                server_info['LastStartTime'] = 'N/A'
         return jsonify(
             {
                 'name': server_info['server_name'],
                 'version': server_info['server_version'],
                 'size': server_info['server_size'],
                 'startCount': server_info['start_count'],
+                'LatestStartedTime': server_info['LatestStartedTime']
             }
         )
     except Exception as e:

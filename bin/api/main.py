@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, url_for
 import logging
 from bin.export import Is_program_running
 import sys
@@ -16,7 +16,8 @@ def resource_path(relative_path):
 
 app = Flask(
     __name__,
-    template_folder=resource_path('templates')  # 动态指定模板路径
+    template_folder=resource_path('templates'),  # 动态指定模板路径
+    static_folder=resource_path('static')       # 动态指定静态资源路径
 )
 app.secret_key = 'pcsmt2'
 
