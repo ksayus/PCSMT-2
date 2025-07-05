@@ -101,18 +101,36 @@ def login():
     return render_template('login.html')
 
 
-@main.app.route('/api/server/<string:server_name>/start', methods=['GET'])
+@main.app.route('/api/server/<string:server_name>/start', methods=['GET', 'POST'])
 @admin_required  # ✅ 添加认证装饰器
 def start_server(server_name):
     try:
         success = server.start_server(server_name)
         if success:
-            return jsonify({"status": "启动成功"}), 200
+            return jsonify({"status": "starting"}), 200
         else:
-            return jsonify({"error": "启动失败"}), 502
+            return jsonify({"error": "error"}), 502
     except Exception as e:
         log.logger.error(str(e))
         return jsonify({"error": "内部错误"}), 500
+
+@main.app.route('/api/server/<string:server_name>/stop', methods=['GET', 'POST'], endpoint='stop_server')
+@admin_required
+def StopServer(server_name):
+    """
+    停止服务器
+    :param server_name: 停止服务器名称
+    """
+    try:
+        success = server.stop_server(server_name)
+        if success == True:
+            return jsonify({"message": "stopped"}), 200
+        else:
+            return jsonify({"error": "error"}), 502
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "内部错误"}), 500
+
 
 @main.app.route('/api/server/<string:server_name>/storage_chart')
 def server_storage_chart(server_name):

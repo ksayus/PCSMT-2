@@ -4,6 +4,10 @@ import os
 from pathlib import Path
 from typing import List, Dict, Union
 from bin.export import log
+import json
+from bin.export import get
+from bin.export import program_info
+from bin.export import size_change
 
 def find_java_installations():
     """自动扫描系统常见Java安装路径"""
@@ -113,3 +117,41 @@ def examin_java_exist(
             found_versions[path] = version
 
     return found_versions
+
+def ServerInfoKeys(server_name):
+    """
+    检查服务器信息json文件
+    :param server_name: 服务器名称
+    :return: False(错误) or server_info(正确)
+    """
+    try:
+        with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'r', encoding='utf-8') as f:
+            server_info = json.load(f)
+            f.close()
+            if not 'server_name' in server_info:
+                log.logger.error('服务器信息文件缺少server_name字段！')
+                server_info['server_name'] = server_name
+            if not 'start_count' in server_info:
+                log.logger.error('服务器信息文件缺少start_count字段！')
+                server_info['start_count'] = 0
+            if not 'server_core' in server_info:
+                log.logger.error('服务器信息文件缺少server_core字段！')
+                server_info['server_core'] = 'N/A'
+            if not 'server_path' in server_info:
+                log.logger.error('服务器信息文件缺少server_path字段！')
+                server_info['server_path'] = 'N/A'
+            if not 'server_start_batch_path' in server_info:
+                log.logger.error('服务器信息文件缺少server_start_batch_path字段！')
+                server_info['server_start_batch_path'] = 'N/A'
+            if not 'server_version' in server_info:
+                log.logger.error('服务器信息文件缺少server_version字段！')
+                server_info['server_version'] = 'N/A'
+            server_info['server_size'] = size_change.size_change(get.get_dir_size(server_info['server_path']))
+        with open(program_info.work_path + program_info.server_save_path + '/' + server_name + '.json', 'w', encoding='utf-8') as f:
+            json.dump(server_info, f, indent=4)
+            f.close()
+        return server_info
+    except Exception as e:
+        log.logger.error('读取服务器信息失败！')
+        log.logger.error(e)
+        return False

@@ -2,7 +2,6 @@ from bin.export import program_info
 from bin.export import log
 from bin.find_files import find_file
 import mcrcon
-import requests
 
 def set_rcon(server_info):
     try:

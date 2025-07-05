@@ -5,7 +5,7 @@ from bin.find_files  import find_file
 from bin.export import size_change
 from bin.export import get
 from bin.export import get_time
-from bin.export import Is_program_running
+from bin.export import IsProgramRunning
 import json
 import threading
 

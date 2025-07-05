@@ -2,7 +2,6 @@ import requests
 import json
 import os
 from bin.export import log
-from bin.export import program_info
 from bin.find_files import find_file
 
 def get_minecraft_version():
@@ -125,8 +124,10 @@ def get_dir_size(path):
     return total
 
 def get_server_storage_size(server_name):
-    if find_file.find_files_with_existence(program_info.work_path + program_info.server_storage_size + '/' + f'{server_name}.json'):
-        with  open(program_info.work_path + program_info.server_storage_size + '/' + f'{server_name}.json', 'r', encoding='utf-8') as f:
-            server_storage_size = json.load(f)
+    # 延迟导入 program_info，避免循环导入问题
+    from bin.command import program
 
+    if find_file.find_files_with_existence(program.work_path + program.server_storage_size + '/' + f'{server_name}.json'):
+        with open(program.work_path + program.server_storage_size + '/' + f'{server_name}.json', 'r', encoding='utf-8') as f:
+            server_storage_size = json.load(f)
             return server_storage_size

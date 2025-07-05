@@ -1,6 +1,6 @@
 from flask import Flask, url_for
 import logging
-from bin.export import Is_program_running
+from bin.export import IsProgramRunning
 import sys
 import os
 
@@ -21,7 +21,7 @@ app = Flask(
 )
 app.secret_key = 'pcsmt2'
 
-if Is_program_running.IsProgramExe():
+if IsProgramRunning.IsProgramExe():
     log = logging.getLogger('werkzeug')
     log.disabled = True  # 禁用请求日志
 

@@ -120,6 +120,42 @@
         th {
             font-weight: 600;
         }
+
+        /* 新增按钮组样式 */
+        .button-group {
+            display: flex;
+            justify-content: center; /* 按钮水平居中 */
+            margin-top: 20px; /* 增加与表格的间距 */
+        }
+
+        /* 新增按钮样式 */
+        .button-group button {
+            display: block;
+            width: 80%;
+            margin: 740px auto 0;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            color: rgb(31, 29, 29);
+            background: linear-gradient(135deg, #3165f1, #00c6ff);
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+        }
+
+        .button-group button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #00c6ff, #3165f1);
+        }
+
+        .button-group button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
     </style>
 </head>
 <body>
@@ -154,6 +190,11 @@
             </tr>
         </table>
     </div>
+    <div class="button-group" id="button-group">
+        <button id="button-server" onclick="StartServer()">
+            启动服务器
+        </button>
+    </div>
 
     <script>
         // 显示加载动画
@@ -184,6 +225,39 @@
                 document.getElementById('loader').style.display = 'none';
                 alert('无法获取服务器信息');
             });
+
+        function StartServer()
+        {
+            document.getElementById('button-server').innerText = '启动中...'
+            fetch(`/api/server/${serverName}/start`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status == 'starting')
+                {
+                    document.getElementById('button-group').innerHTML = '<button id="button-server" onclick="StopServer()">停止服务器</button>'
+                }
+                if (data.error == 'error')
+                {
+                    document.getElementById('button-server').innerText = '启动服务器'
+                }
+            })
+        }
+        function StopServer()
+        {
+            fetch(`/api/server/${serverName}/stop`, { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('button-server').innerText = '停止中...'
+                if (data.status == 'starting')
+                {
+                    document.getElementById('button-group').innerHTML = '<button id="button-server" onclick="StartServer()">启动服务器</button>'
+                }
+                if (data.error == 'error')
+                {
+                    document.getElementById('button-server').innerText = '停止服务器'
+                }
+            })
+        }
     </script>
 </body>
 </html>

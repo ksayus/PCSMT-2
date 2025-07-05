@@ -9,7 +9,7 @@ from bin.export import program_info
 from bin.command import start
 from bin.export import eula
 from bin.export import log
-from bin.export import examin_json_argument
+from bin.export import examin
 from bin.download import server_core
 from bin.export import rcon
 from bin.export import size_change
@@ -279,6 +279,7 @@ def start_server(server_name):
         log.logger.info('启动服务器成功！')
         log.logger.info('服务器端口号:' + str(server_port))
         log.logger.info('服务器本地连接地址:127.0.0.1:{0}'.format(server_port))
+        return True
     else:
         log.logger.error('未找到服务器，请检查服务器名称是否正确！')
         return False
@@ -363,7 +364,7 @@ def server_start_batch_rewrite_run_memories(server_name, memory_min, memory_max)
     :param memory_min: 最小内存
     :param memory_max: 最大内存
     """
-    server_info = examin_json_argument.examin_saves_json_argument(server_name)
+    server_info = examin.ServerInfoKeys(server_name)
     if server_info == False:
         log.logger.error('未找到服务器，请检查服务器名称是否正确！')
     else:
@@ -392,7 +393,7 @@ def download_server_core(server_name, core_type, core_support_version):
     :param core_support_version: 核心支持版本
     """
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if find_folder.find_folders_with_existence(server_info['server_path']):
             while(1):
                 all_files = find_file.find_files_with_extension(server_info['server_path'], '')
@@ -440,7 +441,7 @@ def delete_server(server_name, double_check):
     :param double_check: 是否二次确认
     """
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
@@ -492,7 +493,7 @@ def search_server(server_name, Output=False):
     """
     try:
         log.logger.info('正在搜索服务器...')
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
@@ -526,7 +527,7 @@ def banned_player(server_name, player_name):
     """
     log.logger.info('查找服务器...')
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
@@ -564,7 +565,7 @@ def banned_ip(server_name, player_ip):
     """
     log.logger.info('查找服务器...')
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
@@ -602,7 +603,7 @@ def op(server_name, player_name):
     """
     log.logger.info('查找服务器...')
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
@@ -640,7 +641,7 @@ def unban_player(server_name, player_name):
     """
     log.logger.info('查找服务器...')
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
@@ -678,7 +679,7 @@ def unban_ip(server_name, player_ip):
     """
     log.logger.info('查找服务器...')
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
@@ -716,7 +717,7 @@ def deop(server_name, player_name):
     """
     log.logger.info('查找服务器...')
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
@@ -753,7 +754,7 @@ def stop_server(server_name):
     """
     log.logger.info('查找服务器...')
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
@@ -774,6 +775,7 @@ def stop_server(server_name):
                     log.logger.info('发送命令：stop')
                     log.logger.info(response)
                     server_command.disconnect()
+                    return True
                 except Exception as e:
                     log.logger.error('发送命令失败！')
                     log.logger.error(e)
@@ -791,7 +793,7 @@ def rename_server(server_name, new_name):
     """
     log.logger.info('查找服务器...')
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
         else:
@@ -826,7 +828,7 @@ def redirected_server_path(server_name, new_path):
     """
     log.logger.info('查找服务器...')
     try:
-        server_info = examin_json_argument.examin_saves_json_argument(server_name)
+        server_info = examin.ServerInfoKeys(server_name)
         if server_info == False:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
             return
@@ -947,6 +949,8 @@ def find_backup_file(server_name):
                             try:
                                 log.logger.info('尝试获取FTB Backups 2 备份文件...')
                                 backup_list = os.listdir(server_info['server_path'] + '/backups')
+                                # 按照时间排序
+                                backup_list = sorted(backup_list, key=lambda x: os.path.getmtime(server_info['server_path'] + '/backups/' + x))
                                 if len(backup_list) > 0:
                                     log.logger.info('已找到FTB Backups 2 备份文件！')
 

@@ -294,15 +294,20 @@ def Restart_Program(program_name):
     try:
         find_file.find_files_with_existence_and_create(program_info.work_path + program_info.delete_old_program)
         with open(program_info.work_path + program_info.delete_old_program, "w") as f:
-            f.write("timeout /t 5\n")
-            f.write("cd " + program_info.work_path + "\n")
-            f.write("powershell rm " + program_info.work_path + '/' + program_info.program_name + '-v' + program_info.PCSMTVersion + ".exe" + "\n")
-            f.write("start " + program_name + ".exe" + "\n")
-            # f.write("pause")
-            f.write("exit")
+            f.write(
+                "@echo off\n"
+                "if \"%1\" == \"h\" goto begin\n"
+                "start mshta vbscript:createobject(\"wscript.shell\").run(\"\"\"%~nx0\"\"h\",0)(window.close)&&exit\n"
+                ":begin\n"
+                "timeout /t 5\n"
+                "cd " + program_info.work_path + "\n"
+                "powershell rm " + program_info.work_path + '/' + program_info.program_name + '-v' + program_info.PCSMTVersion + ".exe" + "\n"
+                "start " + program_name + ".exe" + "\n"
+                "exit"
+            )
             f.close()
         time.sleep(2)
-        os.system("start " + program_info.work_path + program_info.delete_old_program + " -WindowStyle Hidden")
+        os.system("start " + program_info.work_path + program_info.delete_old_program + " h")
         time.sleep(1)
         sys.exit()
     except Exception as e:

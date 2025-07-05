@@ -1,42 +1,30 @@
-from bin.export import Is_program_running
+from bin.export import IsProgramRunning
 
 import os
 import psutil
-import ctypes
 
-counts = Is_program_running.exist_program_is_running()
+counts = IsProgramRunning.exist_program_is_running()
 
-now_program_pid = os.getpid()
-if psutil.Process(now_program_pid).name() == "python.exe":
+import pygetwindow as gw
+
+def SetWindowTop(window_title):
+    # 获取具有指定标题的窗口
+    windows = gw.getWindowsWithTitle(window_title)
+    if windows:
+        # 激活并置顶窗口
+        windows[0].activate()
+        windows[0].bringToTop()
+    else:
+        print(f"未找到标题为 '{window_title}' 的窗口")
+
+NowProgramPID = os.getpid()
+ProgramName = psutil.Process(NowProgramPID).name()
+if psutil.Process(NowProgramPID).name() == "python.exe":
     if counts > 1:
-        print("程序已经运行，请勿重复运行")
-        cmd = "taskkill /f /pid " + str(now_program_pid)
-
-        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-        if hwnd != 0:
-                ctypes.windll.user32.SetWindowPos(
-                    hwnd,
-                    -1,  # HWND_TOPMOST
-                    0, 0, 0, 0,
-                    0x0001 | 0x0002  # SWP_NOMOVE | SWP_NOSIZE
-                )
-
-        os.system(cmd)
+        SetWindowTop(ProgramName)
 else:
     if counts > 2:
-        print("程序已经运行，请勿重复运行")
-        cmd = "taskkill /f /pid " + str(now_program_pid)
-
-        hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-        if hwnd != 0:
-                ctypes.windll.user32.SetWindowPos(
-                    hwnd,
-                    -1,  # HWND_TOPMOST
-                    0, 0, 0, 0,
-                    0x0001 | 0x0002  # SWP_NOMOVE | SWP_NOSIZE
-                )
-
-        os.system(cmd)
+        SetWindowTop(ProgramName)
 
 #检查Java是否安装
 import sys
@@ -44,7 +32,6 @@ import json
 from bin.export import java
 from bin.export import examin
 from bin.export import log
-from bin.command import program
 
 java_versions_address = {
     "1.8": "",
@@ -133,6 +120,7 @@ init.init_program()
 from bin.introduction import introduction
 from bin.command import start
 from bin.command import server
+from bin.command import program
 from bin.export import numbers
 
 from cmd2 import Cmd
