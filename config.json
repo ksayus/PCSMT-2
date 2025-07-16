@@ -1,0 +1,12 @@
+{
+    "PCSMT2_Version": "1.2.0",
+    "ReleaseVersion": "Release",
+    "RunningMemories_Min": 1024,
+    "RunningMemories_Max": 2048,
+    "Nogui": true,
+    "WaitEulaGenerateTime": 30,
+    "AutomaticStartup": true,
+    "AutoUpdateSource": "Github",
+    "MinecraftTestVersion": false,
+    "StorageSizeUpdateTime": 3600
+}

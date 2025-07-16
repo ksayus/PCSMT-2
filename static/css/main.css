@@ -1,0 +1,344 @@
+/* 基础样式 */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    background-color: #ddecfa;
+    display: flex;
+    min-height: 100vh;
+}
+
+/* 侧边栏样式 */
+.sidebar {
+    width: 250px;
+    background-color: #2987e4;
+    color: white;
+    height: 100vh;
+    position: fixed;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #247acf;
+}
+
+.sidebar-logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.sidebar-name {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    padding: 0;
+}
+
+.sidebar a {
+    display: block;
+    padding: 0.8rem 1rem;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: #1177dd;
+}
+
+.dropdown-content {
+    display: none;
+    background-color: #1779db;
+    padding-left: 1rem;
+}
+
+.server-item:hover .dropdown-content {
+    display: block;
+}
+
+/* 内容区域样式 */
+.content {
+    flex: 1;
+    margin-left: 250px;
+    padding: 2rem;
+}
+
+/* 加载动画 */
+.loader {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 4px solid #3498db;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* 首页样式 */
+.home-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.project-info {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+
+.link-group {
+    margin: 1.5rem 0;
+}
+
+.link-group a {
+    display: inline-block;
+    margin-right: 1rem;
+    color: #3498db;
+    text-decoration: none;
+}
+
+.link-group a:hover {
+    text-decoration: underline;
+}
+
+.version-info {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+}
+
+/* API帮助页面样式 */
+.help-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.help-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+}
+
+.help-table th {
+    background-color: #3498db;
+    color: white;
+    padding: 1.2em;
+    font-size: 1.1em;
+    text-align: center;
+}
+
+.help-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.help-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.help-table tr:hover {
+    background-color: #f1f8ff;
+}
+
+.help-table td:first-child {
+    color: #e74c3c;
+    font-weight: 500;
+}
+
+/* 统一卡片样式 - 蓝白渐变背景 */
+.server-card,
+.program-version-content .card {
+    background: rgb(255, 255, 255);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    color: cornflowerblue;
+}
+
+.server-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+}
+
+/* 增强卡片悬停效果 */
+.server-card:hover,
+.program-version-content .card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 30px rgba(49, 101, 241, 0.15);
+}
+
+/* 优化表格样式 */
+.server-card table {
+    width: 100%;
+    border-collapse: collapse;
+    background: transparent;
+}
+
+/* 修复表头背景色 */
+.server-card table tbody th {
+    background-color: #3165f1;
+    color: white;
+    padding: 0.2rem;
+    text-align: center;
+    font-weight: 500;
+    border: none; /* 移除边框避免白边 */
+}
+
+/* 修复表格行悬停效果 */
+.server-card table tr:hover td {
+    background-color: #f1f8ff;
+}
+
+.server-card table td {
+    padding: 1rem;
+    background: transparent; /* 确保背景色覆盖整个单元格 */
+    border-bottom: 1px solid #f0f4ff;
+}
+
+/* 优化按钮样式 */
+.button-group button {
+    background: linear-gradient(135deg, #3165f1, #4a7dff);
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+}
+
+.button-group button:hover {
+    background: linear-gradient(135deg, #4a7dff, #3165f1);
+    box-shadow: 0 6px 12px rgba(49, 101, 241, 0.25);
+    transform: translateY(-2px);
+}
+
+.server-chart button {
+    background: linear-gradient(135deg, #3165f1, #4a7dff);
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+}
+
+.server-chart button:hover {
+    background: linear-gradient(135deg, #4a7dff, #3165f1);
+    box-shadow: 0 6px 12px rgba(49, 101, 241, 0.25);
+    transform: translateY(-2px);
+}
+
+/* 精简响应式设计 */
+@media (max-width: 768px) {
+    .server-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .server-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .server-card-info {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 按钮组样式 */
+.button-group {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.button-group button {
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #3165f1, #00c6ff);
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+
+.button-group button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #00c6ff, #3165f1);
+}
+
+.button-group button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    
+    .content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+    
+    .server-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+}

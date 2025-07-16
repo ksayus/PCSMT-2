@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/icon" href="/static/PCSMT2.ico">
+    <title>PCSMT2 | Welcome</title>
+    <!-- 整合所有CSS -->
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <img src="/static/PCSMT2.ico" alt="Logo" class="sidebar-logo">
+            <span class="sidebar-name">PCSMT2</span>
+        </div>
+        <ul>
+            <li><a href="#home" onclick="loadContent('home')">首页</a></li>
+            <li class="server-item">
+                <a href="#servers" onclick="loadContent('servers')">服务器</a>
+                <ul class="dropdown-content" id="server-list">
+                    <!-- 服务器列表将通过JavaScript动态加载 -->
+                </ul>
+            </li>
+            <li><a href="#help" onclick="loadContent('help')">API帮助</a></li>
+            <li><a href="#settings" onclick="loadContent('settings')">设置</a></li>
+            <!-- <li><a href="#mods" onclick="loadContent('mods')">MOD 下载</a></li> -->
+        </ul>
+    </nav>
+
+    <div class="content" id="content">
+        <!-- 内容区域将通过JavaScript动态加载 -->
+        <div class="loader" id="loader"></div>
+        <div id="dynamic-content"></div>
+    </div>
+
+    <!-- 整合所有JS -->
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
