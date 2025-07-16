@@ -88,9 +88,14 @@ def start_latest_server():
 
 def admin_required(f):
     def wrapper(*args, **kwargs):
-        if 'authenticated' not in session:  # 修改为登录时设置的键名
-            session['next_url'] = request.url
-            return redirect(url_for('login'))
+        if 'authenticated' not in session:
+            # 判断是否为AJAX请求
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # 返回401错误，让前端处理跳转
+                return jsonify({"error": "Unauthorized"}), 401
+            else:
+                session['next_url'] = request.url
+                return redirect(url_for('login'))  # 非AJAX请求仍重定向
         return f(*args, **kwargs)
     return wrapper
 
@@ -117,7 +122,7 @@ def login():
             # 如果存在有效重定向目标，则跳转
             if next_url and is_safe_url(next_url):
                 return redirect(next_url)
-            return redirect(url_for('/'))
+            return render_template('index.html')
         else:
             return render_template('login.html', error="账号或密码错误")
     return render_template('login.html')

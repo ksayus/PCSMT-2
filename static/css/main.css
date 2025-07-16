@@ -307,18 +307,36 @@ body {
     justify-content: center;
 }
 
-.download-btn:hover {
-    background: linear-gradient(135deg, #2E7D32, #4CAF50);
-    box-shadow: 0 6px 12px rgba(46, 125, 50, 0.25);
+/* 创建服务器按钮样式 */
+.create-btn {
+    background: linear-gradient(135deg, #FF9800, #F57C00); /* 橙色渐变 */
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+    margin: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.create-btn:hover {
+    background: linear-gradient(135deg, #F57C00, #FF9800);
+    box-shadow: 0 6px 12px rgba(245, 124, 0, 0.25);
     transform: translateY(-2px);
 }
 
-.download-btn:active {
+.create-btn:active {
     transform: translateY(1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.download-btn i {
+.create-btn i {
     margin-right: 8px;
     font-size: 18px;
 }

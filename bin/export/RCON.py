@@ -59,7 +59,7 @@ class Get:
             with mcrcon.MCRcon(Info.RCON.LocalHost(), Info.RCON.Password(), int(port)) as mcr:
                 if msg:
                     response = mcr.command("/say Hello from RCON! I'm PCSMT2!")
-                    log.Debug("Server response: %s", response)
+                    log.Debug(f"Server response: {response}")
             log.Debug('连接RCON成功！')
             return mcr
         except Exception as e:

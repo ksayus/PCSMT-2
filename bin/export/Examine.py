@@ -57,7 +57,7 @@ class Java:
             # 1. 旧格式: "1.8.0_391"
             # 2. 新格式: "21.0.2" 或 "21.0.2+13-LTS"
             version_match = re.search(
-                r'version "(\d+\.\d+\.\d+[_\+\-]?.*?)"', 
+                r'version "(\d+\.\d+\.\d+[_\+\-]?.*?)"',
                 output
             )
             return version_match.group(1) if version_match else None

@@ -38,7 +38,7 @@ class Info:
                 with open(config_path, 'r', encoding='utf-8') as f:
                     try:
                         config_read = json.load(f)
-                        minecraft_test = config_read.get('Minecraft_Test_Version', "false")
+                        minecraft_test = config_read.get('MinecraftTestVersion', "false")
                     except json.JSONDecodeError:
                         log.Debug("配置文件格式错误，使用默认值")
                         minecraft_test = "false"
@@ -46,7 +46,8 @@ class Info:
                 minecraft_test = "false"
                 log.logger.warning("配置文件不存在，使用默认值")
 
-            if minecraft_test.lower() == "false":
+            # 修复：添加str()转换确保兼容布尔类型配置值
+            if str(minecraft_test).lower() == "false":
                 exclude_keyword = {
                     'w', 'a', 'b', 'c', 'rd', 'rc', 'craftmine', 'inf', 'pre',
                     '1.RV-Pre1', '3D', 'Shareware', 'Pre-release',

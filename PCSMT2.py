@@ -582,14 +582,14 @@ class PCSMT2(Cmd):
 
     # 添加服务器
     def do_add_server(self, arg):
-        """添加服务器\nCommand: add_server <server_path> <server_name> <server_version>"""
+        """添加服务器\nCommand: add_server <server_path> <server_name> <server_version> <CoreType>"""
         try:
-            server_path, server_name, server_version = arg.split()
-            print(server_path, server_name, server_version)
+            server_path, server_name, server_version, CoreType = arg.split()
+            print(server_path, server_name, server_version, CoreType)
         except ValueError:
             log.logger.error('参数错误，请输入正确的参数！')
             return
-        Server.Processing.Add(server_path, server_name, False, server_version)
+        Server.Processing.Add(server_path, server_name, False, server_version, CoreType)
     def complete_add_server(self, text, line, begidx, endidx):
         arg = line.split()[1:]
         arg_counts = len(arg)

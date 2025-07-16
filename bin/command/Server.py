@@ -89,7 +89,6 @@ class Processing:
                                     log.Debug('发现run.bat文件,开始读取...')
                                     server_start_command = None
                                     for line in fi:
-                                        # TODO: 处理新版 Forge 启动脚本: 跳过 java -jar forge-1.21.7-57.0.2-shim.jar --onlyCheckJava 语句
                                         if '--onlyCheckJava' in line:
                                             continue
                                         if 'java' in line:
@@ -968,7 +967,7 @@ class Get:
         False(错误) or server_info(正确)
         """
         try:
-            log.logger.debug('正在搜索服务器...')
+            log.Debug('正在搜索服务器...')
             file_path = Info.work_path + Info.File.Folder.Save + '/' + server_name + '.json'
 
             # 检查文件是否存在

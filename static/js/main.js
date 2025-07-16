@@ -292,14 +292,32 @@ async function fetchServerList() {
                     return;
                 }
 
-                // 在服务器列表容器前添加下载按钮
+                // 在服务器列表容器前添加按钮组
+                const buttonGroup = document.createElement('div');
+                buttonGroup.className = 'button-group'; // 使用现有按钮组样式
+                buttonGroup.style.display = 'flex'; // 确保按钮水平排列
+                buttonGroup.style.justifyContent = 'center'; // 居中显示
+                buttonGroup.style.gap = '15px'; // 设置按钮间距
+
+                // 添加创建服务器按钮
+                const createServerBtn = document.createElement('button');
+                createServerBtn.className = 'create-btn';
+                createServerBtn.innerHTML = '<i class="fas fa-plus"></i>创建服务器';
+                createServerBtn.onclick = function() {
+                    createServer();
+                };
+                buttonGroup.appendChild(createServerBtn);
+
+                // 添加下载所有服务器按钮
                 const downloadAllBtn = document.createElement('button');
                 downloadAllBtn.className = 'download-btn';
                 downloadAllBtn.innerHTML = '<i class="fas fa-file-download"></i>下载所有服务器信息';
                 downloadAllBtn.onclick = function() {
                     downloadAllServers(serverListData);
                 };
-                serverList.parentNode.insertBefore(downloadAllBtn, serverList);
+                buttonGroup.appendChild(downloadAllBtn);
+
+                serverList.parentNode.insertBefore(buttonGroup, serverList);
 
                 const serverElements = serverListData.map(server => `
                     <div class="server-card">
@@ -370,9 +388,13 @@ async function fetchServerInfo(serverName) {
         const statusResponse = await fetch(`/api/server/status/${serverName}`);
         const statusData = await statusResponse.json();
 
+        const buttonServer = document.getElementById('button-server');
         if (statusData.status === 'starting') {
-            document.getElementById('button-group').innerHTML = '<button id="button-server" onclick="stopServer(\'' + serverName + '\')">停止服务器</button>';
-            document.getElementById('button-group').innerHTML = '<button id="storage-server" onclick="ChartImage(\'' + serverName + '\')">存储占用</button>';
+            buttonServer.innerText = '停止服务器';
+            buttonServer.onclick = function() { stopServer(serverName); };
+        } else {
+            buttonServer.innerText = '启动服务器';
+            buttonServer.onclick = function() { startServer(serverName); };
         }
     } catch (error) {
         console.error('获取服务器信息失败:', error);
@@ -423,16 +445,37 @@ async function fetchProgramVersion() {
     }
 }
 
+// 添加全局AJAX错误处理
+function handleAjaxError(response) {
+    if (response.status === 401) {
+        // 未授权，跳转到登录页面
+        window.location.href = '/login';
+        return true;
+    }
+    return false;
+}
+
 // 启动服务器
 async function startServer(serverName) {
     document.getElementById('button-server').innerText = '启动中...';
 
     try {
-        const response = await fetch(`/api/server/${serverName}/start`, { method: 'POST' });
+        const response = await fetch(`/api/server/${serverName}/start`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'  // 添加AJAX标识头
+            }
+        });
+
+        // 检查401错误
+        if (handleAjaxError(response)) return;
+
         const data = await response.json();
 
+        const buttonServer = document.getElementById('button-server');
         if (data.status === 'starting') {
-            document.getElementById('button-group').innerHTML = '<button id="button-server" onclick="stopServer(\'' + serverName + '\')">停止服务器</button>';
+            buttonServer.innerText = '停止服务器';
+            buttonServer.onclick = function() { stopServer(serverName); };
         } else if (data.error) {
             document.getElementById('button-server').innerText = '启动服务器';
             alert('启动服务器失败');
@@ -449,11 +492,22 @@ async function stopServer(serverName) {
     document.getElementById('button-server').innerText = '停止中...';
 
     try {
-        const response = await fetch(`/api/server/${serverName}/stop`, { method: 'POST' });
+        const response = await fetch(`/api/server/${serverName}/stop`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'  // 添加AJAX标识头
+            }
+        });
+
+        // 检查401错误
+        if (handleAjaxError(response)) return;
+
         const data = await response.json();
 
+        const buttonServer = document.getElementById('button-server');
         if (data.status === 'stopped') {
-            document.getElementById('button-group').innerHTML = '<button id="button-server" onclick="startServer(\'' + serverName + '\')">启动服务器</button>';
+            buttonServer.innerText = '启动服务器';
+            buttonServer.onclick = function() { startServer(serverName); };
         } else if (data.error) {
             document.getElementById('button-server').innerText = '停止服务器';
             alert('停止服务器失败');
@@ -510,4 +564,10 @@ function downloadAllServers(serverList) {
         .catch(error => {
             console.error('下载所有服务器信息列表失败:', error);
         })
+}
+
+// 创建服务器函数（由用户实现具体逻辑）
+function createServer() {
+    // 这里打开页面创建服务器
+    window.open('/server/create');
 }
