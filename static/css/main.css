@@ -289,35 +289,46 @@ body {
     }
 }
 
-/* 按钮组样式 */
+/* 下载按钮统一样式 */
+.download-btn {
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+    margin: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.download-btn:hover {
+    background: linear-gradient(135deg, #2E7D32, #4CAF50);
+    box-shadow: 0 6px 12px rgba(46, 125, 50, 0.25);
+    transform: translateY(-2px);
+}
+
+.download-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.download-btn i {
+    margin-right: 8px;
+    font-size: 18px;
+}
+
+/* 新增：按钮组内间距优化 */
 .button-group {
     display: flex;
     justify-content: center;
     margin-top: 20px;
-}
-
-.button-group button {
-    padding: 12px 24px;
-    font-size: 16px;
-    font-weight: bold;
-    color: white;
-    background: linear-gradient(135deg, #3165f1, #00c6ff);
-    border: none;
-    border-radius: 25px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-}
-
-.button-group button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(135deg, #00c6ff, #3165f1);
-}
-
-.button-group button:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    gap: 15px; /* 添加按钮间距 */
 }
 
 /* 响应式布局 */
@@ -327,12 +338,12 @@ body {
         height: auto;
         position: relative;
     }
-    
+
     .content {
         margin-left: 0;
         padding: 1rem;
     }
-    
+
     .server-card {
         background-color: white;
         border-radius: 8px;

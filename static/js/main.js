@@ -125,7 +125,9 @@ const pageContents = {
             <div class="button-group" id="button-group">
                 <button id="button-server" onclick="startServer('${serverName}')">启动服务器</button>
                 <button id="storage-chart" onclick="ChartImage('${serverName}')">存储占用</button>
-                <button class="download-btn" onclick="downloadServer('${serverName}')">下载服务器信息表格</button>
+                <button class="download-btn" onclick="downloadServer('${serverName}')">
+                    <i class="fas fa-file-download"></i>下载服务器信息
+                </button>
             </div>
         </div>
     `,
@@ -292,8 +294,8 @@ async function fetchServerList() {
 
                 // 在服务器列表容器前添加下载按钮
                 const downloadAllBtn = document.createElement('button');
-                downloadAllBtn.className = 'download-all-btn';
-                downloadAllBtn.textContent = '下载所有服务器';
+                downloadAllBtn.className = 'download-btn';
+                downloadAllBtn.innerHTML = '<i class="fas fa-file-download"></i>下载所有服务器信息';
                 downloadAllBtn.onclick = function() {
                     downloadAllServers(serverListData);
                 };
