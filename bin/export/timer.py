@@ -52,9 +52,12 @@ class TimerStorageSizeUpdate:
                             StorageSizeUpdateTime = config_read['StorageSizeUpdateTime']
 
                             if StorageSizeUpdateTime > 0 and StorageSizeUpdateTime < 1555200: # 小于18天时启用
-                                if server_save_json['storage_size'][-1] == StorageSize:
-                                    log.Debug('存储大小无变化，不进行更新！')
-                                    return
+                                try:
+                                    if server_save_json['storage_size'][-1] == StorageSize:
+                                        log.Debug('存储大小无变化，不进行更新！')
+                                        return
+                                except IndexError:
+                                    pass  # 初次启动时没有数据，跳过检查
 
                             server_save_json['storage_size'].append(StorageSize)
                             server_save_json['time'].append(NowTime)
@@ -66,7 +69,7 @@ class TimerStorageSizeUpdate:
                             server_info = json.load(f)
                             with open(Info.work_path + Info.File.Folder.Save + '/' + server_name + '.json', 'w', encoding='utf-8') as f:
                                 # 写入文件
-                                server_info['server_size'] = server_save_json['storage_size'][-1]
+                                server_info['Size'] = server_save_json['storage_size'][-1]
 
                                 json.dump(server_info, f, indent=4)
 
