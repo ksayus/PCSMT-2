@@ -208,6 +208,38 @@ class Change:
                 log.logger.error(e)
                 return
 
+    def Port(argument: int):
+        """
+        修改端口
+        argument: int 端口
+        """
+        if find_file.find_files_with_existence(Info.work_path + Info.File.Document.Config):
+            try:
+                with open(Info.work_path + Info.File.Document.Config, "r") as f:
+                    config_read = json.load(f) # 读取json文件
+                    f.close()
+                if(config_read['Port'] == argument):
+                    log.logger.info('端口已为:' + argument + '，无需修改')
+                    return
+                else:
+                    config_read['Port'] = argument
+                    try:
+                        with open(Info.work_path + Info.File.Document.Config, "w") as f:
+                            json.dump(config_read, f, indent=4) # 写入json文件
+                            f.close()
+                        log.logger.info("修改端口设置成功")
+                        log.logger.info("修改将会在下次启动生效")
+                        Info.Config.Port = argument
+
+                    except Exception as e:
+                        log.logger.error('写入程序配置文件失败！')
+                        log.logger.error(e)
+                        return
+            except Exception as e:
+                log.logger.error('读取程序配置文件失败！')
+                log.logger.error(e)
+                return
+
 class Do:
 
     def AddStartup(name,file_path=""):

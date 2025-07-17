@@ -104,17 +104,31 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
         }
+
+        /* 遮罩层样式 */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7); /* 半透明白色背景 */
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
-    <!-- 添加容器类 -->
+    <!-- 容器类 -->
     <div class="container">
         <h1>创建服务器</h1>
         <p>请填写以下信息以创建服务器：</p>
-        <!-- 添加表单容器 -->
+        <!-- 表单容器 -->
         <div class="form-container">
             <form action="" method="post">
-                <!-- 添加表单组 -->
+                <!-- 表单组 -->
                 <div class="form-group">
                     <label for="serverName">服务器名：</label>
                     <input type="text" id="serverName" name="serverName" required>
@@ -145,7 +159,7 @@
                 <div class="form-group">
                     <div class="checkbox-group">
                         <input type="checkbox" id="pvpEnabled" name="pvpEnabled" value="true" checked>
-                        <!-- 添加隐藏字段确保未勾选时返回false -->
+                        <!-- 隐藏字段确保未勾选时返回false -->
                         <input type="hidden" name="pvpEnabled" value="false">
                         <label for="pvpEnabled">启用PVP</label>
                     </div>
@@ -153,9 +167,9 @@
 
                 <div class="form-group">
                     <div class="checkbox-group">
-                        <!-- 修改value为true，确保勾选时返回true -->
+                        <!-- value为true，勾选时返回true -->
                         <input type="checkbox" id="onlineMode" name="onlineMode" value="true">
-                        <!-- 添加隐藏字段确保未勾选时返回false -->
+                        <!-- 隐藏字段确保未勾选时返回false -->
                         <input type="hidden" name="onlineMode" value="false">
                         <label for="onlineMode">启用正版验证</label>
                     </div>
@@ -163,7 +177,7 @@
 
                 <div class="form-group">
                     <label>默认游戏模式：</label>
-                    <!-- 添加游戏选项网格布局 -->
+                    <!-- 游戏选项网格布局 -->
                     <div class="game-options">
                         <div class="radio-group">
                             <input type="radio" id="survival" name="gameMode" value="survival" checked>
@@ -185,28 +199,45 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit">创建服务器</button>
+                    <button type="submit" id="create">创建服务器</button>
                 </div>
             </form>
         </div>
     </div>
-</body>
-<script>
-    fetch('/api/program/minecraft_version')
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert(data.error);
-                return;
-            }
 
-            // 获取版本列表
-            const versions = data.minecraft_version;
+    <!-- 遮罩层 -->
+    <div id="loadingOverlay">
+        <img src="/static/loading.gif" alt="加载中" style="width: 80px; height: 80px;">
+        <p>正在创建服务器...</p>
+    </div>
 
-            // 创建版本选项
-            versions.forEach(version => {
-                document.getElementById('coreVersion').innerHTML += '<option value="' + version + '">' + version + '</option>';
+    <script>
+        fetch('/api/program/minecraft_version')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                // 获取版本列表
+                const versions = data.minecraft_version;
+
+                // 创建版本选项
+                versions.forEach(version => {
+                    document.getElementById('coreVersion').innerHTML += '<option value="' + version + '">' + version + '</option>';
+                })
             })
-        })
-</script>
+
+        // 修改：从按钮点击改为表单提交事件
+        document.querySelector('form').addEventListener('submit', function(event) {
+            // 显示遮罩层
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            // 禁用提交按钮，避免重复提交
+            const submitButton = document.getElementById('create');
+            submitButton.disabled = true;
+        });
+    </script>
+</body>
 </html>

@@ -104,7 +104,7 @@ class Infomation:
             log.logger.info('获取服务器状态')
             port = Get.Port(ServerInfo)
             try:
-                if Get.RCON_Object(port) == False:
+                if Get.RCON_Object(port, msg=False) == False:
                     return False
                 return True
             except Exception as e:

@@ -1,6 +1,7 @@
-from flask import Flask, url_for
+from flask import Flask
 import logging
 from bin.export import IsProgramRunning
+from bin.export import Info
 import sys
 import os
 
@@ -26,6 +27,5 @@ if IsProgramRunning.Is.Running():
     log.disabled = True  # 禁用请求日志
 
 def run_flask():
-    # TODO: 添加端口参数,以便用户自行配置
     from . import api, api_server, api_program, PageServer, PageProgram, Resouce
-    app.run(port=5000)
+    app.run(port = Info.Config.Port())

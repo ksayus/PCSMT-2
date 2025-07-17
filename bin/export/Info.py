@@ -71,7 +71,7 @@ class Config:
     _config_cache = None  # 添加配置缓存
 
     Config = {
-        "PCSMT2_Version": "1.2.0",
+        "PCSMT2_Version": "1.2.0.1",
         "ReleaseVersion": "Release",
         "RunningMemories_Min": 1024,
         "RunningMemories_Max": 2048,
@@ -81,6 +81,7 @@ class Config:
         "AutoUpdateSource": "Github",
         "MinecraftTestVersion": False,
         "StorageSizeUpdateTime": 3600,
+        "Port": 5000
     }
 
     ConfigRead = {
@@ -94,6 +95,7 @@ class Config:
         "AutoUpdateSource": "",
         "MinecraftTestVersion": False,
         "StorageSizeUpdateTime": 0,
+        "Port": 0
     }
 
     @classmethod
@@ -148,3 +150,7 @@ class Config:
     @classmethod
     def StorageSizeUpdateTime(cls):
         return cls._load_config().get('StorageSizeUpdateTime', cls.Config['StorageSizeUpdateTime'])
+
+    @classmethod
+    def Port(cls):
+        return cls._load_config().get('Port', cls.Config['Port'])

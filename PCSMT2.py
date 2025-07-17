@@ -189,7 +189,21 @@ class TkinterApp:
         self.cmd = cmd_instance
         self.root = tk.Tk()
         self.root.title("PCSMT2")
-        self.root.geometry("1296x729")
+
+        # 获取窗口分辨率
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+
+        # 窗口大小
+        window_width = int(screen_width / 2 + 160)
+        window_height = int(screen_height  / 2 + 90)
+
+        # 初始化窗口位置
+        init_position_X = int(screen_width / 4 - 80)
+        init_position_Y = int(screen_height / 4 - 45)
+
+        self.root.geometry(f"{window_width}x{window_height}+{init_position_X}+{init_position_Y}")
+        # 程序运行时出现位置
         try:
             # 使用PIL加载图标以支持更多格式
             from PIL import Image, ImageTk
@@ -217,7 +231,7 @@ class TkinterApp:
 
         self.root.configure(bg="#f0f2f5")  # 更现代的浅灰色背景
 
-        # 新增：命令历史记录
+        # 命令历史记录
         self.command_history = []  # 存储历史命令
         self.history_index = -1    # 当前历史命令索引，-1表示不在历史记录中
 
@@ -347,11 +361,11 @@ class TkinterApp:
         self.log_text = scrolledtext.ScrolledText(
             log_frame,
             wrap=tk.WORD,
-            bg="#ffffff",  # 纯白背景
-            fg="#333333",  # 深灰色文字
+            bg="#97c2eb",  # 浅蓝背景
+            fg="#2B79EC",  # 蓝色文字
             font=("Consolas", 10),
-            insertbackground="#4a86e8",  # 插入光标颜色
-            selectbackground="#d6e4ff"   # 选中文本背景色
+            insertbackground="#2fee6f",  # 光标颜色
+            selectbackground="#3c7af7"   # 选中文本背景色
         )
         self.log_text.pack(fill=tk.BOTH, expand=True)
         self.log_text.config(state=tk.DISABLED)
@@ -552,9 +566,11 @@ class TkinterApp:
 
     def open_web_interface(self):
         """打开Web界面"""
-        webbrowser.open("http://127.0.0.1:5000")
+        port = str(Info.Config.Port())
+        webbrowser.open(f"http://127.0.0.1:{port}")
         self.log_text.config(state=tk.NORMAL)
-        self.log_text.insert(tk.END, "> 已打开Web界面: http://127.0.0.1:5000\n")
+        self.log_text.insert(tk.END, f"> 已打开Web界面: http://127.0.0.1:{port}\n")
+        self.log_text.insert(tk.END, "\n")
         self.log_text.see(tk.END)
         self.log_text.config(state=tk.DISABLED)
 
@@ -1042,6 +1058,17 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             log.logger.error(e)
         Program.Change.StorageSizeUpdateTime(time)
+
+    def do_change_port(self, arg):
+        try:
+            port = arg.strip()
+            if not port.isdigit():
+                log.logger.error('参数错误:请输入数字')
+                return
+        except ValueError as e:
+            log.logger.error('参数错误，请输入正确的参数！')
+            log.logger.error(e)
+        Program.Change.Port(int(port))
 
     # 退出控制台
     def do_exit(self, arg):

@@ -210,6 +210,17 @@ class Infomation:
                             log.logger.info('写入存储空间更新时间参数为默认值')
                             config_read['StorageSizeUpdateTime'] = Info.Config.Config['StorageSizeUpdateTime']
 
+                    #Port
+                    if not 'Port' in config_read:
+                        log.logger.warning('config文件已存在，但端口关键字不存在')
+                        log.logger.info('写入端口参数为默认值5000')
+                        config_read['Port'] = Info.Config.Config['Port']
+                    else:
+                        if config_read['Port'] == None:
+                            log.logger.warning('config文件已存在，但端口未设置')
+                            log.logger.info('写入端口参数为默认值5000')
+                            config_read['Port'] = Info.Config.Config['Port']
+
 
                     try:
                         with open(Info.work_path + Info.File.Document.Config, "w") as f:

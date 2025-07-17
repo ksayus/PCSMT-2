@@ -1,5 +1,5 @@
 {
-    "PCSMT2_Version": "1.2.0",
+    "PCSMT2_Version": "1.2.0.1",
     "ReleaseVersion": "Release",
     "RunningMemories_Min": 1024,
     "RunningMemories_Max": 2048,
@@ -8,5 +8,6 @@
     "AutomaticStartup": true,
     "AutoUpdateSource": "Github",
     "MinecraftTestVersion": false,
-    "StorageSizeUpdateTime": 3600
+    "StorageSizeUpdateTime": 3600,
+    "Port": 3000
 }

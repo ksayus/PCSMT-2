@@ -123,7 +123,7 @@ const pageContents = {
                 </table>
             </div>
             <div class="button-group" id="button-group">
-                <button id="button-server" onclick="startServer('${serverName}')">启动服务器</button>
+                <button id="button-server" onclick="">检查中...</button>
                 <button id="storage-chart" onclick="ChartImage('${serverName}')">存储占用</button>
                 <button class="download-btn" onclick="downloadServer('${serverName}')">
                     <i class="fas fa-file-download"></i>下载服务器信息
