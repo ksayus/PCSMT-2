@@ -697,8 +697,7 @@ class Do:
         if find_file.find_files_with_existence(Info.work_path + Info.File.Folder.Save + '/' + server_name + '.json'):
             try:
                 server_info = Examine.Server.InfoKeys(server_name)
-                if not 'LatestStartedTime' in server_info:
-                    server_info['LatestStartedTime'] = GetTime.TimeString.DetailedTime()
+                server_info['LatestStartedTime'] = GetTime.TimeString.DetailedTime()
             except Exception as e:
                 log.logger.error('读取服务器信息文件失败!')
                 log.logger.error(e)

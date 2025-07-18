@@ -15,7 +15,6 @@ class Examine:
                     if 'eula=true' in line:
                         f.write(line)
                         log.logger.info('eula协议已同意')
-                        server_info['Counts'] += 1
                         break
                     if 'eula=false' in line:
                         f.write('eula=true')
