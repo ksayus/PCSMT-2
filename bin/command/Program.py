@@ -17,7 +17,7 @@ import shutil
 import threading
 
 class Change:
-    def RunningMemories_Config(argument_min, argument_max):
+    def RunningMemories_Config(argument_min: int, argument_max: int):
         """
         修改写入服务器启动脚本默认运行内存
         :param argument_min: 最小内存
@@ -31,24 +31,25 @@ class Change:
             except Exception as e:
                 log.logger.error('读取程序配置文件失败！')
                 log.logger.error(e)
-                return
-            server_info['RunningMemories_Min'] = argument_min
-            server_info['RunningMemories_Max'] = argument_max
+                return False
+            server_info['RunningMemories_Min'] = int(argument_min)
+            server_info['RunningMemories_Max'] = int(argument_max)
             try:
                 with open(Info.work_path + Info.File.Document.Config, "w") as f:
                     json.dump(server_info, f, indent=4) # 写入json文件
             except Exception as e:
                 log.logger.error('写入程序配置文件失败！')
                 log.logger.error(e)
-                return
-            log.logger.info("最小内存:" + server_info['RunningMemories_Min'])
-            log.logger.info("最大内存:" + server_info['RunningMemories_Max'])
+                return False
+            log.logger.info("最小内存:" + str(server_info['RunningMemories_Min']))
+            log.logger.info("最大内存:" + str(server_info['RunningMemories_Max']))
             log.logger.info("修改服务器启动内存成功")
+            return True
         else:
             log.logger.error("程序配置文件不存在")
-            return
+            return False
 
-    def Nogui(argument):
+    def Nogui(argument: bool):
         """
         修改写入服务器启动脚本默认使用 nogui 启动
         :param argument: True/False
@@ -60,8 +61,8 @@ class Change:
                     config_read = json.load(f) # 读取json文件
                     f.close()
                 if(config_read['Nogui'] == argument):
-                    log.logger.info('默认启用nogui状态已为:' + argument + '，无需修改')
-                    return
+                    log.logger.info('默认启用nogui状态已为:' + str(argument) + '，无需修改')
+                    return True
                 else:
                     config_read['Nogui'] = argument
                     try:
@@ -70,15 +71,17 @@ class Change:
                             f.close()
                         log.logger.info("修改nogui设置成功")
                         Info.Config.Nogui = argument
+                        return True
                     except Exception as e:
                         log.logger.error('写入程序配置文件失败！')
                         log.logger.error(e)
+                        return False
             except Exception as e:
                 log.logger.error('读取程序配置文件失败！')
                 log.logger.error(e)
-                return
+                return False
 
-    def WaitEulaGenerateTime(argument):
+    def WaitEulaGenerateTime(argument: int):
         """
         修改写入服务器启动脚本默认等待eula生成时间
         :param argument: 等待eula生成时间
@@ -90,8 +93,8 @@ class Change:
                     config_read = json.load(f) # 读取json文件
                     f.close()
                 if(config_read['WaitEulaGenerateTime'] == argument):
-                    log.logger.info('等待eula生成时间已为:' + argument + '，无需修改')
-                    return
+                    log.logger.info('等待eula生成时间已为:' + str(argument) + '，无需修改')
+                    return True
                 else:
                     config_read['WaitEulaGenerateTime'] = argument
                     try:
@@ -99,15 +102,18 @@ class Change:
                             json.dump(config_read, f, indent=4) # 写入json文件
                             f.close()
                         log.logger.info("修改等待eula生成时间设置成功")
-                        Info.Config.WaitEulaGenerateTime= argument
+                        Info.Config.WaitEulaGenerateTime = argument
+                        return True
                     except Exception as e:
                         log.logger.error('写入程序配置文件失败！')
                         log.logger.error(e)
+                        return False
             except Exception as e:
                 log.logger.error('读取程序配置文件失败！')
                 log.logger.error(e)
+                return False
 
-    def AutoStartup(argument):
+    def AutoStartup(argument: bool):
         """
         修改程序自动启动
         :param argument: True/False
@@ -118,8 +124,8 @@ class Change:
                     config_read = json.load(f) # 读取json文件
                     f.close()
                 if(config_read['AutomaticStartup'] == argument):
-                    log.logger.info('开机自启动已为:' + argument + '，无需修改')
-                    return
+                    log.logger.info('开机自启动已为:' + str(argument) + '，无需修改')
+                    return True
                 else:
                     config_read['AutomaticStartup'] = argument
                     try:
@@ -128,15 +134,17 @@ class Change:
                             f.close()
                         log.logger.info("修改开机自启动设置成功")
                         Info.Config.AutomaticStartup= argument
+                        return True
                     except Exception as e:
                         log.logger.error('写入程序配置文件失败！')
                         log.logger.error(e)
+                        return False
             except Exception as e:
                 log.logger.error('读取程序配置文件失败！')
                 log.logger.error(e)
-                return
+                return False
 
-    def MinecraftTestVersion(argument):
+    def MinecraftTestVersion(argument: bool):
         """
         修改获取测试版服务器版本
         :param argument: True/False
@@ -148,7 +156,7 @@ class Change:
                     f.close()
                 if config_read['MinecraftTestVersion'] == argument:
                     log.logger.info(f'开关状态已为{argument},无需修改')
-                    return
+                    return True
                 else:
                     config_read['MinecraftTestVersion'] = argument
                     try:
@@ -157,17 +165,18 @@ class Change:
                             f.close()
                         log.logger.info('修改获取测试版服务器版本开关成功！')
                         Info.Config.MinecraftTestVersion = argument
+                        return True
                     except Exception as e:
                         log.logger.error('写入config文件失败')
                         log.logger.error(e)
-                        return
+                        return False
                 Info.Information.MinecraftVersion = Get.Info.MinecraftVersion()
             except Exception as e:
                 log.logger.error('读取config文件失败！')
                 log.logger.error(e)
-                return
+                return False
 
-    def StorageSizeUpdateTime(time):
+    def StorageSizeUpdateTime(time: int):
         """
         更改存储大小更新时间
         参数：
@@ -178,11 +187,11 @@ class Change:
             try:
                 with open(Info.work_path + Info.File.Document.Config, "r") as f:
                     config_read = json.load(f) # 读取json文件
-                if(config_read['StorageSizeUpdateTime'] == int(time)):
-                    log.logger.info('更改存储大小更新时间已为:' + time + '，无需修改')
-                    return
+                if(config_read['StorageSizeUpdateTime'] == time):
+                    log.logger.info('更改存储大小更新时间已为:' + str(time) + '，无需修改')
+                    return True
                 else:
-                    config_read['StorageSizeUpdateTime'] = int(time)
+                    config_read['StorageSizeUpdateTime'] = time
                     try:
                         with open(Info.work_path + Info.File.Document.Config, "w") as f:
                             json.dump(config_read, f, indent=4) # 写入json文件
@@ -200,13 +209,15 @@ class Change:
                         sleep(1)
                         timer.TimerStorageSizeUpdate.thread()
                         log.Debug('已启动服务器存储空间更新任务！')
+                        return True
                     except Exception as e:
                         log.logger.error('写入程序配置文件失败！')
                         log.logger.error(e)
+                        False
             except Exception as e:
                 log.logger.error('读取程序配置文件失败！')
                 log.logger.error(e)
-                return
+                return False
 
     def Port(argument: int):
         """
@@ -219,8 +230,8 @@ class Change:
                     config_read = json.load(f) # 读取json文件
                     f.close()
                 if(config_read['Port'] == argument):
-                    log.logger.info('端口已为:' + argument + '，无需修改')
-                    return
+                    log.logger.info(f'端口已为:{argument}，无需修改')
+                    return True
                 else:
                     config_read['Port'] = argument
                     try:
@@ -230,15 +241,48 @@ class Change:
                         log.logger.info("修改端口设置成功")
                         log.logger.info("修改将会在下次启动生效")
                         Info.Config.Port = argument
+                        return True
 
                     except Exception as e:
                         log.logger.error('写入程序配置文件失败！')
                         log.logger.error(e)
-                        return
+                        return False
             except Exception as e:
                 log.logger.error('读取程序配置文件失败！')
                 log.logger.error(e)
-                return
+                return False
+
+    def UpdateSource(argument: str):
+        """
+        修改更新源
+        argument: str 源
+        可选值: Github Gitee
+        """
+        if find_file.find_files_with_existence(Info.work_path + Info.File.Document.Config):
+            try:
+                with open(Info.work_path + Info.File.Document.Config, "r") as f:
+                    config_read = json.load(f) # 读取json文件
+                    f.close()
+                if(config_read['AutoUpdateSource'] == argument):
+                    log.logger.info(f'更新源已为:{argument}，无需修改')
+                    return True
+                else:
+                    config_read['AutoUpdateSource'] = argument
+                    try:
+                        with open(Info.work_path + Info.File.Document.Config, "w") as f:
+                            json.dump(config_read, f, indent=4) # 写入json文件
+                            f.close()
+                        log.logger.info("修改更新源设置成功")
+                        Info.Config.AutoUpdateSource = argument
+                        return True
+                    except Exception as e:
+                        log.logger.error('写入程序配置文件失败！')
+                        log.logger.error(e)
+                        return False
+            except Exception as e:
+                log.logger.error('读取程序配置文件失败！')
+                log.logger.error(e)
+                return False
 
 class Do:
 
@@ -334,11 +378,11 @@ class Processing:
     def Delete_Script():
         """删除程序自动更新时生成的脚本"""
         try:
-            if find_file.find_files_with_existence(Info.work_path + Info.File.Document.DeteleteOldProgram):
+            if find_file.find_files_with_existence(Info.work_path + Info.File.Document.DeteleteOldProgram, msg=False):
                 os.remove(Info.work_path + Info.File.Document.DeteleteOldProgram)
         except Exception as e:
-            log.logger.error('删除旧脚本失败！')
-            log.logger.error(e)
+            log.logger.debug('删除旧脚本失败！')
+            log.logger.debug(e)
             return
 
 class Output:

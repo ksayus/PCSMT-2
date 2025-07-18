@@ -55,20 +55,28 @@ const pageContents = {
                         <td>上次启动服务器</td>
                     </tr>
                     <tr>
-                        <td>/login</td>
-                        <td>登录界面</td>
+                        <td>/api/server/<string:server_name>/start</td>
+                        <td>启动指定服务器</td>
                     </tr>
                     <tr>
-                        <td>/api/server/{string:server_name}/start</td>
-                        <td>启动服务器</td>
+                        <td>/api/server/<string:server_name>/stop</td>
+                        <td>停止指定服务器</td>
                     </tr>
                     <tr>
-                        <td>/api/server/{string:server_name}/storage_chart</td>
-                        <td>服务器存储占用大小变化图表</td>
+                        <td>/api/server/status</td>
+                        <td>获取服务器启动状态</td>
                     </tr>
                     <tr>
-                        <td>/api/server/{string:server_name}/storage_info</td>
-                        <td>服务器存储占用大小变化信息</td>
+                        <td>/api/server/info/<string:server_name>/excel</td>
+                        <td>生成并下载指定服务器的Excel表格</td>
+                    </tr>
+                    <tr>
+                        <td>/api/server/list/excel</td>
+                        <td>生成并下载所有服务器的Excel表格</td>
+                    </tr>
+                    <tr>
+                        <td>/api/server/<string:server_name>/storage_info</td>
+                        <td>获取指定服务器的存储数据</td>
                     </tr>
                     <tr>
                         <td>/api/program</td>
@@ -78,6 +86,38 @@ const pageContents = {
                         <td>/api/program/version</td>
                         <td>程序版本</td>
                     </tr>
+                    <tr>
+                        <td>/api/program/minecraft_version</td>
+                        <td>获取Minecraft的所有版本</td>
+                    </tr>
+                    <tr>
+                        <td>/api/program/disk_usage</td>
+                        <td>获取程序所在硬盘使用状态</td>
+                    </tr>
+                    <tr>
+                        <td>/api/program/get/settings</td>
+                        <td>获取程序设置信息</td>
+                    </tr>
+                    <tr>
+                        <td>/api/program/set/settings</td>
+                        <td>设置程序设置信息</td>
+                    </tr>
+                    <tr>
+                        <td>/api/static/ico</td>
+                        <td>获取图标</td>
+                    </tr>
+                    <tr>
+                        <td>/login</td>
+                        <td>登录界面</td>
+                    </tr>
+                    <tr>
+                        <td>/server/create</td>
+                        <td>创建服务器</td>
+                    </tr>
+                    <tr>
+                        <td>/api/server/<string:server_name>/storage_chart</td>
+                        <td>渲染存储图表页面</td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -86,6 +126,9 @@ const pageContents = {
     servers: `
         <div class="servers-content">
             <h1>服务器列表</h1>
+            <!-- ECharts 容器 -->
+            <div id="disk-usage-chart" style="width: 200px; height: 200px; margin: 20px auto;"></div>
+            <div id="usage-font" style="margin: auto"> 磁盘使用率 </div>
             <div class="server-container" id="server-list-container">
                 <div class="loading">加载中...</div>
             </div>
@@ -180,7 +223,66 @@ const pageContents = {
     settings: `
         <div class="settings-content">
             <h1>程序设置</h1>
-            <!-- 添加设置表单 -->
+            <p>这里可以配置程序的各种设置，例如服务器路径、日志级别等。</p>
+            <form id="settings-form">
+                <div class="form-group">
+                    <label>服务器运行内存设置 (MB):</label>
+                    <div class="input-row">
+                        <input type="number" id="min-memory" name="min_memory" min="1024" placeholder="最小值">
+                        <span>至</span>
+                        <input type="number" id="max-memory" name="max_memory" min="1024" placeholder="最大值">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Nogui 模式:</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="nogui-enabled" name="nogui_enabled">
+                        <label for="nogui-enabled"></label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>EULA 生成等待时间 (秒):</label>
+                    <input type="number" id="eula-wait-time" name="eula_wait_time" min="1" max="300" value="">
+                </div>
+
+                <div class="form-group">
+                    <label>开机自启动:</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="auto-start" name="auto_start">
+                        <label for="auto-start"></label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>自动更新源:</label>
+                    <select id="update-source" name="update_source">
+                        <option value="Github">Github</option>
+                        <option value="Gitee">Gitee</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>获取测试版本:</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="test-versions" name="test_versions">
+                        <label for="test-versions"></label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>服务器存储占用的更新时间:</label>
+                    <input type="text" id="storage-update-time" name="storage_update_time" min="1" value="">
+                </div>
+
+                <div class="form-group">
+                    <label>API端口:</label>
+                    <input type="number" id="server-port" name="server_port" min="1024" max="65535" value="">
+                </div>
+
+                <button type="submit" class="save-btn">保存设置</button>
+            </form>
         </div>
     `,
 
@@ -221,6 +323,7 @@ function loadContent(page, serverName = '') {
                 break;
             case 'servers':
                 contentDiv.innerHTML = pageContents.servers;
+                fetchDiskUsage();  // 获取磁盘使用率
                 fetchServerList();
                 break;
             case 'server_info':
@@ -239,6 +342,7 @@ function loadContent(page, serverName = '') {
                 break;
             case 'settings':
                 contentDiv.innerHTML = pageContents.settings;
+                fetchSettings(); // 新增：获取设置数据
                 break;
             case 'mods':
                 contentDiv.innerHTML = pageContents.mods;
@@ -275,9 +379,39 @@ async function fetchServers() {
 // 获取服务器列表卡片 - 优化版本
 async function fetchServerList() {
     try {
+        // 获取圆环元素
+        const $text = $('.text');
+        // 更新进度条显示
+        function updateProgress(value) {
+            // 当百分比小于等于50
+            if(value <= 50){
+                $('.mask-right').remove();
+                var html = '<div class="mask-right" style="transform:rotate('+ (value * 3.6) +'deg)"></div>';
+                $('.circle-right').append(html);
+            }else{
+                $('.circle-left, .mask-left').remove();
+                const adjustedValue = value - 50;
+                var html = '<div class="circle-left">';
+                html += '<div class="mask-left" style="transform:rotate('+ (adjustedValue * 3.6) +'deg)"></div>';
+                html += '</div>';
+                $('.circle-right').after(html);
+            }
+
+            // 更新文本显示
+            $text.html(Math.round(value) + '%');
+        }
+
+        // 设置API请求超时（10秒）
+        const timeout = setTimeout(() => {
+            updateProgress(0, 0, true); // 显示错误状态
+            console.error('获取服务器列表超时');
+        }, 10000);
+
         fetch('/api/server/list')
             .then(response => response.json())
             .then(data => {
+                clearTimeout(timeout); // 清除超时计时器
+
                 const serverList = document.getElementById('server-list-container');
                 serverList.innerHTML = ''; // 清空加载中的提示
 
@@ -299,7 +433,7 @@ async function fetchServerList() {
                 buttonGroup.style.justifyContent = 'center'; // 居中显示
                 buttonGroup.style.gap = '15px'; // 设置按钮间距
 
-                // 添加创建服务器按钮
+                // 创建服务器按钮
                 const createServerBtn = document.createElement('button');
                 createServerBtn.className = 'create-btn';
                 createServerBtn.innerHTML = '<i class="fas fa-plus"></i>创建服务器';
@@ -308,7 +442,7 @@ async function fetchServerList() {
                 };
                 buttonGroup.appendChild(createServerBtn);
 
-                // 添加下载所有服务器按钮
+                // 下载所有服务器按钮
                 const downloadAllBtn = document.createElement('button');
                 downloadAllBtn.className = 'download-btn';
                 downloadAllBtn.innerHTML = '<i class="fas fa-file-download"></i>下载所有服务器信息';
@@ -345,8 +479,11 @@ async function fetchServerList() {
                 });
             })
             .catch(error => {
+                clearTimeout(timeout); // 清除超时计时器
                 console.error('获取服务器列表时出错:', error);
                 document.getElementById('server-list-container').innerHTML = '<p style="color: red;">获取服务器列表失败，请稍后重试。</p>';
+                // 显示错误状态
+                updateProgress(0, 0, true);
             });
     } catch (error) {
         console.error('获取服务器列表失败:', error);
@@ -522,7 +659,7 @@ async function stopServer(serverName) {
 async function ChartImage(serverName) {
     try {
         setTimeout(function () {
-            window.location.href = `/api/server/${serverName}/storage_chart`;
+            window.location.href = `/server/${serverName}/storage_chart`;
         }, 0);
     } catch (error) {
         console.error('获取图表失败:', error);
@@ -570,4 +707,212 @@ function downloadAllServers(serverList) {
 function createServer() {
     // 这里打开页面创建服务器
     window.open('/server/create');
+}
+
+// 获取磁盘使用率
+async function fetchDiskUsage() {
+    try {
+        const response = await fetch('/api/program/disk_usage');
+        const data = await response.json();
+
+        if (data.error) {
+            console.error('获取磁盘使用率失败:', data.error);
+            showChartError();
+            return;
+        }
+
+        // 动态加载 ECharts 库（如果未加载）
+        if (typeof echarts === 'undefined') {
+            // 防止重复加载
+            if (!window.echartsLoading) {
+                window.echartsLoading = true;
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js';
+                script.onload = () => {
+                    window.echartsLoading = false;
+                    initDiskUsageChart(data.disk_usage, data.disk_free, data.usage, data.free);
+                };
+                script.onerror = () => {
+                    window.echartsLoading = false;
+                    console.error('加载ECharts库失败');
+                    showChartError();
+                };
+                document.head.appendChild(script);
+            }
+        } else {
+            // 初始化 ECharts 图表
+            initDiskUsageChart(data.disk_usage, data.disk_free, data.usage, data.free);
+        }
+    } catch (error) {
+        console.error('获取磁盘使用率失败:', error);
+        showChartError();
+    }
+}
+
+// 初始化磁盘使用率图表
+function initDiskUsageChart(usedPercent, freePercent, used, free) {
+    const chartDom = document.getElementById('disk-usage-chart');
+    if (!chartDom) return;
+
+    const chart = echarts.init(chartDom);
+    const option = {
+        tooltip: {
+            formatter: '{b}: {c}%'
+        },
+        graphic: [{
+            type: 'text',
+            left: 'center',
+            top: 'center',
+            style: {
+                text: (usedPercent) + '%',
+                textAlign: 'center',
+                fill: '#67afdfff',
+                fontSize: 20,
+                fontWeight: 'bold'
+            }
+        }],
+        series: [{
+            name: '磁盘使用率',
+            type: 'pie',
+            radius: ['60%', '80%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+                borderRadius: 0,
+                borderColor: '#ffffffff',
+                borderWidth: 2
+            },
+            label: {
+                show: false
+            },
+            emphasis: {
+                label: {
+                    show: false
+                }
+            },
+            data: [
+                {
+                    value: usedPercent,
+                    name: `已使用: ${used} GB
+                            已使用`,
+                    itemStyle: { color: '#386ffcff' }
+                },
+                {
+                    value: freePercent,
+                    name: `未使用: ${free} GB
+                            未使用`,
+                    itemStyle: { color: '#a2c2fcff' },
+                }
+            ]
+        }]
+    };
+
+    chart.setOption(option);
+}
+
+// 显示图表错误状态
+function showChartError() {
+    const chartDom = document.getElementById('disk-usage-chart');
+    if (chartDom) {
+        chartDom.innerHTML = `
+            <div style="text-align:center; padding:40px 0; color:#e74c3c;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>获取数据失败</p>
+            </div>
+        `;
+    }
+}
+
+// 获取设置数据
+async function fetchSettings() {
+    try {
+        const response = await fetch('/api/program/get/settings');
+        const settings = await response.json();
+
+        console.log(settings);
+
+        // 填充表单数据
+        document.getElementById('min-memory').value = settings.min_memory || '';
+        document.getElementById('max-memory').value = settings.max_memory || '';
+        document.getElementById('nogui-enabled').checked = settings.nogui_enabled || false;
+        document.getElementById('eula-wait-time').value = settings.eula_wait_time || '';
+        document.getElementById('auto-start').checked = settings.auto_start || false;
+        document.getElementById('update-source').value = settings.update_source || 'Github';
+        document.getElementById('test-versions').checked = settings.test_versions || false;
+        document.getElementById('storage-update-time').value = settings.storage_update_time || '';
+        document.getElementById('server-port').value = settings.server_port || '';
+
+        // 添加表单提交事件
+        document.getElementById('settings-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const saveBtn = document.querySelector('.save-btn');
+            if (!saveBtn) return;
+
+            const formData = {
+                min_memory: document.getElementById('min-memory').value,
+                max_memory: document.getElementById('max-memory').value,
+                nogui_enabled: document.getElementById('nogui-enabled').checked,
+                eula_wait_time: document.getElementById('eula-wait-time').value,
+                auto_start: document.getElementById('auto-start').checked,
+                update_source: document.getElementById('update-source').value,
+                test_versions: document.getElementById('test-versions').checked,
+                storage_update_time: document.getElementById('storage-update-time').value,
+                server_port: document.getElementById('server-port').value
+            };
+
+            console.log('提交表单数据:', formData);
+
+            // 转换数字字段，空字符串转为0
+            const numberFields = ['min_memory', 'max_memory', 'eula_wait_time', 'server_port'];
+            numberFields.forEach(field => {
+                const value = formData[field];
+                if (value === '') {
+                    formData[field] = 0;
+                } else {
+                    const num = parseInt(value, 10);
+                    formData[field] = isNaN(num) ? 0 : num;
+                }
+            });
+
+            try {
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = '保存中...';
+                }
+
+                const response = await fetch('/api/program/set/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                // 检查响应是否为JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    throw new Error('无效的响应格式');
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('设置保存成功！');
+                    location.href = '/';
+                } else {
+                    alert(`保存失败: ${result.error || '未知错误'}`);
+                }
+            } catch (error) {
+                console.error('保存设置失败:', error);
+                alert('保存设置失败: ' + error.message);
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = '保存设置';
+                }
+            }
+        });
+    } catch (error) {
+        console.error('获取设置失败:', error);
+        alert('无法加载设置，请刷新页面重试');
+    }
 }

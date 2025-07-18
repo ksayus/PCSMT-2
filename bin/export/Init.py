@@ -17,6 +17,7 @@ class Infomation:
             Info.work_path = os.getcwd()  # 显式设置工作路径为字符串类型
 
             Program.Processing.Delete_Script()
+
             if Info.Config.AutoUpdateSource() == "Github":
                 result = Update.Source.Github()
                 if result == 0:
@@ -31,10 +32,12 @@ class Infomation:
                     result = Update.Source.Github()
                     if result == 0:
                         log.logger.info("无法完成自动更新,请手动更新!")
+
             if Info.Config.AutomaticStartup() == True:
                 Program.Do.AddStartup(Info.program_name)
             elif Info.Config.AutomaticStartup() == False:
                 Program.Do.RemoveStartup(Info.program_name)
+
             find_folder.find_folders_with_existence_and_create(Info.work_path + Info.File.Folder.Resource)
             find_folder.find_folders_with_existence_and_create(Info.work_path + Info.File.Folder.Resource + Info.File.Folder.CoreInstallation)
             find_folder.find_folders_with_existence_and_create(Info.work_path + Info.File.Folder.Resource + Info.File.Folder.Excel)

@@ -112,7 +112,7 @@ class Processing:
                         else:
                             f.write(f'{java_args} -Xms' + str(Info.Config.RunningMemories_Min()) + 'M -Xmx' + str(Info.Config.RunningMemories_Max()) + 'M -jar ' + Core)
 
-                        if Info.Config.Nogui() == "true":
+                        if Info.Config.Nogui() == "true" or Info.Config.Nogui() == True:
                             f.write(' -nogui')
                         else:
                             f.write('')
@@ -1115,7 +1115,7 @@ class Change:
                     log.logger.info('修改服务器启动内存为：' + str(memory_min) + ' ' + str(memory_max))
                     f.write('cd ' + server_info['Path'] + '\n')
                     f.write('java -Xmx' + str(memory_min) + 'M -Xms' + str(memory_max) + 'M -jar ' + server_info['Core'])
-                    if Info.Config.Nogui() == "true":
+                    if Info.Config.Nogui() == "true" or Info.Config.Nogui() == True:
                         f.write(' -nogui')
                     else:
                         f.write('')
@@ -1189,7 +1189,7 @@ class Change:
                         with open(server_info['StartBatchPath'], 'w') as f:
                             f.write('cd ' + server_info['Path'] + '\n')
                             f.write('java -Xms' + str(Info.Config.RunningMemories_Min()) + 'M -Xmx' + str(Info.Config.RunningMemories_Max()) + 'M -jar ' + server_info['Core'])
-                            if Info.Config.Nogui() == 'true':
+                            if Info.Config.Nogui() == 'true' or Info.Config.Nogui() == True:
                                 f.write(' -nogui\n')
                             else:
                                 f.write('\n')

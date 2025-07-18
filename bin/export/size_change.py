@@ -21,6 +21,12 @@ def round_half_up(number, ndigits=0):
     return size
 
 def size_change(size):
+    """
+    将字节转换为更易读的格式\n
+    :param size: 字节数\n
+    :return: 字符串格式的大小
+
+    """
     size_types = ['B', 'KB', 'MB', 'GB', 'TB']
     for size_type in size_types:
         if size < 1024:

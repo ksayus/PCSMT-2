@@ -4,20 +4,6 @@ from flask import request
 from bin.command import Server
 import time
 
-# 添加唯一端点名避免路由冲突
-
-@main.app.route('/server/info/<string:server_name>', endpoint='page_server_info_server_name')
-def server_info(server_name):
-    return render_template('ServerInfo.html', server_name=server_name)
-
-@main.app.route('/server/latest', endpoint='page_server_latest')
-def server_info_latest():
-    return render_template('ServerLatest.html', server_name='latest')
-
-@main.app.route('/server/list', endpoint='page_server_list')
-def server_list():
-    return render_template('ServerList.html')
-
 @main.app.route('/server/create', endpoint='server_create', methods=['GET', 'POST'])
 def server_create():
     if request.method == 'POST':
@@ -42,3 +28,8 @@ def server_create():
 
 
     return render_template('CreateServer.html')
+
+@main.app.route('/server/<string:server_name>/storage_chart')
+def server_storage_chart(server_name):
+    """渲染存储图表页面"""
+    return render_template('chart_js.html', server_name=server_name)

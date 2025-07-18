@@ -1,8 +1,10 @@
 import requests
 import json
 import os
+import shutil
 from bin.export import log
 from bin.find_files import find_file
+from bin.export import size_change
 
 class Info:
     def MinecraftVersion():
@@ -136,6 +138,9 @@ class Info:
         return keyword
 
     def DirSize(path):
+        """
+        计算指定目录的总大小
+        """
         total = 0
         with os.scandir(path) as it:
             for entry in it:
@@ -146,6 +151,9 @@ class Info:
         return total
 
     def StorageSize(server_name):
+        """
+        获取服务器存储大小
+        """
         # 延迟导入 program_info，避免循环导入问题
         from bin.export import Info
 
@@ -153,3 +161,21 @@ class Info:
             with open(Info.work_path + Info.File.Folder.ServerStorageSize + '/' + f'{server_name}.json', 'r', encoding='utf-8') as f:
                 server_storage_size = json.load(f)
                 return server_storage_size
+
+    def DiskUsage():
+        """
+        获取磁盘使用情况
+        返回: 磁盘使用率百分比
+        """
+        GB = 1024 ** 3 #GB == gigabyte
+        root = os.path.abspath('.')[:3]
+        Total, Usage, Free = shutil.disk_usage(f'{root[0]}:') #查看磁盘的使用情况
+
+        UsagePercent = size_change.round_half_up(Usage / Total * 100, 2) #计算磁盘使用率
+
+        FreePercent = size_change.round_half_up(Free / Total * 100, 2) #计算磁盘剩余率
+
+        Usage = size_change.round_half_up(Usage / GB, 2) #转换为GB
+        Free = size_change.round_half_up(Free / GB, 2) #转换为GB
+
+        return UsagePercent, FreePercent, Usage, Free

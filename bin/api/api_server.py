@@ -117,12 +117,7 @@ def login():
 
         if Admin.Examine.Password(account, password):
             session['authenticated'] = True  # 此处依赖secret_key
-            next_url = session.pop('next_url', None)
-
-            # 如果存在有效重定向目标，则跳转
-            if next_url and is_safe_url(next_url):
-                return redirect(next_url)
-            return render_template('index.html')
+            return redirect('/')  # 确保始终重定向到安全路径
         else:
             return render_template('login.html', error="账号或密码错误")
     return render_template('login.html')
@@ -157,12 +152,6 @@ def StopServer(server_name):
     except Exception as e:
         log.logger.error(str(e))
         return jsonify({"error": "内部错误"}), 500
-
-
-@main.app.route('/api/server/<string:server_name>/storage_chart')
-def server_storage_chart(server_name):
-    """渲染存储图表页面"""
-    return render_template('chart_js.html', server_name=server_name)
 
 @main.app.route('/api/server/<string:server_name>/storage_info', methods=['GET'])
 def return_server_storage_info(server_name):

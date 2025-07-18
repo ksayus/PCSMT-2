@@ -371,3 +371,230 @@ body {
         transition: transform 0.3s ease;
     }
 }
+
+.bg{
+    width: 150px;
+    height: 150px;
+    border-radius: 100%;
+    background: #ccc;
+    position: relative;
+    margin: 20px auto;
+    cursor: pointer;
+}
+/* 不同区域的悬停提示 */
+.circle-right:hover::after,
+.circle-left:hover::after,
+.mask-right:hover::after,
+.mask-left:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-size: 14px;
+    z-index: 10;
+}
+
+/* 悬停提示样式增强 */
+.circle-right:hover::after,
+.circle-left:hover::after {
+    content: "已使用: " attr(data-used);
+}
+
+.mask-right:hover::after,
+.mask-left:hover::after {
+    content: "未使用: " attr(data-free);
+}
+
+.circle-right, .circle-left, .mask-right, .mask-left{
+    width: 150px;
+    height: 150px;
+    border-radius: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.circle-right, .circle-left{
+    background: skyblue;
+}
+.mask-right, .mask-left{
+    background: #ccc;
+    transition: transform 1.5s ease-in-out;
+}
+.circle-right, .mask-right{
+    clip: rect(0,150px,150px,75px);
+}
+.circle-left, .mask-left{
+    clip: rect(0,75px,150px,0);
+}
+.text{
+    font: bold 20px/160px "Arial", sans-serif;
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    text-align: center;
+    font-size: 24px;
+    color: deepskyblue;
+    border-radius: 100%;
+    background: #fff;
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    transition: opacity 0.3s ease-in-out;
+    cursor: pointer;
+    position: relative;
+}
+
+/* 文本悬停提示增强 */
+.text:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-size: 14px;
+    z-index: 10;
+}
+
+/* 错误状态样式 */
+.text[data-used="获取数据失败"] {
+    color: #e74c3c;
+    font-size: 16px;
+    line-height: 120px;
+}
+
+#usage-font{
+    font-size: 20px;
+    text-align: center;
+    color: #67afdfff;
+    font-weight: bold;
+}
+
+/* 新增：设置表单美化样式 */
+.settings-content .form-group {
+    margin-bottom: 1.5rem;
+    padding: 1.2rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.settings-content .form-group:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.settings-content label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.settings-content .input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.settings-content input[type="number"],
+.settings-content input[type="text"],
+.settings-content select {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.settings-content input:focus,
+.settings-content select:focus {
+    border-color: #3498db;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+/* 切换开关样式 */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-switch label {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.toggle-switch label:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + label {
+    background-color: #3498db;
+}
+
+.toggle-switch input:checked + label:before {
+    transform: translateX(26px);
+}
+
+/* 保存按钮样式 */
+.save-btn {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    border: none;
+    border-radius: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 12px 24px;
+    transition: all 0.3s ease;
+    display: block;
+    margin: 30px auto 0;
+    width: 200px;
+}
+
+.save-btn:hover {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    box-shadow: 0 6px 12px rgba(46, 204, 113, 0.25);
+    transform: translateY(-2px);
+}
+
+.save-btn:active {
+    transform: translateY(1px);
+}

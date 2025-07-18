@@ -35,7 +35,7 @@ def find_files_with_existence_and_create(directory):
             log.logger.error("创建文件失败")
             return False
 
-def find_files_with_existence(directory):
+def find_files_with_existence(directory ,msg=True):
     """
     在指定目录中查找指定的文件
     若不存在则返回False
@@ -44,7 +44,8 @@ def find_files_with_existence(directory):
         # log.logger.info("文件存在:" + directory)
         return True
     else:
-        log.logger.error("文件不存在:" + directory)
+        if msg:
+            log.logger.error("文件不存在:" + directory)
         return False
 
 def find_keyword_inline_and_change_argument(file_path, keyword, argument):

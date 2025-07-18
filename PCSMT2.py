@@ -341,7 +341,7 @@ class TkinterApp:
                 width=2
             )
 
-            # 添加按钮文本
+            # 按钮文本
             btn_canvas.create_text(
                 50, 17,
                 text=text,
@@ -351,7 +351,7 @@ class TkinterApp:
 
             # 绑定点击事件
             btn_canvas.bind("<Button-1>", lambda e, c=cmd: c())
-            btn_canvas.bind("<Enter>", lambda e, c=btn_canvas: c.itemconfig(1, fill="#3a76d8"))
+            btn_canvas.bind("<Enter>", lambda e, c=btn_canvas: c.itemconfig(1, fill="#629dfc"))
             btn_canvas.bind("<Leave>", lambda e, c=btn_canvas: c.itemconfig(1, fill="#e0e7ff"))
 
         # 日志输出区域 - 使用新样式
@@ -361,7 +361,7 @@ class TkinterApp:
         self.log_text = scrolledtext.ScrolledText(
             log_frame,
             wrap=tk.WORD,
-            bg="#97c2eb",  # 浅蓝背景
+            bg="#bcdbf8",  # 浅蓝背景
             fg="#2B79EC",  # 蓝色文字
             font=("Consolas", 10),
             insertbackground="#2fee6f",  # 光标颜色
@@ -370,7 +370,7 @@ class TkinterApp:
         self.log_text.pack(fill=tk.BOTH, expand=True)
         self.log_text.config(state=tk.DISABLED)
 
-        # 添加分隔线
+        # 分隔线
         ttk.Separator(self.root, orient=tk.HORIZONTAL).pack(fill=tk.X, padx=10, pady=5)
 
         # 命令输入区域 - 使用新样式
@@ -406,6 +406,21 @@ class TkinterApp:
                 command=self.execute_current_command,
                 style="Blue.TButton").pack(side=tk.LEFT)
 
+        # ========== 状态栏 ==========
+        status_bar = ttk.Frame(self.root, padding=(5, 2))
+        status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+
+        # 版本信息标签（右下角）
+        from bin.export import Info
+        version_text = f"PCSMT2 v{Info.Config.PCSMT2_Version()}-{Info.Config.ReleaseVersion()}"
+        version_label = ttk.Label(
+            status_bar,
+            text=version_text,
+            font=("Segoe UI", 8),
+            anchor="e"  # 右对齐
+        )
+        version_label.pack(side=tk.RIGHT, padx=5)
+
     def redirect_logging(self):
         """重定向日志输出到文本框"""
         class TextHandler(log.logging.Handler):
@@ -430,7 +445,7 @@ class TkinterApp:
         sys.stderr = self.StdoutRedirector(self.log_text)
 
     def update_autocomplete(self):
-        """更新命令自动补全列表 - 修复Tab补全问题"""
+        """更新命令自动补全列表"""
         # 获取所有命令（包括内置命令和自定义命令）
         cmd_list = self.cmd.get_all_commands()
         self.cmd_entry['values'] = cmd_list
@@ -488,7 +503,7 @@ class TkinterApp:
                 self.cmd_entry.event_generate('<Down>')
         return "break"
 
-    # 新增：上键事件处理函数
+    # 上键事件处理函数
     def on_up_key(self, event):
         """上键按下时，显示上一条历史命令"""
         if not self.command_history:
@@ -498,7 +513,7 @@ class TkinterApp:
             self.cmd_entry.set(self.command_history[self.history_index])
         return "break"
 
-    # 新增：下键事件处理函数
+    # 下键事件处理函数
     def on_down_key(self, event):
         """下键按下时，显示下一条历史命令"""
         if not self.command_history:
@@ -515,7 +530,7 @@ class TkinterApp:
         """执行当前输入框中的命令"""
         command = self.cmd_entry.get().strip()
         if command:
-            # 新增：将命令添加到历史记录
+            # 将命令添加到历史记录
             if not self.command_history or self.command_history[0] != command:
                 self.command_history.insert(0, command)
             # 重置历史索引
@@ -1069,6 +1084,20 @@ class PCSMT2(Cmd):
             log.logger.error('参数错误，请输入正确的参数！')
             log.logger.error(e)
         Program.Change.Port(int(port))
+
+    def do_change_update_source(self, arg):
+        """修改更新源\nCommand: change_update_source <update_source>"""
+        try:
+            argument = arg.strip()
+        except ValueError:
+            log.logger.error('参数错误，请输入正确的参数！')
+            return
+        Program.Change.UpdateSource(argument)
+
+    def complete_change_update_source(self, text, line, begidx, endidx):
+        """自动补全更新源"""
+        update_sources = ['github', 'gitee']
+        return [source for source in update_sources if source.startswith(text)]
 
     # 退出控制台
     def do_exit(self, arg):

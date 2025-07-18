@@ -71,7 +71,7 @@ class Config:
     _config_cache = None  # 添加配置缓存
 
     Config = {
-        "PCSMT2_Version": "1.2.0.1",
+        "PCSMT2_Version": "1.2.0.2",
         "ReleaseVersion": "Release",
         "RunningMemories_Min": 1024,
         "RunningMemories_Max": 2048,
@@ -85,17 +85,17 @@ class Config:
     }
 
     ConfigRead = {
-        "PCSMT2_Version": "",
-        "ReleaseVersion": "",
-        "RunningMemories_Min": 0,
-        "RunningMemories_Max": 0,
-        "Nogui": False,
-        "WaitEulaGenerateTime": 0,
-        "AutomaticStartup": False,
-        "AutoUpdateSource": "",
-        "MinecraftTestVersion": False,
-        "StorageSizeUpdateTime": 0,
-        "Port": 0
+        "PCSMT2_Version": str,
+        "ReleaseVersion": str,
+        "RunningMemories_Min": int,
+        "RunningMemories_Max": int,
+        "Nogui": bool,
+        "WaitEulaGenerateTime": int,
+        "AutomaticStartup": bool,
+        "AutoUpdateSource": str,
+        "MinecraftTestVersion": bool,
+        "StorageSizeUpdateTime": int,
+        "Port": int
     }
 
     @classmethod
