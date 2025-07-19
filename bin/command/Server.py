@@ -43,6 +43,28 @@ class Processing:
                 for i in range(len(Core)):
                     exclude_keywords = {
                         'server.jar',
+                        'com',
+                        'commons-io',
+                        'cpw',
+                        'de',
+                        'io',
+                        'it',
+                        'org',
+                        'trove',
+                        'java',
+                        'jodah',
+                        'mincraftforge',
+                        'minecrell',
+                        'sf',
+                        'net',
+                        'org',
+                        'org.apache',
+                        'org.apache.commons',
+                        'org.apache.logging.log4j',
+                        'org.apache.logging.log4j.core',
+                        'org.apache.logging.log4j.core.lookup',
+                        'org.apache.logging.log4j.core.config',
+                        'org.apache.logging.log4j.core.appender',
                     }
 
                     Core = [
@@ -83,7 +105,7 @@ class Processing:
 
                     with open(Path + Info.File.Document.StartBatch, 'w') as f:
                         f.write('cd ' + Path + '\n')
-                        if find_file.find_files_with_existence(Path + Info.File.Document.StartBatch):
+                        if find_file.find_files_with_existence(Path + Info.File.Document.ForgeServerStartBatchDefaultName):
                             try:
                                 with open(Path + Info.File.Document.ForgeServerStartBatchDefaultName, 'r') as fi:
                                     log.Debug('发现run.bat文件,开始读取...')
@@ -110,6 +132,7 @@ class Processing:
                                 log.logger.error(e)
                                 f.write(f'{java_args} -Xms' + str(Info.Config.RunningMemories_Min()) + 'M -Xmx' + str(Info.Config.RunningMemories_Max()) + 'M -jar ' + Core)
                         else:
+                            # 直接使用默认命令
                             f.write(f'{java_args} -Xms' + str(Info.Config.RunningMemories_Min()) + 'M -Xmx' + str(Info.Config.RunningMemories_Max()) + 'M -jar ' + Core)
 
                         if Info.Config.Nogui() == "true" or Info.Config.Nogui() == True:
@@ -180,8 +203,32 @@ class Processing:
                             return
                     else:
                         log.logger.error('创建服务器信息文件失败!')
+                        return
 
-            Info.Information.ServerList.append(server_name)
+        server_info_path = Info.work_path + Info.File.Folder.Save + '/' + server_name + '.json'
+        if not os.path.exists(server_info_path):
+            try:
+                with open(server_info_path, 'w') as f:
+                    json.dump({
+                        'Name': server_name,
+                        'Counts': 0,
+                        'Core': Core,
+                        'Path': Path,
+                        'StartBatchPath': AbsolutePath,
+                        'Size': server_size,
+                        'Version': Version,
+                        'LatestStartedTime': 'N/A',
+                        'CoreType': CoreType
+                    }, f, indent=4)
+                    log.logger.info(f'创建服务器信息文件: {server_info_path}')
+            except Exception as e:
+                log.logger.error(f'创建服务器信息文件失败: {e}')
+                return
+
+        # 确保 ServerList 被初始化后再添加
+        if Info.Information.ServerList is None:
+            Info.Information.ServerList = []
+        Info.Information.ServerList.append(server_name)
 
     def Build(server_name, core_type, core_support_version):
         """
@@ -826,7 +873,9 @@ class Do:
             else:
                 log.logger.info('已找到服务器:' + server_info['Path'])
                 if RCON_key == 'false':
+                    log.logger.info('未启用RCON，正在使用cmd.exe任务管理器结束进程...')
                     IsProgramRunning.Do.taskkill(server_name, 'cmd.exe')
+                    log.logger.info('已结束进程！')
                 else:
                     port = RCON.Get.Port(server_info, msg=False)
                     if port != None:
@@ -907,12 +956,12 @@ class Get:
         返回值：服务器列表(list)
         """
         server_list = find_file.find_files_with_extension(Info.work_path + Info.File.Folder.Save, '.json')
+        server_lists = []
         if len(server_list) == 0:
             if ShowMessage:
                 log.logger.error('未找到服务器，请添加服务器！')
-            return
+            return server_lists
         else:
-            server_lists = []
             if ShowMessage:
                 log.logger.info('当前服务器列表：')
             for server in server_list:

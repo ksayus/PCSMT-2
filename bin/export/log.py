@@ -44,7 +44,10 @@ if find_folder.find_folders_with_existence("logs"):
         file_handler.setLevel(logging.DEBUG)
 
         console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)
+        if IsProgramRunning.Is.ProgramExe():
+            console_handler.setLevel(logging.INFO)
+        else:
+            console_handler.setLevel(logging.DEBUG)
 
         formatter = ColorFormatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
@@ -60,3 +63,7 @@ def Debug(message: str):
         pass
     else:
         logger.debug(message)
+
+def DebugOutputLog(message: str):
+    # 只写入日志文件（不输出到控制台）
+    logger.debug(message)

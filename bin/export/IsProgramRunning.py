@@ -53,12 +53,17 @@ class Do:
         for window in windows_list:
             title = win32gui.GetWindowText(window)
             if f'{Name}' in title:
-                if f'{typeName}' not in title:  # 忽略cmd窗口
-                    pass
-                else:
-                    # print(f'title:{title}')
-                    # 获取窗口对应的进程ID
-                    _, pid = win32process.GetWindowThreadProcessId(window)
-                    # print(f'pid:{pid}')
-                    # kill process
-                    os.system(f'taskkill /F /PID {pid}')
+                # 获取窗口对应的进程ID
+                _, pid = win32process.GetWindowThreadProcessId(window)
+
+                try:
+                    # 检查进程名是否为cmd.exe
+                    p = psutil.Process(pid)
+                    if p.name().lower() != "cmd.exe":  # 只处理cmd.exe进程
+                        continue
+                except (psutil.NoSuchProcess, psutil.AccessDenied):
+                    continue
+
+                # kill process
+                print(f'正在关闭窗口:{title}')
+                os.system(f'powershell taskkill /F /PID {pid}')

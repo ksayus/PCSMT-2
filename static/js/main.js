@@ -421,8 +421,25 @@ async function fetchServerList() {
                 }
 
                 const serverListData = data.serverlist || [];
-                if (serverListData.length === 0) {
+                if (serverListData.length == 0) {
                     serverList.innerHTML = '<p>没有可用的服务器。</p>';
+
+                    // 仅添加创建服务器按钮（移除下载按钮）
+                    const buttonGroup = document.createElement('div');
+                    buttonGroup.className = 'button-group';
+                    buttonGroup.style.display = 'flex';
+                    buttonGroup.style.justifyContent = 'center';
+                    buttonGroup.style.gap = '15px';
+
+                    const createServerBtn = document.createElement('button');
+                    createServerBtn.className = 'create-btn';
+                    createServerBtn.innerHTML = '<i class="fas fa-plus"></i>创建服务器';
+                    createServerBtn.onclick = function() {
+                        createServer();
+                    };
+                    buttonGroup.appendChild(createServerBtn);
+
+                    serverList.parentNode.insertBefore(buttonGroup, serverList);
                     return;
                 }
 
