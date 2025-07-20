@@ -1,12 +1,12 @@
 {
-    "PCSMT2_Version": "1.2.0.3",
+    "PCSMT2_Version": "1.2.0.3.1",
     "ReleaseVersion": "Release",
     "RunningMemories_Min": 2048,
     "RunningMemories_Max": 4096,
     "Nogui": true,
     "WaitEulaGenerateTime": 25,
-    "AutomaticStartup": true,
-    "AutoUpdateSource": "Gitee",
+    "AutomaticStartup": false,
+    "AutoUpdateSource": "Github",
     "MinecraftTestVersion": false,
     "StorageSizeUpdateTime": 1800,
     "Port": 3000

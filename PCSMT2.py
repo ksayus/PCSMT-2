@@ -1,8 +1,32 @@
+import os
+import sys  # 新增导入
+
+# 获取程序基础路径
+def get_base_path_inlet(relative_path=""):
+    """获取应用程序路径，适配各种运行环境
+
+    :param relative_path: 需要拼接的相对路径
+    :return: 完整绝对路径
+    """
+    if getattr(sys, 'frozen', False):
+        # 打包后的执行模式：始终使用exe所在目录
+        base_path = os.path.dirname(sys.executable)
+    else:
+        # 开发模式：脚本所在目录
+        base_path = os.path.dirname(os.path.abspath(__file__))
+
+    return os.path.normpath(os.path.join(base_path, relative_path))
+
+# 设置工作目录为程序所在路径
+base_path = get_base_path_inlet()
+os.chdir(base_path)
+# print(f"已设置工作目录为程序所在路径: {base_path}")
+
 from bin.export import IsProgramRunning
 
-import os
 import psutil
 import webbrowser
+import sys
 
 counts = IsProgramRunning.Is.Running()
 
@@ -92,8 +116,12 @@ except FileNotFoundError:
     log.logger.error('未找到java_versions.json文件，请检查文件是否存在！')
     log.logger.info('正在创建java_versions.json文件...')
 
-with open('java_versions.json', 'w', encoding='utf-8') as f:
-    json.dump(java_versions_address, f, indent=4)
+try:
+    with open('java_versions.json', 'w', encoding='utf-8') as f:
+        json.dump(java_versions_address, f, indent=4)
+except Exception as e:
+    log.logger.error(f'保存java_versions.json文件时发生错误: {e}')
+    log.logger.error(e)
 
 from bin.export import Info
 from bin.export import Init
@@ -156,10 +184,6 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 from cmd2 import Cmd
 
-# 在程序开始处添加资源路径设置
-import os
-import sys
-
 # 获取程序根目录路径
 def get_base_path(relative_path=""):
     """获取应用程序路径，适配各种运行环境
@@ -168,13 +192,9 @@ def get_base_path(relative_path=""):
     :return: 完整绝对路径
     """
     if getattr(sys, 'frozen', False):
-        # 打包后的执行模式
         if hasattr(sys, '_MEIPASS'):
-            # onefile模式：_MEIPASS指向解压目录
+            # PyInstaller打包后的临时文件路径
             base_path = sys._MEIPASS
-        else:
-            # onedir模式：exe所在目录
-            base_path = os.path.dirname(sys.executable)
     else:
         # 开发模式：脚本所在目录
         base_path = os.path.dirname(os.path.abspath(__file__))
@@ -229,7 +249,7 @@ class TkinterApp:
             except Exception as e:
                 log.logger.error(f"备选方案加载图标失败: {str(e)}")
 
-        self.root.configure(bg="#f0f2f5")  # 更现代的浅灰色背景
+        self.root.configure(bg="#a6c9ff")  # 更现代的浅灰色背景
 
         # 命令历史记录
         self.command_history = []  # 存储历史命令

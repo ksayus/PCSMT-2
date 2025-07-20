@@ -71,7 +71,7 @@ class Config:
     _config_cache = None  # 添加配置缓存
 
     Config = {
-        "PCSMT2_Version": "1.2.0.3",
+        "PCSMT2_Version": "1.2.0.3.1",
         "ReleaseVersion": "Release",
         "RunningMemories_Min": 1024,
         "RunningMemories_Max": 2048,

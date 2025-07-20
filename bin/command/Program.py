@@ -362,7 +362,7 @@ class Processing:
                     "timeout /t 5\n"
                     "cd " + Info.work_path + "\n"
                     "powershell rm " + Info.work_path + '/' + Info.program_name + '-v' + Info.Config.PCSMT2_Version + ".exe" + "\n"
-                    "start " + program_name + ".exe" + "\n"
+                    "start " + program_name + "\n"
                     "exit"
                 )
                 f.close()
