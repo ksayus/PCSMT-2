@@ -3,7 +3,6 @@ import json
 import time
 import shutil
 import zipfile
-import re
 from bin.find_files import find_file
 from bin.find_files import find_folder
 from bin.export import Info
@@ -14,11 +13,11 @@ from bin.export import IsProgramRunning
 from bin.export import RCON
 from bin.export import size_change
 from bin.export import Get as GetThings
+from packaging import version
 from bin.export import timer
 from bin.export import GetTime
 from bin.command import Start
 from bin.download import Core
-from bin.export import Java
 
 class Processing:
     def Add(Path, server_name, rewrite, Version, CoreType):
@@ -88,7 +87,21 @@ class Processing:
                 log.Debug("找到服务器启动批处理文件,位置:" + AbsolutePath)
 
                 try:
-                    java_args: str = Java.Get.JavaVersion(Version)
+                    java_args: str = ''
+                    v = version.parse(Version)
+                    with open('./java_versions.json', 'r', encoding='utf-8') as f:
+                        java_versions_address = json.load(f)
+
+                        # 按照版本使用不同版本的Java JDK
+                        # 获取Java版本
+                        if v < version.parse('1.17.0'):
+                            java_args = '"' f'{java_versions_address['1.8']}' '"'
+                        elif v > version.parse('1.17.0') and v <= version.parse('1.18.2'):
+                            java_args = '"' f'{java_versions_address['16']}' '"'
+                        elif v > version.parse('1.18.2') and v <= version.parse('1.20.4'):
+                            java_args = '"' f'{java_versions_address['17']}' '"'
+                        elif v > version.parse('1.20.5') and v <= version.parse('1.21.8'):
+                            java_args = '"' f'{java_versions_address['21']}' '"'
 
                     with open(Path + Info.File.Document.StartBatch, 'w') as f:
                         f.write('cd ' + Path + '\n')
@@ -1118,42 +1131,8 @@ class Get:
             log.logger.error(e)
             return
 
-    def Properties(server_name: str):
-        try:
-            keywords = GetThings.Info.PropertiesKeys()
-            ServerInfo = Examine.Server.InfoKeys(server_name)
-
-            for key in keywords:
-                keyword = key
-                argument = find_file.Get.PropertiesKeys(ServerInfo['Path'] + Info.File.Document.ServerProperties, keyword)
-                yield keyword, argument
-        except Exception as e:
-            log.logger.error('读取服务器信息文件失败！')
-            log.logger.error(e)
-            return
-
-    def RunMemory(server_name: str):
-        try:
-            ServerInfo = Examine.Server.InfoKeys(server_name)
-            with open(ServerInfo['StartBatchPath'], 'r', encoding='utf-8') as f:
-                data = f.read()
-
-                Xms = re.findall(r'-Xms(\d+)', data)
-                Xmx = re.findall(r'-Xmx(\d+)', data)
-
-            run_memory_data ={
-                'Xms': Xms if Xms else 0,
-                'Xmx': Xmx if Xmx else 0
-            }
-
-            return run_memory_data
-        except Exception as e:
-            log.logger.error('获取服务器运行内存失败！')
-            log.logger.error(e)
-            return False
-
 class Change:
-    def Properties(server_name: str, keyword: str, argument: str):
+    def Properties(server_name, keyword, argument):
         """
         修改服务器属性
         :param server_name: 服务器名称
@@ -1179,7 +1158,18 @@ class Change:
             log.logger.error('未找到服务器，请检查服务器名称是否正确！')
         else:
             try:
-                java_args: str = Java.Get.JavaVersion(server_info['Version'])
+                java_args: str = ''
+                v = version.parse(server_info['Version'])
+                with open('./java_versions.json', 'r', encoding='utf-8') as f:
+                    java_versions_address = json.load(f)
+                    if v < version.parse('1.17.0'):
+                        java_args = '"' f'{java_versions_address['1.8']}' '"'
+                    elif v > version.parse('1.17.0') and v <= version.parse('1.18.2'):
+                        java_args = '"' f'{java_versions_address['16']}' '"'
+                    elif v > version.parse('1.18.2') and v <= version.parse('1.20.4'):
+                        java_args = '"' f'{java_versions_address['17']}' '"'
+                    elif v > version.parse('1.20.5') and v <= version.parse('1.21.8'):
+                        java_args = '"' f'{java_versions_address['21']}' '"'
 
                 with open(server_info['StartBatchPath'], 'w', encoding='utf-8') as f:
                     log.logger.info('正在修改服务器启动批处理文件...')
@@ -1212,16 +1202,27 @@ class Change:
                 log.logger.info('已找到服务器:' + server_info['Path'])
                 log.logger.info('重命名服务器...')
                 try:
-                    server_info['Name'] = new_name
-                    os.rename(Info.work_path + Info.File.Folder.Save + '/' + server_name + '.json',
-                                Info.work_path + Info.File.Folder.Save + '/' + new_name + '.json')
-
-                    # 更新服务器信息
-                    with open(Info.work_path + Info.File.Folder.Save + '/' + new_name + '.json', 'w', encoding='utf-8') as f:
-                        json.dump(server_info, f, ensure_ascii=False, indent=4)
-
+                    server_info['server_name'] = new_name
                     log.logger.info('重命名成功！')
                     log.logger.info('修改服务器信息文件...')
+                    try:
+                        with open(Info.work_path + Info.File.Folder.Save + '/' + new_name + '.json','w', encoding='utf-8') as f:
+                            json.dump(server_info, f, indent=4)
+                            f.close()
+                            os.remove(Info.work_path + Info.File.Folder.Save + '/' + server_name + '.json')
+                            log.logger.info('修改服务器信息文件成功！')
+
+                            # 更改服务器信息文件名称
+                            os.rename(Info.work_path + Info.File.Folder.Save + '/' + server_name + '.json',
+                                        Info.work_path + Info.File.Folder.Save + '/' + new_name + '.json')
+                            # 刷新服务器列表
+                            Get.List()
+
+                            return True
+                    except Exception as e:
+                        log.logger.error('修改服务器信息文件失败！')
+                        log.logger.error(e)
+                        return False
                 except Exception as e:
                     log.logger.error('重命名失败！')
                     log.logger.error(e)
@@ -1242,7 +1243,6 @@ class Change:
                 log.logger.error('未找到服务器，请检查服务器名称是否正确！')
                 return
             else:
-                java_args = Java.Get.JavaVersion(server_info['Version'])
                 log.logger.info('已找到服务器:' + server_info['Path'])
                 log.logger.info('重定向服务器路径...')
                 try:
@@ -1257,7 +1257,7 @@ class Change:
                             json.dump(server_info, f, indent=4)
                         with open(server_info['StartBatchPath'], 'w') as f:
                             f.write('cd ' + server_info['Path'] + '\n')
-                            f.write(f'{java_args} -Xms' + str(Info.Config.RunningMemories_Min()) + 'M -Xmx' + str(Info.Config.RunningMemories_Max()) + 'M -jar ' + server_info['Core'])
+                            f.write('java -Xms' + str(Info.Config.RunningMemories_Min()) + 'M -Xmx' + str(Info.Config.RunningMemories_Max()) + 'M -jar ' + server_info['Core'])
                             if Info.Config.Nogui() == 'true' or Info.Config.Nogui() == True:
                                 f.write(' -nogui\n')
                             else:

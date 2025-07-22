@@ -84,3 +84,26 @@ def find_keyword_inline_and_change_argument(file_path, keyword, argument):
 
     for line_number, line in matched_lines:
         log.logger.debug(f"匹配到行 {line_number}: {line.strip()}")
+
+class Get:
+    def PropertiesKeys(FilePath: str, Keyword: str):
+        """
+        获取服务器配置文件指定关键字的值
+
+        :param ServerName: 服务器名称
+        :param Keyword: 关键字
+        :return: 关键字对应的值
+        """
+        try:
+            with open(FilePath, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+                matched_lines = []
+                for line_number, line in enumerate(lines, start=1):
+                    if Keyword in line:
+                        matched_lines.append((line_number, line))
+                        return lines[line_number - 1].split('=')[1].strip()
+
+        except Exception as e:
+            log.logger.error("获取服务器配置文件指定关键字的值失败！")
+            log.logger.error(e)
+            return False

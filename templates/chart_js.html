@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh_CN">
 <head>
     <meta charset="UTF-8">
-    <title id="title">{{ title }}</title>
+    <title id="title">PCSMT2 | {{ title }}的存储占用图表</title>
     <link rel="icon" href="/static/PCSMT2.ico">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -22,7 +22,7 @@
                     return;
                 }
 
-                document.getElementById('title').innerText = serverName;
+                document.getElementById('title').innerText = `PCSMT2 | ${serverName}的存储占用图表`;
 
                 // 创建图表
                 const ctx = document.getElementById('storageChart').getContext('2d');

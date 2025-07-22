@@ -171,6 +171,9 @@ const pageContents = {
                 <button class="download-btn" onclick="downloadServer('${serverName}')">
                     <i class="fas fa-file-download"></i>下载服务器信息
                 </button>
+                <button class="change-properties-btn" onclick="changeServerProperties('${serverName}')">
+                    <i class="fas fa-cog"></i>修改服务器属性
+                </button>
             </div>
         </div>
     `,
@@ -376,8 +379,8 @@ async function fetchServers() {
     }
 }
 
-// 获取服务器列表卡片 - 优化版本
-async function fetchServerList() {
+// 获取服务器列表卡片
+async function fetchServerList(AddButton = true) {
     try {
         // 获取圆环元素
         const $text = $('.text');
@@ -421,16 +424,38 @@ async function fetchServerList() {
                 }
 
                 const serverListData = data.serverlist || [];
-                if (serverListData.length == 0) {
-                    serverList.innerHTML = '<p>没有可用的服务器。</p>';
+                if (AddButton)
+                {
+                    if (serverListData.length == 0) {
+                        serverList.innerHTML = '<p>没有可用的服务器。</p>';
 
-                    // 仅添加创建服务器按钮（移除下载按钮）
+                        // 仅添加创建服务器按钮（移除下载按钮）
+                        const buttonGroup = document.createElement('div');
+                        buttonGroup.className = 'button-group';
+                        buttonGroup.style.display = 'flex';
+                        buttonGroup.style.justifyContent = 'center';
+                        buttonGroup.style.gap = '15px';
+
+                        const createServerBtn = document.createElement('button');
+                        createServerBtn.className = 'create-btn';
+                        createServerBtn.innerHTML = '<i class="fas fa-plus"></i>创建服务器';
+                        createServerBtn.onclick = function() {
+                            createServer();
+                        };
+                        buttonGroup.appendChild(createServerBtn);
+
+                        serverList.parentNode.insertBefore(buttonGroup, serverList);
+                        return;
+                    }
+
+                    // 在服务器列表容器前添加按钮组
                     const buttonGroup = document.createElement('div');
-                    buttonGroup.className = 'button-group';
-                    buttonGroup.style.display = 'flex';
-                    buttonGroup.style.justifyContent = 'center';
-                    buttonGroup.style.gap = '15px';
+                    buttonGroup.className = 'button-group'; // 使用现有按钮组样式
+                    buttonGroup.style.display = 'flex'; // 确保按钮水平排列
+                    buttonGroup.style.justifyContent = 'center'; // 居中显示
+                    buttonGroup.style.gap = '15px'; // 设置按钮间距
 
+                    // 创建服务器按钮
                     const createServerBtn = document.createElement('button');
                     createServerBtn.className = 'create-btn';
                     createServerBtn.innerHTML = '<i class="fas fa-plus"></i>创建服务器';
@@ -439,42 +464,31 @@ async function fetchServerList() {
                     };
                     buttonGroup.appendChild(createServerBtn);
 
+                    // 下载所有服务器按钮
+                    const downloadAllBtn = document.createElement('button');
+                    downloadAllBtn.className = 'download-btn';
+                    downloadAllBtn.innerHTML = '<i class="fas fa-file-download"></i>下载所有服务器信息';
+                    downloadAllBtn.onclick = function() {
+                        downloadAllServers(serverListData);
+                    };
+                    buttonGroup.appendChild(downloadAllBtn);
+
                     serverList.parentNode.insertBefore(buttonGroup, serverList);
-                    return;
                 }
-
-                // 在服务器列表容器前添加按钮组
-                const buttonGroup = document.createElement('div');
-                buttonGroup.className = 'button-group'; // 使用现有按钮组样式
-                buttonGroup.style.display = 'flex'; // 确保按钮水平排列
-                buttonGroup.style.justifyContent = 'center'; // 居中显示
-                buttonGroup.style.gap = '15px'; // 设置按钮间距
-
-                // 创建服务器按钮
-                const createServerBtn = document.createElement('button');
-                createServerBtn.className = 'create-btn';
-                createServerBtn.innerHTML = '<i class="fas fa-plus"></i>创建服务器';
-                createServerBtn.onclick = function() {
-                    createServer();
-                };
-                buttonGroup.appendChild(createServerBtn);
-
-                // 下载所有服务器按钮
-                const downloadAllBtn = document.createElement('button');
-                downloadAllBtn.className = 'download-btn';
-                downloadAllBtn.innerHTML = '<i class="fas fa-file-download"></i>下载所有服务器信息';
-                downloadAllBtn.onclick = function() {
-                    downloadAllServers(serverListData);
-                };
-                buttonGroup.appendChild(downloadAllBtn);
-
-                serverList.parentNode.insertBefore(buttonGroup, serverList);
 
                 const serverElements = serverListData.map(server => `
                     <div class="server-card">
+                        <!-- 删除按钮 -->
+                        <div class="delete-btn" onclick="deleteServer('${server}'); event.stopPropagation();">
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
                         <div class="server-card-content" onclick="loadContent('server_info', '${server}')">
                             <h3>${server}</h3>
                             <div class="server-card-info">
+                                <div>
+                                    <span>在线人数</span>
+                                    <span id="online-player-${server}">加载中...</span>
+                                </div>
                                 <div>
                                     <span>版本</span>
                                     <span id="version-${server}">加载中...</span>
@@ -493,6 +507,7 @@ async function fetchServerList() {
                 // 异步加载每个服务器的详细信息
                 serverListData.forEach(server => {
                     fetchServerBasicInfo(server);
+                    fetchServerPlayerInfo(server);
                 });
             })
             .catch(error => {
@@ -504,6 +519,26 @@ async function fetchServerList() {
             });
     } catch (error) {
         console.error('获取服务器列表失败:', error);
+    }
+}
+
+async function fetchServerPlayerInfo(serverName) {
+    try {
+        const response = await fetch(`/api/server/players/${serverName}`);
+        const data = await response.json();
+        if (data.error) {
+            document.getElementById(`online-player-${serverName}`).textContent = '获取失败';
+            return;
+        };
+        if (!data.players)
+        {
+            document.getElementById(`online-player-${serverName}`).textContent = '服务器未启动';
+            return;
+        }
+
+        document.getElementById(`online-player-${serverName}`).textContent = `${data.players[0]} / ${data.players[1]}` || '服务器未启动';
+    } catch (error) {
+        console.error('获取玩家列表失败:', error);
     }
 }
 
@@ -684,7 +719,7 @@ async function ChartImage(serverName) {
     }
 }
 
-// 下载服务器函数（由用户实现具体逻辑）
+// 下载服务器函数
 function downloadServer(serverName) {
     console.log(`下载服务器信息列表: ${serverName}`);
     fetch(`/api/server/info/${serverName}/excel`, { method: 'POST' })
@@ -702,7 +737,7 @@ function downloadServer(serverName) {
         })
 }
 
-// 下载所有服务器函数（由用户实现具体逻辑）
+// 下载所有服务器函数
 function downloadAllServers(serverList) {
     console.log('下载所有服务器信息列表:', serverList);
     fetch('api/server/list/excel', { method: 'POST' })
@@ -720,10 +755,113 @@ function downloadAllServers(serverList) {
         })
 }
 
-// 创建服务器函数（由用户实现具体逻辑）
+// 创建服务器函数
 function createServer() {
     // 这里打开页面创建服务器
     window.open('/server/create');
+}
+
+function changeServerProperties(serverName){
+    window.open('/server/settings/'+serverName);
+}
+
+// 删除服务器函数
+async function deleteServer(serverName) {
+    try{
+        if (confirm(`确定要删除服务器 "${serverName}" 吗？此操作不可撤销！`)) {
+            // 显示加载状态
+            const deleteBtn = document.querySelector(`.delete-btn[onclick*="${serverName}"]`);
+            if (deleteBtn) {
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                deleteBtn.style.pointerEvents = 'none';
+            }
+
+            const response = await fetch(`/api/server/delete/${serverName}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'  // 添加AJAX标识头
+                }
+            });
+
+            // 检查401错误
+            if (handleAjaxError(response)){
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                return;
+            }
+
+            const data = await response.json();
+
+            if (data.status === 'deleted') {
+                // 只刷新服务器卡片区域，不重建按钮组
+                alert('删除服务器成功');
+                refreshServerCards();  // 修改点：替换为专门刷新卡片的函数
+            }else if (data.error) {
+                deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                alert('删除服务器失败');
+            }
+        }
+    }catch (error) {
+        console.error('删除服务器失败:', error);
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        alert('删除服务器失败');
+    }
+}
+
+// 新增：专门刷新服务器卡片的函数
+async function refreshServerCards() {
+    try {
+        const response = await fetch('/api/server/list');
+        const data = await response.json();
+        const serverList = document.getElementById('server-list-container');
+
+        if (data.error) {
+            console.error(data.error);
+            return;
+        }
+
+        const serverListData = data.serverlist || [];
+        if (serverListData.length === 0) {
+            serverList.innerHTML = '<p>没有可用的服务器。</p>';
+            return;
+        }
+
+        // 只更新卡片区域，不重建按钮组
+        const serverElements = serverListData.map(server => `
+            <div class="server-card">
+                <!-- 删除按钮 -->
+                <div class="delete-btn" onclick="deleteServer('${server}'); event.stopPropagation();">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <div class="server-card-content" onclick="loadContent('server_info', '${server}')">
+                    <h3>${server}</h3>
+                    <div class="server-card-info">
+                        <div>
+                            <span>在线人数</span>
+                            <span id="online-player-${server}">加载中...</span>
+                        </div>
+                        <div>
+                            <span>版本</span>
+                            <span id="version-${server}">加载中...</span>
+                        </div>
+                        <div>
+                            <span>大小</span>
+                            <span id="size-${server}">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        serverList.innerHTML = serverElements.join('');
+
+        // 异步加载每个服务器的详细信息
+        serverListData.forEach(server => {
+            fetchServerBasicInfo(server);
+            fetchServerPlayerInfo(server);
+        });
+    } catch (error) {
+        console.error('刷新服务器卡片失败:', error);
+    }
 }
 
 // 获取磁盘使用率

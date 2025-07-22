@@ -144,7 +144,6 @@ import threading
 #         thread.start()
 
 timer.TimerStorageSizeUpdate.thread()
-timer.Heartbeat.thread(self=timer.Heartbeat)
 
 Init.Infomation.Program()
 

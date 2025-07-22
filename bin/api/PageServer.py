@@ -33,3 +33,8 @@ def server_create():
 def server_storage_chart(server_name):
     """渲染存储图表页面"""
     return render_template('chart_js.html', server_name=server_name)
+
+@main.app.route('/server/settings/<string:server_name>')
+def server_settings(server_name):
+    """渲染服务器设置页面"""
+    return render_template('ServerSettings.html', server_name=server_name)

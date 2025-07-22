@@ -6,17 +6,13 @@ from bin.export import log
 from bin.find_files import find_file
 from bin.command import Server
 from bin.export import Admin
-from flask import session, redirect, url_for
-from flask import render_template
-from flask import request
+from flask import session, redirect, url_for, request, render_template
 from bin.export import Get
 from bin.export import RCON
+from bin.export import timer
 from bin.export import Examine
 from bin.download import Download
 from urllib.parse import urlparse, urljoin
-import time
-import os
-
 # server
 @main.app.route('/api/server', methods=['GET'])
 def server_api_root():
@@ -26,10 +22,12 @@ def server_api_root():
 def server_lists():
     try:
         # 使用 jsonify 返回 JSON 格式的响应
+        ServerList = Server.Get.List(ShowMessage=False)
+
         return jsonify(
             {
-                "serverlist": Info.Information.ServerList,
-                "serverCount": str(len(Info.Information.ServerList))
+                "serverlist": ServerList,
+                "serverCount": str(ServerList)
             }
         )
     except Exception as e:
@@ -37,6 +35,37 @@ def server_lists():
         # 返回 JSON 格式的错误信息和 500 状态码
         log.logger.error('获取服务器列表时发生内部错误')
         return jsonify({"error": "获取服务器列表时发生内部错误"}), 500
+
+@main.app.route('/api/server/players/<string:ServerName>', methods=['GET'])
+def server_players(ServerName):
+    try:
+        # 获取数据并验证结构
+        server_data = timer.Heartbeat_instance.GetList()
+        if not server_data or 'Name' not in server_data or 'Online' not in server_data:
+            log.logger.error(f'数据为空: {server_data}')
+            return jsonify({"error": "数据为空"}), 500
+
+        # 重构为更安全的处理逻辑
+        found = False
+        player_status = None
+
+        for i in range(len(server_data['Name'])):
+            if server_data['Name'][i] == ServerName:
+                player_status = server_data['Online'][i]
+                found = True
+                break
+
+        if not found:
+            log.logger.error(f'未找到服务器: {ServerName}')
+            return jsonify({"error": "服务器不存在"}), 404
+
+        return jsonify({
+            "server": ServerName,
+            "players": player_status  # 根据实际数据结构调整
+        })
+    except Exception as e:
+        log.logger.error(f'获取玩家列表错误: {str(e)}')
+        return jsonify({"error": "内部服务器错误"}), 500
 
 @main.app.route('/api/server/info/<string:server_name>', methods=['GET'])
 def server_info(server_name):
@@ -123,8 +152,8 @@ def login():
     return render_template('login.html')
 
 
-@main.app.route('/api/server/<string:server_name>/start', methods=['GET', 'POST'])
-@admin_required  # 认证装饰器
+@main.app.route('/api/server/<string:server_name>/start', methods=['GET', 'POST'], endpoint='start_server')
+@admin_required
 def start_server(server_name):
     try:
         success = Server.Do.Start(server_name)
@@ -141,6 +170,7 @@ def start_server(server_name):
 def StopServer(server_name):
     """
     停止服务器
+
     :param server_name: 停止服务器名称
     """
     try:
@@ -157,6 +187,7 @@ def StopServer(server_name):
 def return_server_storage_info(server_name):
     """
     获取服务器存储信息
+
     :param server_name: 服务器名称
     """
     try:
@@ -195,7 +226,7 @@ def return_server_storage_info(server_name):
 def ServerStatus(server_name):
     """
     获取服务器状态
-    server_name: 服务器名称
+    :param server_name: 服务器名称
 
     返回：
     {
@@ -219,7 +250,7 @@ def ServerStatus(server_name):
 def server_excel(server_name):
     """
     生成指定服务器信息Excel文件
-    server_name: 服务器名称
+    :param server_name: 服务器名称
     """
     try:
         ServerInfo = Examine.Server.InfoKeys(server_name)
@@ -239,7 +270,8 @@ def server_excel(server_name):
 def GetServerListExcel():
     """
     生成所有服务器信息Excel文件
-    server_name: 服务器名称
+
+    :param server_name: 服务器名称
     """
     try:
         server_list = Server.Get.List(ShowMessage=False)
@@ -254,3 +286,102 @@ def GetServerListExcel():
         log.logger.error('生成所有服务器信息Excel文件时发生错误')
         log.logger.error(e)
         return jsonify({"error": "生成文件失败"}), 500
+
+@main.app.route('/api/server/delete/<string:server_name>', methods=['POST'], endpoint='delete_server')
+@admin_required
+def DeleteServer(server_name):
+    """
+    删除服务器
+
+    :param server_name: 删除服务器名称
+    """
+    try:
+        log.Debug(f'删除服务器: {server_name}')
+        success = Server.Processing.Delete(server_name, False)
+
+        if success:
+            return jsonify({"status": "deleted"}), 200
+        else:
+            return jsonify({"error": "删除错误"}), 502
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "内部错误"}), 500
+
+@main.app.route('/api/server/get/document/server.properties/<string:server_name>', methods=['GET'])
+def server_properties_document(server_name):
+    try:
+        properties_dict = {}
+        for item in Server.Get.Properties(server_name):
+            # 确保配置项是键值对格式
+            if isinstance(item, (tuple, list)) and len(item) == 2:
+                key, value = item
+                properties_dict[key] = value
+            else:
+                log.logger.warning(f"Invalid property format: {item}")
+
+        return jsonify(properties_dict), 200
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "内部错误"}), 500
+
+@main.app.route('/api/server/get/run_memory/<string:server_name>', methods=['GET'])
+def get_run_memory(server_name):
+    try:
+        RunMemory = Server.Get.RunMemory(server_name)
+        return jsonify(
+            {
+                "min": RunMemory['Xms'],
+                "max": RunMemory['Xmx']
+            }
+        )
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "内部错误"}), 500
+
+@main.app.route('/api/server/set/settings/<string:server_name>', methods=['POST'])
+def set_server_settings(server_name):
+    try:
+        # 获取请求数据
+        request_data = request.form
+
+        # 获取参数
+        new_name = request_data.get('serverName', type=str)
+        port = request_data.get('server-port', type=int)
+        min_memory = request_data.get('min-memory', type=int)
+        max_memory = request_data.get('max-memory', type=int)
+        gamemode = request_data.get('gamemode', type=str)
+        difficulty = request_data.get('difficulty', type=str)
+        max_players = request_data.get('max-players', type=int)
+        max_world_size = request_data.get('max-world-size', type=int)
+        spawn_protection = request_data.get('spawn-protection', type=int)
+        # 安全转换布尔值属性
+        spawn_monsters = 'true' if request_data.get('spawn-monsters') == 'on' else 'false'
+        pvp = 'true' if request_data.get('pvp') == 'on' else 'false'
+        allow_flight = 'true' if request_data.get('allow-flight') == 'on' else 'false'
+        enable_command_block = 'true' if request_data.get('enable-command-block') == 'on' else 'false'
+        white_list = 'true' if request_data.get('white-list') == 'on' else 'false'
+        online_mode = 'true' if request_data.get('online-mode') == 'on' else 'false'
+        hardcore = 'true' if request_data.get('hardcore') == 'on' else 'false'
+
+        # 修改配置文件
+        Server.Change.Properties(server_name, 'server-port', str(port))
+        Server.Change.Properties(server_name, 'gamemode', str(gamemode))
+        Server.Change.Properties(server_name, 'difficulty', str(difficulty))
+        Server.Change.Properties(server_name, 'max-players', str(max_players))
+        Server.Change.Properties(server_name, 'max-world-size', str(max_world_size))
+        Server.Change.Properties(server_name, 'spawn-protection', str(spawn_protection))
+        Server.Change.Properties(server_name, 'spawn-monsters', spawn_monsters)
+        Server.Change.Properties(server_name, 'pvp', pvp)
+        Server.Change.Properties(server_name, 'allow-flight', allow_flight)
+        Server.Change.Properties(server_name, 'enable-command-block', enable_command_block)
+        Server.Change.Properties(server_name, 'white-list', white_list)
+        Server.Change.Properties(server_name, 'online-mode', online_mode)
+        Server.Change.Properties(server_name, 'hardcore', hardcore)
+        # 修改服务器运行内存
+        Server.Change.RunningMemories(server_name, min_memory, max_memory)
+        # 重命名服务器
+        Server.Change.Rename(server_name, new_name)
+        return jsonify({"message": "修改成功"}), 200
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "内部错误"}), 500

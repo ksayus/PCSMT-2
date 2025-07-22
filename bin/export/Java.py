@@ -6,6 +6,8 @@ import sys
 import platform
 import time
 import ctypes
+import json
+from packaging import version
 from tqdm import tqdm
 from bin.export import log
 
@@ -174,3 +176,23 @@ class Install:
             except Exception:
                 pass
             return False
+
+class Get:
+    def JavaVersion(Version: str):
+        java_args: str = ''
+        v = version.parse(Version)
+
+        # 按照版本使用不同版本的Java JDK
+        # 获取Java版本
+        with open('./java_versions.json', 'r', encoding='utf-8') as f:
+            java_versions_address = json.load(f)
+            if v < version.parse('1.17.0'):
+                java_args = '"' f'{java_versions_address['1.8']}' '"'
+            elif v > version.parse('1.17.0') and v <= version.parse('1.18.2'):
+                java_args = '"' f'{java_versions_address['16']}' '"'
+            elif v > version.parse('1.18.2') and v <= version.parse('1.20.4'):
+                java_args = '"' f'{java_versions_address['17']}' '"'
+            elif v > version.parse('1.20.5') and v <= version.parse('1.21.8'):
+                java_args = '"' f'{java_versions_address['21']}' '"'
+
+        return java_args

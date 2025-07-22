@@ -123,8 +123,8 @@ class Heartbeat:
         self.Frequency = 4
 
     def thread(self):
-        HeartbeatInstance = Heartbeat()
-        self.body = threading.Thread(target=HeartbeatInstance.Start, daemon=True)
+        self.HeartbeatInstance = Heartbeat()
+        self.body = threading.Thread(target=self.HeartbeatInstance.Start, daemon=True)
         self.body.start()
 
     def Start(self):
@@ -134,18 +134,30 @@ class Heartbeat:
             self.GetInfo()
 
     def GetInfo(self):
-        # 将self.List从列表改为字典
-        self.List = {'Name': [], 'Online': []}
+        # 将List从列表改为字典
+        List = {'Name': [], 'Online': []}
         list = Server.Get.List(ShowMessage=False)
         if list is None: return
         for server in list:
             try:
                 ServerInfo = Examine.Server.InfoKeys(server)
                 # 向字典的Name列表添加服务器名称
-                self.List['Name'].append(Server.Get.Search(server, Output=False)['Name'])
+                List['Name'].append(Server.Get.Search(server, Output=False)['Name'])
                 # 向字典的Online列表添加服务器在线状态
-                self.List['Online'].append(RCON.Infomation.ServerOnline(ServerInfo))
+                List['Online'].append(RCON.Infomation.ServerOnline(ServerInfo))
             except Exception as e:
                 log.logger.error("获取失败")
                 log.logger.error(e)
+        log.Debug(List)
         # print(self.List)
+        # 将获取到的列表赋值给self.List
+        self.List = List
+
+    def GetList(self):
+        """获取玩家列表"""
+        PlayerList = self.HeartbeatInstance.List
+        return PlayerList
+
+
+Heartbeat_instance = Heartbeat()
+Heartbeat_instance.thread()
