@@ -352,8 +352,8 @@ class Processing:
         :param program_name: 程序名称
         """
         try:
-            find_file.find_files_with_existence_and_create(Info.work_path + Info.File.Document.DeteleteOldProgram)
-            with open(Info.work_path + Info.File.Document.DeteleteOldProgram, "w") as f:
+            find_file.find_files_with_existence_and_create(Info.work_path + Info.File.Document.DeleteOldProgram)
+            with open(Info.work_path + Info.File.Document.DeleteOldProgram, "w") as f:
                 f.write(
                     "@echo off\n"
                     "if \"%1\" == \"h\" goto begin\n"
@@ -361,13 +361,13 @@ class Processing:
                     ":begin\n"
                     "timeout /t 5\n"
                     "cd " + Info.work_path + "\n"
-                    "powershell rm " + Info.work_path + '/' + Info.program_name + '-v' + Info.Config.PCSMT2_Version + ".exe" + "\n"
+                    "powershell rm " + Info.work_path + '/' + Info.program_name + '-v' + Info.Config.PCSMT2_Version() + ".exe" + "\n"
                     "start " + program_name + "\n"
                     "exit"
                 )
                 f.close()
             time.sleep(2)
-            os.system("start " + Info.work_path + Info.File.Document.DeteleteOldProgram + " h")
+            os.system("start " + Info.work_path + Info.File.Document.DeleteOldProgram + " h")
             time.sleep(1)
             sys.exit()
         except Exception as e:
@@ -378,8 +378,8 @@ class Processing:
     def Delete_Script():
         """删除程序自动更新时生成的脚本"""
         try:
-            if find_file.find_files_with_existence(Info.work_path + Info.File.Document.DeteleteOldProgram, msg=False):
-                os.remove(Info.work_path + Info.File.Document.DeteleteOldProgram)
+            if find_file.find_files_with_existence(Info.work_path + Info.File.Document.DeleteOldProgram, msg=False):
+                os.remove(Info.work_path + Info.File.Document.DeleteOldProgram)
         except Exception as e:
             log.logger.debug('删除旧脚本失败！')
             log.logger.debug(e)

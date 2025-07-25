@@ -385,3 +385,123 @@ def set_server_settings(server_name):
     except Exception as e:
         log.logger.error(str(e))
         return jsonify({"error": "内部错误"}), 500
+
+@main.app.route('/api/server/get/<server_name>/terminal/logs', methods=['GET'])
+def get_server_terminal_logs(server_name):
+    """
+    获取服务器控制台日志
+    """
+    try:
+        Server.Get.TerminalLogs(server_name)
+    except Exception as e:
+        log.logger.error(e)
+        return False
+
+@main.app.route('/api/server/<string:server_name>/command', methods=['POST'])
+def execute_server_command(server_name):
+    """
+    执行服务器命令
+    """
+    try:
+        ServerInfo = Examine.Server.InfoKeys(server_name)
+
+        response = request.get_json()
+        log.logger.debug(response)
+
+        result = RCON.Do.Command(ServerInfo, response['command'])
+
+        if result == False:
+            return jsonify({'success': False, 'message': '服务器未启动'})
+        else:
+            return jsonify({'success': True, 'message': result})
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "内部错误"}), 500
+
+@main.app.route('/api/server/get/banned/players/<string:server_name>')
+def get_banned_players(server_name):
+    """
+    获取封禁玩家列表
+
+    :param server_name: 服务器名称
+    :return: 封禁玩家列表
+    """
+    try:
+        server_info = Examine.Server.InfoKeys(server_name)
+
+        BannedPlayerList = Server.Get.BannedPlayers(server_info)
+
+        return jsonify(
+            {
+                "success": True,
+                "message": "获取封禁玩家列表成功",
+                "BannedPlayerList": BannedPlayerList
+            }
+        )
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "获取封禁玩家列表时发生内部错误", "success": False})
+
+@main.app.route('/api/server/get/white-list/<string:server_name>')
+def get_white_list(server_name):
+    """
+    获取白名单列表
+
+    :param server_name: 服务器名称
+    :return: 白名单列表
+    """
+    try:
+        server_info = Examine.Server.InfoKeys(server_name)
+
+        WhiteList = Server.Get.WhiteList(server_info)
+
+        if WhiteList == False:
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "白名单未启用"
+                }
+            )
+        else:
+            return jsonify(
+                {
+                    "success": True,
+                    "message": "获取白名单列表成功",
+                    "WhiteList": WhiteList
+                }
+            )
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "获取白名单列表时发生内部错误", "success": False})
+
+@main.app.route('/api/server/get/history/players/<string:server_name>')
+def get_history_players(server_name):
+    """
+    获取历史玩家列表
+
+    :param server_name: 服务器名称
+    :return: 历史玩家列表
+    """
+    try:
+        server_info = Examine.Server.InfoKeys(server_name)
+
+        HistoryPlayerList = Server.Get.HistoryPlayers(server_info)
+
+        if len(HistoryPlayerList) == 0:
+            return jsonify(
+                {
+                    "success": False,
+                    "message": "无历史玩家"
+                }
+            )
+        else:
+            return jsonify(
+                {
+                    "success": True,
+                    "message": "获取历史玩家列表成功",
+                    "HistoryPlayerList": HistoryPlayerList
+                }
+            )
+    except Exception as e:
+        log.logger.error(str(e))
+        return jsonify({"error": "获取历史玩家列表时发生内部错误", "success": False})

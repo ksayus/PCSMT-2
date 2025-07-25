@@ -1152,6 +1152,108 @@ class Get:
             log.logger.error(e)
             return False
 
+    def TerminalLogs(server_name: str):
+        """
+        获取服务器终端日志
+
+        :param server_name: 服务器名称
+        :return: 终端日志
+        """
+        try:
+            ServerInfo = Examine.Server.InfoKeys(server_name)
+
+            with open(f'{ServerInfo['Path']}{Info.File.Folder.Logs}{Info.File.Document.Latest_log}') as f:
+                Logs = f.read()
+
+            return Logs
+        except Exception as e:
+            log.logger.error('获取服务器终端日志失败！')
+            log.logger.error(e)
+            return False
+
+    def BannedPlayers(ServerInfo: str):
+        """
+        获取服务器封禁玩家列表
+
+        :param ServerInfo: 服务器信息
+        :return: 封禁玩家列表
+        """
+        try:
+            log.logger.info('正在获取封禁玩家列表...')
+            with open(ServerInfo['Path'] + Info.File.Document.banned_player, 'r', encoding='utf-8') as f:
+                json_file = json.load(f)
+
+            BannedPlayerList = []
+            for playerInfo in json_file:
+                BannedPlayerList.append(playerInfo['name'])
+
+            log.Debug(BannedPlayerList)
+            return BannedPlayerList
+        except Exception as e:
+            log.logger.error('获取封禁玩家列表失败！')
+            log.logger.error(e)
+            return False
+
+    def WhiteList(ServerInfo: str):
+        """
+        获取服务器白名单列表
+
+        :param ServerInfo: 服务器信息
+        :return: 白名单列表
+        """
+        try:
+            with open(ServerInfo['Path'] + Info.File.Document.ServerProperties, 'r', encoding='utf-8') as f:
+                log.logger.info('获取白名单开启状态...')
+                lines = f.readlines()
+                matched_lines = []
+                for line_number, line in enumerate(lines, start=1):
+                    if 'white-list' in line:
+                        matched_lines.append((line_number, line))
+                        white_list = lines[line_number - 1].split('=')[1].strip()
+                if white_list == 'true':
+                    log.logger.info('已开启白名单！')
+                    log.logger.info('正在获取白名单列表...')
+                    with open(ServerInfo['Path'] + Info.File.Document.WhiteList, 'r', encoding='utf-8') as f:
+                        json_file = json.load(f)
+
+                    WhiteList = []
+                    for playerInfo in json_file:
+                        WhiteList.append(playerInfo['name'])
+                    return WhiteList
+                else:
+                    log.logger.info('未开启白名单！')
+                    return False
+        except Exception as e:
+            log.logger.error('获取服务器白名单列表失败！')
+            log.logger.error(e)
+            return False
+
+    def HistoryPlayers(ServerInfo: str):
+        """
+        获取服务器历史玩家列表
+
+        :param ServerInfo: 服务器信息
+        :return: 历史玩家列表
+        """
+        try:
+            with open(ServerInfo['Path'] + Info.File.Document.UserCache, 'r', encoding='utf-8') as f:
+                user_list = json.load(f)
+
+                HistoryPlayers = []
+
+                if len(user_list) == 0:
+                    log.logger.info('无历史玩家！')
+                    return HistoryPlayers
+
+                for user in user_list:
+                    HistoryPlayers.append(user['name'])
+
+                return HistoryPlayers
+        except Exception as e:
+            log.logger.error('获取服务器历史玩家列表失败！')
+            log.logger.error(e)
+            return False
+
 class Change:
     def Properties(server_name: str, keyword: str, argument: str):
         """

@@ -22,15 +22,18 @@ class File:
         Eula = '\eula.txt'
         ServerProperties = '\server.properties'
         Config = '\config.json'
-        DeteleteOldProgram = '\delete_old_program.bat'
+        DeleteOldProgram = '\delete_old_program.bat'
         Latest = '/latest.txt'
         Latest_json = '/latest.json'
+        Latest_log = '/latest.log'
         banned_player = '/banned-players.json'
         banned_ip = '/banned-ips.json'
         op = '/ops.json'
         ForgeServerStartBatchDefaultName = '/run.bat'
         ForgeServer_JVM_args = '@user_jvm_args.txt'
         ServerInfoExcel = '/AllServerInfo.xlsx'
+        WhiteList = '/whitelist.json'
+        UserCache = '/usercache.json'
 
 class RCON:
     def LocalHost():
@@ -71,7 +74,7 @@ class Config:
     _config_cache = None  # 添加配置缓存
 
     Config = {
-        "PCSMT2_Version": "1.2.1",
+        "PCSMT2_Version": "1.2.2",
         "ReleaseVersion": "Release",
         "RunningMemories_Min": 1024,
         "RunningMemories_Max": 2048,

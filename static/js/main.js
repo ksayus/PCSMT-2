@@ -137,46 +137,88 @@ const pageContents = {
 
     server_info: (serverName) => `
         <div class="server-info-content">
-            <div class="server-card">
-                <table>
-                    <tr>
-                        <th id="Type-th">类型</th>
-                        <td id="Info-td">信息</td>
-                    </tr>
-                    <tr>
-                        <th>服务器名</th>
-                        <td id="id-name">${serverName}</td>
-                    </tr>
-                    <tr>
-                        <th>服务器版本</th>
-                        <td id="id-version"></td>
-                    </tr>
-                    <tr>
-                        <th>服务器大小</th>
-                        <td id="id-size"></td>
-                    </tr>
-                    <tr>
-                        <th>服务器启动次数</th>
-                        <td id="id-start-counts"></td>
-                    </tr>
-                    <tr>
-                        <th>上次启动时间</th>
-                        <td id="id-latest-start-time"></td>
-                    </tr>
-                </table>
+            <!-- 左侧：服务器信息 -->
+            <div class="server-info-left">
+                <div class="server-card">
+                    <table>
+                        <tr>
+                            <th id="Type-th">类型</th>
+                            <td id="Info-td">信息</td>
+                        </tr>
+                        <tr>
+                            <th>服务器名</th>
+                            <td id="id-name">${serverName}</td>
+                        </tr>
+                        <tr>
+                            <th>服务器版本</th>
+                            <td id="id-version"></td>
+                        </tr>
+                        <tr>
+                            <th>服务器大小</th>
+                            <td id="id-size"></td>
+                        </tr>
+                        <tr>
+                            <th>服务器启动次数</th>
+                            <td id="id-start-counts"></td>
+                        </tr>
+                        <tr>
+                            <th>上次启动时间</th>
+                            <td id="id-latest-start-time"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="button-group" id="button-group">
+                    <button id="button-server" onclick="">检查中...</button>
+                    <button id="storage-chart" onclick="ChartImage('${serverName}')">存储占用</button>
+                    <button class="download-btn" onclick="downloadServer('${serverName}')">
+                        <i class="fas fa-file-download"></i>下载服务器信息
+                    </button>
+                    <button class="change-properties-btn" onclick="changeServerProperties('${serverName}')">
+                        <i class="fas fa-cog"></i>修改服务器属性
+                    </button>
+                </div>
             </div>
-            <div class="button-group" id="button-group">
-                <button id="button-server" onclick="">检查中...</button>
-                <button id="storage-chart" onclick="ChartImage('${serverName}')">存储占用</button>
-                <button class="download-btn" onclick="downloadServer('${serverName}')">
-                    <i class="fas fa-file-download"></i>下载服务器信息
-                </button>
-                <button class="change-properties-btn" onclick="changeServerProperties('${serverName}')">
-                    <i class="fas fa-cog"></i>修改服务器属性
-                </button>
+
+            <!-- 中间：终端消息 -->
+            <div class="server-info-center">
+                <h3>服务器终端</h3>
+                <div class="terminal-output" id="terminal-output-${serverName}">
+                    <h1>暂未开发完成</h1>
+                </div>
+                <div class="terminal-input">
+                    <input type="text" id="command-input-${serverName}" placeholder="输入命令...">
+                    <button onclick="sendCommand('${serverName}')">发送</button>
+                </div>
+            </div>
+
+            <!-- 右侧：在线玩家列表及历史玩家抽屉 -->
+            <div class="server-info-right">
+                <h3>在线玩家</h3>
+                <div class="player-list" id="player-list-${serverName}"></div>
+
+                <h3>封禁玩家</h3>
+                <div class="banned-player-list" id="banned-players-${serverName}">
+                    <p>加载中...</p>
+                </div>
+
+                <h3>白名单玩家</h3>
+                <div class="whitelist-player-list" id="whitelist-players-${serverName}">
+                    <p>加载中...</p>
+                </div>
+
+                <!-- 历史玩家下拉框 -->
+                <div class="history-players-dropdown">
+                    <div class="dropdown-header" onclick="toggleHistoryPlayersDropdown('${serverName}')">
+                        <h3>历史玩家</h3>
+                        <span class="dropdown-toggle">▼</span>
+                    </div>
+                    <div class="dropdown-content-history-player" id="history-players-content-${serverName}" style="display: none;">
+                        <p>加载中...</p>
+                    </div>
+                </div>
             </div>
         </div>
-    `,
+`,
 
     server_latest: `
         <div class="server-latest-content">
@@ -522,6 +564,7 @@ async function fetchServerList(AddButton = true) {
     }
 }
 
+// 获取服务器玩家信息
 async function fetchServerPlayerInfo(serverName) {
     try {
         const response = await fetch(`/api/server/players/${serverName}`);
@@ -585,6 +628,21 @@ async function fetchServerInfo(serverName) {
             buttonServer.innerText = '启动服务器';
             buttonServer.onclick = function() { startServer(serverName); };
         }
+
+        // 获取在线玩家列表
+        fetchOnlinePlayers(serverName);
+
+        // 获取封禁玩家列表
+        getBannedPlayers(serverName);
+
+        // 获取白名单列表
+        getWhiteList(serverName);
+
+        // 获取历史玩家列表
+        fetchHistoryPlayers(serverName)
+
+        // 建立WebSocket连接获取终端消息
+        setupTerminalWebSocket(serverName);
     } catch (error) {
         console.error('获取服务器信息失败:', error);
         alert('无法获取服务器信息');
@@ -634,7 +692,7 @@ async function fetchProgramVersion() {
     }
 }
 
-// 添加全局AJAX错误处理
+// 全局AJAX错误处理
 function handleAjaxError(response) {
     if (response.status === 401) {
         // 未授权，跳转到登录页面
@@ -655,6 +713,20 @@ async function startServer(serverName) {
                 'X-Requested-With': 'XMLHttpRequest'  // 添加AJAX标识头
             }
         });
+
+    // 切换历史玩家上拉框
+    function toggleHistoryPlayersDropdown(serverName) {
+        const dropdownContent = document.getElementById(`history-players-content-${serverName}`);
+        const dropdownToggle = document.querySelector(`[onclick="toggleHistoryPlayersDropdown('${serverName}')"] .dropdown-toggle`);
+
+        if (dropdownContent.style.display === 'none') {
+            dropdownContent.style.display = 'block';
+            dropdownToggle.style.transform = 'rotate(180deg)';
+        } else {
+            dropdownContent.style.display = 'none';
+            dropdownToggle.style.transform = 'rotate(0deg)';
+        }
+    }
 
         // 检查401错误
         if (handleAjaxError(response)) return;
@@ -807,7 +879,7 @@ async function deleteServer(serverName) {
     }
 }
 
-// 新增：专门刷新服务器卡片的函数
+// 专门刷新服务器卡片的函数
 async function refreshServerCards() {
     try {
         const response = await fetch('/api/server/list');
@@ -1070,4 +1142,469 @@ async function fetchSettings() {
         console.error('获取设置失败:', error);
         alert('无法加载设置，请刷新页面重试');
     }
+}
+
+
+// 获取在线玩家列表
+async function fetchOnlinePlayers(serverName) {
+    try {
+        const response = await fetch(`/api/server/players/${serverName}`);
+        const data = await response.json();
+        const playerList = document.getElementById(`player-list-${serverName}`);
+        if (!playerList) return;
+
+        if (data.error || !data.players[2] || data.players[2].length === 0) {
+            // 当没有玩家时，显示提示信息
+            playerList.innerHTML = '<p>服务器没有玩家</p>';
+            return;
+        }
+
+        // 假设data.players是一个玩家名字数组
+        const players = data.players[2];
+        if (players == '') {
+            playerList.innerHTML = '<p>服务器没有玩家</p>';
+            return;
+        }
+
+        let playerHtml = '';
+        players.forEach(player => {
+            playerHtml += `
+                <div class="player-card">
+                    <span class="player-name">${player}</span>
+                    <div class="player-actions">
+                        <button onclick="kickPlayer('${serverName}', '${player}')">踢出</button>
+                        <button onclick="banPlayer('${serverName}', '${player}')">封禁</button>
+                    </div>
+                </div>
+            `;
+        });
+        playerList.innerHTML = playerHtml;
+    } catch (error) {
+        console.error('获取在线玩家失败:', error);
+    }
+}
+
+// 切换玩家操作按钮的显示状态
+function togglePlayerActions(iconElement) {
+    const playerCard = iconElement.closest('.player-card');
+    const actions = playerCard.querySelector('.player-actions');
+    if (actions.style.display === 'none' || actions.style.display === '') {
+        actions.style.display = 'block';
+        iconElement.textContent = '▲'; // 切换图标为向上箭头
+    } else {
+        actions.style.display = 'none';
+        iconElement.textContent = '▼'; // 切换图标为向下箭头
+    }
+}
+
+// 建立连接获取终端消息
+function setupTerminalWebSocket(serverName) {
+    const terminalOutput = document.getElementById(`terminal-output-${serverName}`);
+    if (!terminalOutput) return;
+
+    // 定时获取日志
+    const fetchLogs = () => {
+        fetch(`/api/server/terminal/${serverName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    terminalOutput.innerHTML += `<div>${data.logs}</div>`;
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                } else {
+                    terminalOutput.innerHTML += `<div style="color: red;">${data.error}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error('获取终端日志失败:', error);
+                terminalOutput.innerHTML += '<div style="color: red;">获取终端日志失败</div>';
+            });
+    };
+
+    // 初始获取日志
+    fetchLogs();
+    // 每 5 秒获取一次日志，可根据需求调整间隔时间
+    const intervalId = setInterval(fetchLogs, 5000);
+
+    // 保存定时器 ID 以便后续清除
+    if (!window.terminalTimers) {
+        window.terminalTimers = {};
+    }
+    window.terminalTimers[serverName] = intervalId;
+}
+
+// 发送命令
+function sendCommand(serverName) {
+    const commandInput = document.getElementById(`command-input-${serverName}`);
+    const command = commandInput.value.trim();
+    if (!command) return;
+
+    fetch(`/api/server/terminal/${serverName}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ command })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const terminalOutput = document.getElementById(`terminal-output-${serverName}`);
+            if (terminalOutput) {
+                terminalOutput.innerHTML += `<div style="color: #4CAF50;">&gt; ${command}</div>`;
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('发送命令失败:', error);
+        alert('发送命令失败，请检查日志');
+    });
+
+    // 清空输入框
+    commandInput.value = '';
+}
+
+// 通过API请求发送命令
+function kickPlayer(serverName, playerName) {
+    if (confirm(`确定要踢出玩家 ${playerName} 吗？`)) {
+        fetch(`/api/server/${serverName}/command`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ command: `kick ${playerName}` })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`玩家 ${playerName} 已被成功踢出: ${data.message}`);
+                setTimeout(() => {
+                    fetchOnlinePlayers(serverName);
+                    getBannedPlayers(serverName);
+                }, 8000);
+            } else {
+                alert(`踢出玩家失败: ${data.error || '未知错误'}`);
+            }
+        })
+        .catch(error => {
+            console.error('踢出玩家失败:', error);
+            alert('踢出玩家失败，请检查日志');
+        });
+    }
+}
+
+function banPlayer(serverName, playerName) {
+    if (confirm(`确定要封禁玩家 ${playerName} 吗？`)) {
+        fetch(`/api/server/${serverName}/command`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ command: `ban ${playerName}` })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`玩家 ${playerName} 已被成功封禁: ${data.message}`);
+                // 刷新在线玩家列表和封禁玩家列表
+                getBannedPlayers(serverName);
+                setTimeout(() => {
+                    fetchOnlinePlayers(serverName);
+                }, 8000);
+            } else {
+                alert(`封禁玩家失败: ${data.error || '未知错误'}`);
+            }
+        })
+        .catch(error => {
+            console.error('封禁玩家失败:', error);
+            alert('封禁玩家失败，请检查日志');
+        });
+    }
+}
+
+function pardonPlayer(serverName, playerName) {
+    if (confirm(`确定要解封玩家 ${playerName} 吗？`)) {
+        fetch(`/api/server/${serverName}/command`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ command: `pardon ${playerName}` })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`玩家 ${playerName} 已被成功解封: ${data.message}`);
+                // 刷新在线玩家列表和封禁玩家列表
+                getBannedPlayers(serverName);
+                setTimeout(() => {
+                    fetchOnlinePlayers(serverName);
+                }, 8000);
+            } else {
+                alert(`解封玩家失败: ${data.error || '未知错误'}`);
+            }
+        })
+        .catch(error => {
+            console.error('解封玩家失败:', error);
+            alert('解封玩家失败，请检查日志');
+        });
+    }
+}
+
+
+function getBannedPlayers(serverName) {
+    fetch(`/api/server/get/banned/players/${serverName}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const bannedPlayersList = data.BannedPlayerList || [];
+            const bannedPlayersContainer = document.getElementById(`banned-players-${serverName}`);
+
+            if (bannedPlayersList.length === 0) {
+                bannedPlayersContainer.innerHTML = '<p>没有被封禁的玩家</p>';
+                return;
+            }
+
+            // 动态生成封禁玩家卡片
+            let playerHtml = '';
+            bannedPlayersList.forEach(player => {
+                playerHtml += `
+                    <div class="player-card">
+                        <span class="player-name">${player}</span>
+                        <div class="player-actions">
+                            <button onclick="pardonPlayer('${serverName}', '${player}')">解封</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            bannedPlayersContainer.innerHTML = playerHtml;
+        } else {
+            console.error('获取封禁玩家列表失败:', data.error);
+            document.getElementById(`banned-players-${serverName}`).innerHTML = '<p>获取封禁玩家列表失败</p>';
+        }
+    })
+    .catch(error => {
+        console.error('获取封禁玩家列表失败:', error);
+        document.getElementById(`banned-players-${serverName}`).innerHTML = '<p>获取封禁玩家列表失败</p>';
+    });
+}
+
+function getWhiteList(serverName) {
+    fetch(`/api/server/get/white-list/${serverName}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const whiteListPlayersList = data.WhiteList || [];
+            const whiteListPlayersContainer = document.getElementById(`whitelist-players-${serverName}`);
+
+            if (whiteListPlayersList.length === 0) {
+                whiteListPlayersContainer.innerHTML = '<p>没有在白名单中的玩家</p>';
+                return;
+            }
+
+            let playerHtml = '';
+            whiteListPlayersList.forEach(player => {
+                playerHtml += `
+                    <div class="player-card">
+                        <span class="player-name">${player}</span>
+                        <div class="player-actions">
+                            <button onclick="removeFromWhiteList('${serverName}', '${player}')">移出白名单</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            whiteListPlayersContainer.innerHTML = playerHtml;
+        } else {
+            document.getElementById(`whitelist-players-${serverName}`).innerHTML = '<p>白名单未启用</p>';
+        }
+    })
+    .catch(error => {
+        console.error('获取白名单玩家列表失败:', error);
+        document.getElementById(`whitelist-players-${serverName}`).innerHTML = '<p>获取白名单玩家列表失败</p>';
+    });
+}
+
+function addToWhiteList(serverName, playerName) {
+    if (confirm(`确定要添加玩家 ${playerName} 到白名单吗？`)) {
+        fetch(`/api/server/${serverName}/command`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ command: `whitelist add ${playerName}` })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`玩家 ${playerName} 已被成功添加到白名单: ${data.message}`);
+                // 刷新白名单玩家列表
+                getWhiteList(serverName);
+            }else{
+                alert(`添加玩家失败: ${data.error || '未知错误'}`);
+            }
+        })
+    }
+}
+
+function removeFromWhiteList(serverName, playerName) {
+    if (confirm(`确定要移出玩家 ${playerName} 白名单吗？`)) {
+        fetch(`/api/server/${serverName}/command`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ command: `whitelist remove ${playerName}` })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`玩家 ${playerName} 已被成功移出白名单: ${data.message}`);
+                // 刷新白名单玩家列表
+                getWhiteList(serverName);
+            }else{
+                alert(`移出玩家失败: ${data.error || '未知错误'}`);
+            }
+        })
+    }
+}
+
+// 切换历史玩家下拉框显示状态
+function toggleHistoryPlayersDropdown(serverName) {
+    const content = document.getElementById(`history-players-content-${serverName}`);
+    const toggleIcon = document.querySelector(`#history-players-content-${serverName}`).previousElementSibling.querySelector('.dropdown-toggle');
+    if (content.style.display === 'none' || content.style.display === '') {
+        content.style.display = 'block';
+        toggleIcon.textContent = '▲'; // 切换图标为向上箭头
+    } else {
+        content.style.display = 'none';
+        toggleIcon.textContent = '▼'; // 切换图标为向下箭头
+    }
+}
+
+// 获取历史玩家列表
+async function fetchHistoryPlayers(serverName) {
+    const contentDiv = document.getElementById(`history-players-content-${serverName}`);
+    if (!contentDiv) return;
+
+    try {
+        const response = await fetch(`/api/server/get/history/players/${serverName}`);
+        const data = await response.json();
+
+        if (data.error) {
+            contentDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+            return;
+        }
+
+        const players = data.HistoryPlayerList || [];
+        if (players.length === 0) {
+            contentDiv.innerHTML = '<p>没有历史玩家记录</p>';
+            return;
+        }
+
+        let playerHtml = '';
+        players.forEach(player => {
+            playerHtml += `
+                <div class="player-card">
+                    <span class="player-name">${player}</span>
+                    <div class="player-actions">
+                        <button onclick="addToWhiteList('${serverName}', '${player}')">加入白名单</button>
+                    </div>
+                </div>
+            `;
+        });
+        contentDiv.innerHTML = playerHtml;
+    } catch (error) {
+        console.error('获取历史玩家失败:', error);
+        contentDiv.innerHTML = '<p style="color: red;">获取历史玩家失败，请稍后重试。</p>';
+    }
+}
+
+// 存储每个服务器最后一次获取的日志最大 ID
+const lastLogIds = {};
+
+// 定时获取终端日志
+function setupTerminalPolling(serverName) {
+    const terminalOutput = document.getElementById(`terminal-output-${serverName}`);
+    if (!terminalOutput) return;
+
+    const intervalId = setInterval(() => {
+        fetch(`/api/server/terminal/${serverName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const logs = data.logs;
+                    const lastLogId = lastLogIds[serverName] || 0;
+                    // 过滤出 ID 大于 lastLogId 的新日志
+                    const newLogs = logs.filter(log => log.id > lastLogId);
+                    if (newLogs.length > 0) {
+                        newLogs.forEach(log => {
+                            // 使用 white-space: pre-wrap 样式保留换行符和空白符
+                            const logDiv = document.createElement('div');
+                            logDiv.style.whiteSpace = 'pre-wrap';
+                            // 替换特殊字符为换行符
+                            const formattedMessage = log.message.replace(/\\n/g, '\n');
+                            logDiv.textContent = formattedMessage;
+                            terminalOutput.appendChild(logDiv);
+                        });
+                        // 自动滚动到底部
+                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+                        // 更新最后一次获取的日志最大 ID
+                        const maxLogId = newLogs.reduce((max, log) => Math.max(max, log.id), lastLogId);
+                        lastLogIds[serverName] = maxLogId;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('获取终端日志失败:', error);
+                const errorDiv = document.createElement('div');
+                errorDiv.style.color = 'red';
+                errorDiv.style.whiteSpace = 'pre-wrap';
+                errorDiv.textContent = '获取终端日志失败';
+                terminalOutput.appendChild(errorDiv);
+                // 自动滚动到底部
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            });
+    }, 1000); // 每秒轮询一次
+
+    // 保存定时器 ID 以便后续清理
+    window.terminalIntervals = window.terminalIntervals || {};
+    window.terminalIntervals[serverName] = intervalId;
+}
+
+// 发送命令
+function sendCommand(serverName) {
+    const commandInput = document.getElementById(`command-input-${serverName}`);
+    const command = commandInput.value.trim();
+    if (!command) return;
+
+    fetch(`/api/server/${serverName}/command`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ command: command })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const terminalOutput = document.getElementById(`terminal-output-${serverName}`);
+            if (terminalOutput) {
+                terminalOutput.innerHTML += `<div style="color: #4CAF50;">&gt; ${command}</div>`;
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        } else {
+            alert(data.error);
+        }
+    })
+    .catch(error => {
+        console.error('发送命令失败:', error);
+        alert('发送命令失败，请检查日志');
+    });
+
+    // 清空输入框
+    commandInput.value = '';
 }

@@ -181,8 +181,7 @@ body {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
     position: relative;
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    display: grid;
     text-align: center;
     color: cornflowerblue;
 }
@@ -194,21 +193,21 @@ body {
     padding: 1rem;
 }
 
-/* 增强卡片悬停效果 */
+/* 卡片悬停效果 */
 .server-card:hover,
 .program-version-content .card:hover {
     transform: translateY(-10px);
     box-shadow: 0 12px 30px rgba(49, 101, 241, 0.15);
 }
 
-/* 优化表格样式 */
+/* 表格样式 */
 .server-card table {
     width: 100%;
     border-collapse: collapse;
     background: transparent;
 }
 
-/* 修复表头背景色 */
+/* 表头背景色 */
 .server-card table tbody th {
     background-color: #3165f1;
     color: white;
@@ -218,7 +217,7 @@ body {
     border: none; /* 移除边框避免白边 */
 }
 
-/* 修复表格行悬停效果 */
+/* 表格行悬停效果 */
 .server-card table tr:hover td {
     background-color: #f1f8ff;
 }
@@ -229,7 +228,7 @@ body {
     border-bottom: 1px solid #f0f4ff;
 }
 
-/* 优化按钮样式 */
+/* 按钮样式 */
 .button-group button {
     background: linear-gradient(135deg, #3165f1, #4a7dff);
     border: none;
@@ -341,9 +340,10 @@ body {
     font-size: 18px;
 }
 
-/* 新增：按钮组内间距优化 */
+/* 按钮组内间距优化 */
 .button-group {
     display: flex;
+    flex-direction: row-reverse;
     justify-content: center;
     margin-top: 20px;
     gap: 15px; /* 添加按钮间距 */
@@ -633,4 +633,326 @@ body {
 /* 确保卡片有相对定位 */
 .server-card {
     position: relative;
+}
+
+/* 服务器信息页面布局样式 */
+.server-info-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    gap: 1.5rem;
+    height: calc(100vh - 100px);
+}
+
+.server-info-left {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.server-info-center {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.server-info-right {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* 服务器信息页面左侧信息卡片样式 */
+.server-info-left .server-card {
+    overflow: hidden; /* 防止表格底部露白 */
+}
+
+/* 按钮组垂直布局 */
+.server-info-left .button-group {
+    flex-direction: column; /* 垂直排列 */
+    align-items: stretch; /* 按钮拉伸填充 */
+}
+
+.server-info-left .button-group button {
+    width: 100%; /* 按钮填满容器宽度 */
+    margin: 5px 0; /* 垂直间距 */
+}
+
+/* 终端输出区域样式 */
+.terminal-output {
+    background-color: #9ecef9;
+    color: #5171fe;
+    font: bold;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 1rem;
+    flex: 1;
+    overflow-y: auto;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    max-height: 700px; /* 最大高度 */
+    white-space: pre-line;
+}
+
+/* 滚动条整体样式 */
+.terminal-output::-webkit-scrollbar {
+    width: 8px;
+}
+
+/* 滚动条轨道 */
+.terminal-output::-webkit-scrollbar-track {
+    background-color: #ddecfa; /* 与页面背景色一致 */
+    border-radius: 4px;
+}
+
+/* 滚动条滑块 */
+.terminal-output::-webkit-scrollbar-thumb {
+    background-color: #2987e4; /* 与侧边栏颜色一致 */
+    border-radius: 4px;
+}
+
+/* 滚动条滑块悬停状态 */
+.terminal-output::-webkit-scrollbar-thumb:hover {
+    background-color: #1177dd; /* 与侧边栏链接悬停颜色一致 */
+}
+
+/* 滚动条角落 */
+.terminal-output::-webkit-scrollbar-corner {
+    background-color: #ddecfa; /* 与页面背景色一致 */
+}
+
+/* 兼容 Firefox */
+.terminal-output {
+    scrollbar-width: thin;
+    scrollbar-color: #2987e4 #ddecfa;
+}
+
+.terminal-input {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.terminal-input input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.terminal-input button {
+    padding: 0.5rem 1rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* 玩家列表样式 */
+.player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+.player-card {
+    position: relative; /* 确保按钮组定位正确 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+
+.player-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.player-name {
+    font-weight: 500;
+}
+
+.player-actions {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.player-card:hover .player-actions {
+    opacity: 1;
+    visibility: visible;
+}
+
+.player-actions button {
+    background: linear-gradient(135deg, #3165f1, #4a7dff);
+    border: none;
+    border-radius: 12px; /* 更小的圆角 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+    cursor: pointer;
+    font-size: 12px; /* 更小的字体 */
+    font-weight: bold;
+    padding: 4px 8px; /* 更紧凑的按钮 */
+    margin-left: 4px;
+    transition: all 0.3s ease;
+}
+
+.player-actions button:hover {
+    background: linear-gradient(135deg, #4a7dff, #3165f1);
+    box-shadow: 0 4px 8px rgba(49, 101, 241, 0.2);
+    transform: translateY(-1px);
+}
+
+/* 封禁玩家收纳框样式 */
+.banned-players-container {
+    margin-top: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.banned-players-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.banned-players-header:hover {
+    background-color: #f1f8ff;
+}
+
+.banned-players-content {
+    padding: 0.75rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.banned-players-content .player-card {
+    margin-bottom: 0.5rem;
+}
+
+/* 展开/收起图标样式 */
+.banned-players-toggle {
+    transition: transform 0.3s ease;
+}
+
+.banned-players-toggle.collapsed {
+    transform: rotate(-90deg);
+}
+
+/* 历史玩家下拉框整体样式 */
+.history-players-dropdown {
+    position: fixed; /* 固定定位 */
+    bottom: 1rem; /* 距离底部 1rem */
+    right: 1rem; /* 距离右侧 1rem */
+    width: 250px; /* 设定宽度 */
+    z-index: 100; /* 确保在其他元素之上 */
+}
+
+.dropdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    cursor: pointer;
+    font-weight: bold;
+    color: #333;
+    background-color: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.dropdown-header:hover {
+    background-color: #f1f8ff;
+}
+
+.dropdown-content-history-player {
+    padding: 0.75rem;
+    max-height: 200px; /* 限制最大高度 */
+    overflow-y: auto;
+    background-color: #ffffff; /* 白色背景 */
+    position: absolute;
+    bottom: 100%; /* 上拉显示 */
+    width: 100%;
+    box-sizing: border-box;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.dropdown-toggle {
+    font-size: 14px;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+/* 玩家卡片样式优化 */
+.dropdown-content-history-player .player-card {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem;
+    background-color: #f8f9fa; /* 浅灰色背景 */
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+    margin-bottom: 0.6rem;
+}
+
+.dropdown-content-history-player .player-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.12);
+    background-color: #f1f8ff; /* 悬停蓝色背景 */
+}
+
+.dropdown-content {
+    padding: 0.75rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.dropdown-toggle {
+    font-size: 14px;
+    font-weight: bold;
+    transition: transform 0.3s ease;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+    .server-info-content {
+        grid-template-columns: 1fr 1.5fr;
+    }
+    .server-info-right {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .server-info-content {
+        grid-template-columns: 1fr;
+    }
+    .server-info-right {
+        grid-column: span 1;
+    }
 }

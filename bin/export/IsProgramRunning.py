@@ -59,7 +59,7 @@ class Do:
                 try:
                     # 检查进程名是否为cmd.exe
                     p = psutil.Process(pid)
-                    if p.name().lower() != typeName:  # 只处理typeName的进程
+                    if typeName not in p.name().lower():  # 只处理typeName的进程
                         continue
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     continue

@@ -55,8 +55,15 @@ class Get:
                 log.logger.error(f'无效的端口号: {port}')
                 return False
 
+            # 检查密码和主机是否有效
+            password = Info.RCON.Password()
+            localhost = Info.RCON.LocalHost()
+            if not password or not localhost:
+                log.logger.error('RCON密码或主机地址无效！')
+                return False
+
             log.Debug(f'正在连接: {port}')
-            with mcrcon.MCRcon(Info.RCON.LocalHost(), Info.RCON.Password(), int(port)) as mcr:
+            with mcrcon.MCRcon(localhost, password, int(port)) as mcr:
                 if msg:
                     response = mcr.command("/say Hello from RCON! I'm PCSMT2!")
                     log.Debug(f"Server response: {response}")
@@ -173,3 +180,31 @@ class Infomation:
             log.logger.error('未找到服务器配置文件！')
             log.logger.error(e)
             return
+
+class Do:
+    def Command(ServerInfo: dict, command: str):
+        """
+        发送命令
+
+        :param ServerInfo: 服务器信息
+        :param command: 命令
+        :return: 命令执行结果/False
+        """
+        try:
+            # log.logger.info(ServerInfo)
+            # log.logger.info(command)
+
+            port = Get.Port(ServerInfo, msg=False)
+            rcon = Get.RCON_Object(port, msg=False)
+
+            rcon.connect()
+            response:str = rcon.command(command)
+            rcon.disconnect()
+
+            log.logger.info('发送命令：' + command)
+            log.logger.info(response)
+            return response
+        except Exception as e:
+            log.logger.error('RCON发送命令失败！')
+            log.logger.error(e)
+            return False

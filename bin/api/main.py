@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_socketio import SocketIO
 import logging
 from bin.export import IsProgramRunning
 from bin.export import Info
@@ -22,10 +23,12 @@ app = Flask(
 )
 app.secret_key = 'pcsmt2'
 
+socketio = SocketIO(app, cors_allowed_origins="*")  # 允许跨域
+
 if IsProgramRunning.Is.Running():
     log = logging.getLogger('werkzeug')
     log.disabled = True  # 禁用请求日志
 
 def run_flask():
-    from . import api, api_server, api_program, PageServer, PageProgram, Resouce
+    from . import api, api_server, api_program, PageServer, PageProgram, Resouce, ServerSocket
     app.run(port = Info.Config.Port())

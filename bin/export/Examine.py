@@ -122,7 +122,7 @@ class Parse:
         return [int(num) for num in clean_version.split('.') if num.isdigit()]
 
 class Server:
-    def InfoKeys(server_name):
+    def InfoKeys(server_name: str):
         """
         检查服务器信息json文件
         :param server_name: 服务器名称
@@ -130,7 +130,7 @@ class Server:
         """
         try:
             with open(Info.work_path + Info.File.Folder.Save + '/' + server_name + '.json', 'r', encoding='utf-8') as f:
-                server_info = json.load(f)
+                server_info: dict = json.load(f)
                 f.close()
 
                 # Name
