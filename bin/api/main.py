@@ -1,5 +1,4 @@
 from flask import Flask
-from flask_socketio import SocketIO
 import logging
 from bin.export import IsProgramRunning
 from bin.export import Info
@@ -22,8 +21,6 @@ app = Flask(
     static_folder=resource_path('static')       # 动态指定静态资源路径
 )
 app.secret_key = 'pcsmt2'
-
-socketio = SocketIO(app, cors_allowed_origins="*")  # 允许跨域
 
 if IsProgramRunning.Is.Running():
     log = logging.getLogger('werkzeug')
