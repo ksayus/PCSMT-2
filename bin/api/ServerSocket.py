@@ -6,7 +6,7 @@ from flask import request, jsonify
 def get_terminal_logs(server_name):
     """获取服务器终端日志"""
     try:
-        logs = ServerGet.TerminalLogs(server_name)
+        logs = ServerGet.TerminalLogs(server_name, 1000)
         return jsonify({'success': True, 'logs': logs})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

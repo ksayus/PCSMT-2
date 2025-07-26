@@ -1152,7 +1152,7 @@ class Get:
             log.logger.error(e)
             return False
 
-    def TerminalLogs(server_name: str):
+    def TerminalLogs(server_name: str, lines: int, block_size: int = 1024):
         """
         获取服务器终端日志
 
@@ -1162,8 +1162,41 @@ class Get:
         try:
             ServerInfo = Examine.Server.InfoKeys(server_name)
 
-            with open(f'{ServerInfo['Path']}{Info.File.Folder.Logs}{Info.File.Document.Latest_log}') as f:
-                Logs = f.read()
+            newlines_to_skip = lines + 1
+
+            with open(f'{ServerInfo['Path']}{Info.File.Folder.Logs}{Info.File.Document.Latest_log}', 'rb') as f:
+                # 定位到文件末尾
+                f.seek(0, 2)
+                file_size = f.tell()
+                pos = file_size
+                total_newlines = 0
+                found_pos = 0 # 目标起始位置
+
+                # 从后向前逐块读取文件
+                while pos > 0 and total_newlines < total_newlines:
+                    # 计算当前块大小和位置
+                    size_to_read = min(block_size, pos)
+                    pos -= size_to_read
+                    f.seek(pos)
+                    block = f.read(size_to_read)
+
+                    # 在块中从后向前扫描换行符
+                    index = len(block) - 1
+                    while index >= 0:
+                        if block[index] == '\n':
+                            total_newlines += 1
+                            if total_newlines >= newlines_to_skip:
+                                # 找到目标起始位置（换行符后第一个字符）
+                                found_pos = pos + index + 1
+                                break
+                        index -= 1
+
+                # 定位到目标行
+                f.seek(found_pos)
+                # 读取目标行
+                Logs = f.read(file_size - found_pos)
+                # 解码
+                Logs = Logs.decode('utf-8', errors='ignore')
 
             return Logs
         except Exception as e:

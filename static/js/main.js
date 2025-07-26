@@ -183,7 +183,7 @@ const pageContents = {
             <div class="server-info-center">
                 <h3>服务器终端</h3>
                 <div class="terminal-output" id="terminal-output-${serverName}">
-                    <h1>暂未开发完成</h1>
+                    <!-- 终端输出 -->
                 </div>
                 <div class="terminal-input">
                     <input type="text" id="command-input-${serverName}" placeholder="输入命令...">
@@ -1197,75 +1197,6 @@ function togglePlayerActions(iconElement) {
     }
 }
 
-// 建立连接获取终端消息
-function setupTerminalWebSocket(serverName) {
-    const terminalOutput = document.getElementById(`terminal-output-${serverName}`);
-    if (!terminalOutput) return;
-
-    // 定时获取日志
-    const fetchLogs = () => {
-        fetch(`/api/server/terminal/${serverName}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    terminalOutput.innerHTML += `<div>${data.logs}</div>`;
-                    terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                } else {
-                    terminalOutput.innerHTML += `<div style="color: red;">${data.error}</div>`;
-                }
-            })
-            .catch(error => {
-                console.error('获取终端日志失败:', error);
-                terminalOutput.innerHTML += '<div style="color: red;">获取终端日志失败</div>';
-            });
-    };
-
-    // 初始获取日志
-    fetchLogs();
-    // 每 5 秒获取一次日志，可根据需求调整间隔时间
-    const intervalId = setInterval(fetchLogs, 5000);
-
-    // 保存定时器 ID 以便后续清除
-    if (!window.terminalTimers) {
-        window.terminalTimers = {};
-    }
-    window.terminalTimers[serverName] = intervalId;
-}
-
-// 发送命令
-function sendCommand(serverName) {
-    const commandInput = document.getElementById(`command-input-${serverName}`);
-    const command = commandInput.value.trim();
-    if (!command) return;
-
-    fetch(`/api/server/terminal/${serverName}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ command })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const terminalOutput = document.getElementById(`terminal-output-${serverName}`);
-            if (terminalOutput) {
-                terminalOutput.innerHTML += `<div style="color: #4CAF50;">&gt; ${command}</div>`;
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
-            }
-        } else {
-            alert(data.error);
-        }
-    })
-    .catch(error => {
-        console.error('发送命令失败:', error);
-        alert('发送命令失败，请检查日志');
-    });
-
-    // 清空输入框
-    commandInput.value = '';
-}
-
 // 通过API请求发送命令
 function kickPlayer(serverName, playerName) {
     if (confirm(`确定要踢出玩家 ${playerName} 吗？`)) {
@@ -1523,56 +1454,68 @@ async function fetchHistoryPlayers(serverName) {
     }
 }
 
-// 存储每个服务器最后一次获取的日志最大 ID
-const lastLogIds = {};
-
-// 定时获取终端日志
-function setupTerminalPolling(serverName) {
+// 建立连接获取终端消息
+async function setupTerminalWebSocket(serverName) {
     const terminalOutput = document.getElementById(`terminal-output-${serverName}`);
     if (!terminalOutput) return;
 
-    const intervalId = setInterval(() => {
-        fetch(`/api/server/terminal/${serverName}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const logs = data.logs;
-                    const lastLogId = lastLogIds[serverName] || 0;
-                    // 过滤出 ID 大于 lastLogId 的新日志
-                    const newLogs = logs.filter(log => log.id > lastLogId);
-                    if (newLogs.length > 0) {
-                        newLogs.forEach(log => {
-                            // 使用 white-space: pre-wrap 样式保留换行符和空白符
-                            const logDiv = document.createElement('div');
-                            logDiv.style.whiteSpace = 'pre-wrap';
-                            // 替换特殊字符为换行符
-                            const formattedMessage = log.message.replace(/\\n/g, '\n');
-                            logDiv.textContent = formattedMessage;
-                            terminalOutput.appendChild(logDiv);
-                        });
-                        // 自动滚动到底部
-                        terminalOutput.scrollTop = terminalOutput.scrollHeight;
-                        // 更新最后一次获取的日志最大 ID
-                        const maxLogId = newLogs.reduce((max, log) => Math.max(max, log.id), lastLogId);
-                        lastLogIds[serverName] = maxLogId;
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('获取终端日志失败:', error);
-                const errorDiv = document.createElement('div');
-                errorDiv.style.color = 'red';
-                errorDiv.style.whiteSpace = 'pre-wrap';
-                errorDiv.textContent = '获取终端日志失败';
-                terminalOutput.appendChild(errorDiv);
-                // 自动滚动到底部
-                terminalOutput.scrollTop = terminalOutput.scrollHeight;
-            });
-    }, 1000); // 每秒轮询一次
+    // 存储最后获取的日志快照
+    let lastLogsSnapshot = [];
 
-    // 保存定时器 ID 以便后续清理
-    window.terminalIntervals = window.terminalIntervals || {};
-    window.terminalIntervals[serverName] = intervalId;
+    // 异步获取日志
+    const fetchLogs = async () => {
+        try {
+            const response = await fetch(`/api/server/terminal/${serverName}`);
+            const data = await response.json();
+
+            if (data.success) {
+                // 将日志转换为数组格式
+                const newLogs = Array.isArray(data.logs) ? data.logs : data.logs.split('\n');
+
+                // 对比新旧日志差异
+                const diffLogs = getNewLogs(lastLogsSnapshot, newLogs);
+
+                // 仅追加差异内容
+                diffLogs.forEach(log => {
+                    const div = document.createElement('div');
+                    div.textContent = log;
+                    terminalOutput.appendChild(div);
+                });
+
+                // 更新日志快照（保留最后1000行）
+                lastLogsSnapshot = newLogs.slice(-1000);
+
+                // 保持自动滚动
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }
+        } catch (error) {
+            console.error('获取终端日志失败:', error);
+            terminalOutput.innerHTML += '<div style="color: red;">获取终端日志失败</div>';
+        }
+    };
+
+    // 差异对比方法
+    function getNewLogs(prevLogs, newLogs) {
+        if (!prevLogs.length || !newLogs.length) return newLogs;
+        const firstMismatch = newLogs.findIndex((log, index) =>
+            index >= prevLogs.length || log !== prevLogs[index]
+        );
+        return firstMismatch === -1 ? [] : newLogs.slice(firstMismatch);
+    }
+
+    // 初始获取日志
+    await fetchLogs();
+
+    // 定时器, 每3秒获取一次日志
+    const intervalId = setInterval(async () => {
+        await fetchLogs();
+    }, 3000);
+
+    // 保存定时器 ID 以便后续清除
+    if (!window.terminalTimers) {
+        window.terminalTimers = {};
+    }
+    window.terminalTimers[serverName] = intervalId;
 }
 
 // 发送命令
@@ -1581,12 +1524,12 @@ function sendCommand(serverName) {
     const command = commandInput.value.trim();
     if (!command) return;
 
-    fetch(`/api/server/${serverName}/command`, {
+    fetch(`/api/server/terminal/${serverName}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ command: command })
+        body: JSON.stringify({ command })
     })
     .then(response => response.json())
     .then(data => {
