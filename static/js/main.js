@@ -351,6 +351,12 @@ function loadContent(page, serverName = '') {
     const contentDiv = document.getElementById('dynamic-content');
     const loader = document.getElementById('loader');
 
+    // 清除所有终端日志定时器
+    if (window.terminalTimers) {
+        Object.values(window.terminalTimers).forEach(intervalId => clearInterval(intervalId));
+        window.terminalTimers = {};
+    }
+
     // 显示加载动画
     loader.style.display = 'block';
     contentDiv.innerHTML = '';
@@ -1456,8 +1462,21 @@ async function fetchHistoryPlayers(serverName) {
 
 // 建立连接获取终端消息
 async function setupTerminalWebSocket(serverName) {
+    // 清除该服务器已有的定时器
+    if (window.terminalTimers && window.terminalTimers[serverName]) {
+        clearInterval(window.terminalTimers[serverName]);
+    }
+
     const terminalOutput = document.getElementById(`terminal-output-${serverName}`);
     if (!terminalOutput) return;
+
+    // 保持最大行数的函数
+    function keepMaxLines() {
+        const maxLines = 1000;
+        while (terminalOutput.childElementCount > maxLines) {
+            terminalOutput.removeChild(terminalOutput.firstChild);
+        }
+    }
 
     // 存储最后获取的日志快照
     let lastLogsSnapshot = [];
@@ -1469,28 +1488,23 @@ async function setupTerminalWebSocket(serverName) {
             const data = await response.json();
 
             if (data.success) {
-                // 将日志转换为数组格式
                 const newLogs = Array.isArray(data.logs) ? data.logs : data.logs.split('\n');
-
-                // 对比新旧日志差异
                 const diffLogs = getNewLogs(lastLogsSnapshot, newLogs);
 
-                // 仅追加差异内容
+                // 先更新快照再追加日志
+                lastLogsSnapshot = newLogs.slice(-1000);
+
                 diffLogs.forEach(log => {
                     const div = document.createElement('div');
                     div.textContent = log;
                     terminalOutput.appendChild(div);
                 });
 
-                // 更新日志快照（保留最后1000行）
-                lastLogsSnapshot = newLogs.slice(-1000);
-
-                // 保持自动滚动
+                keepMaxLines(); // 新增行数限制
                 terminalOutput.scrollTop = terminalOutput.scrollHeight;
             }
         } catch (error) {
             console.error('获取终端日志失败:', error);
-            terminalOutput.innerHTML += '<div style="color: red;">获取终端日志失败</div>';
         }
     };
 

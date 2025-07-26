@@ -1173,7 +1173,7 @@ class Get:
                 found_pos = 0 # 目标起始位置
 
                 # 从后向前逐块读取文件
-                while pos > 0 and total_newlines < total_newlines:
+                while pos > 0 and total_newlines < newlines_to_skip:
                     # 计算当前块大小和位置
                     size_to_read = min(block_size, pos)
                     pos -= size_to_read
@@ -1183,7 +1183,7 @@ class Get:
                     # 在块中从后向前扫描换行符
                     index = len(block) - 1
                     while index >= 0:
-                        if block[index] == '\n':
+                        if block[index] == 10:
                             total_newlines += 1
                             if total_newlines >= newlines_to_skip:
                                 # 找到目标起始位置（换行符后第一个字符）
