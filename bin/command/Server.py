@@ -829,6 +829,11 @@ class Do:
                         f.write('启动时间:' + StartTime)
                         f.close()
                         log.logger.info('已输出latest.txt文件！')
+
+                # 更新上次启动时间
+                server_info['LatestStartedTime'] = StartTime
+
+                # 输出latest.json文件
                 if find_file.find_files_with_existence_and_create(Info.work_path + Info.File.Folder.Resource + Info.File.Document.Latest_json):
                     with open(Info.work_path + Info.File.Folder.Resource + Info.File.Document.Latest_json, 'w', encoding='utf-8') as f:
                         json.dump(server_info, f, indent=4)

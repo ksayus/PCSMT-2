@@ -123,12 +123,41 @@ const pageContents = {
         </div>
     `,
 
+    // 修改服务器列表页面的布局结构
     servers: `
         <div class="servers-content">
             <h1>服务器列表</h1>
-            <!-- ECharts 容器 -->
-            <div id="disk-usage-chart" style="width: 200px; height: 200px; margin: 20px auto;"></div>
-            <div id="usage-font" style="margin: auto"> 磁盘使用率 </div>
+            <div class="charts-container">
+                <!-- 磁盘使用率 -->
+                <div class="chart-item">
+                    <div id="disk-usage-chart" style="width: 200px; height: 200px;"></div>
+                    <div class="chart-label">磁盘使用率</div>
+                    <div class="chart-stats">
+                        <span id="disk-used">0GB</span> /
+                        <span id="disk-total">0GB</span>
+                    </div>
+                </div>
+
+                <!-- CPU使用率 -->
+                <div class="chart-item">
+                    <div id="cpu-usage-chart" style="width: 200px; height: 200px;"></div>
+                    <div class="chart-label">CPU使用率</div>
+                    <div class="chart-stats">
+                        <span id="cpu-used">0MHz</span> /
+                        <span id="cpu-total">0MHz</span>
+                    </div>
+                </div>
+
+                <!-- 内存使用率 -->
+                <div class="chart-item">
+                    <div id="ram-usage-chart" style="width: 200px; height: 200px;"></div>
+                    <div class="chart-label">内存使用率</div>
+                    <div class="chart-stats">
+                        <span id="ram-used">0GB</span> /
+                        <span id="ram-total">0GB</span>
+                    </div>
+                </div>
+            </div>
             <div class="server-container" id="server-list-container">
                 <div class="loading">加载中...</div>
             </div>
@@ -351,6 +380,15 @@ function loadContent(page, serverName = '') {
     const contentDiv = document.getElementById('dynamic-content');
     const loader = document.getElementById('loader');
 
+    // 清除所有定时器
+    if (window.terminalTimers) {
+        Object.values(window.terminalTimers).forEach(clearTimeout);
+        window.terminalTimers = {};
+    }
+    // 清除CPU/RAM定时器
+    Object.values(CpuRamDiskTimers).forEach(clearTimeout);
+    CpuRamDiskTimers = { cpu: null, ram: null, disk:null };
+
     // 清除所有终端日志定时器
     if (window.terminalTimers) {
         Object.values(window.terminalTimers).forEach(intervalId => clearInterval(intervalId));
@@ -374,7 +412,7 @@ function loadContent(page, serverName = '') {
                 break;
             case 'servers':
                 contentDiv.innerHTML = pageContents.servers;
-                fetchDiskUsage();  // 获取磁盘使用率
+                fetchCpuRamDiskUsage();  // 获取CPU、内存和磁盘使用率
                 fetchServerList();
                 break;
             case 'server_info':
@@ -942,119 +980,6 @@ async function refreshServerCards() {
     }
 }
 
-// 获取磁盘使用率
-async function fetchDiskUsage() {
-    try {
-        const response = await fetch('/api/program/disk_usage');
-        const data = await response.json();
-
-        if (data.error) {
-            console.error('获取磁盘使用率失败:', data.error);
-            showChartError();
-            return;
-        }
-
-        // 动态加载 ECharts 库（如果未加载）
-        if (typeof echarts === 'undefined') {
-            // 防止重复加载
-            if (!window.echartsLoading) {
-                window.echartsLoading = true;
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js';
-                script.onload = () => {
-                    window.echartsLoading = false;
-                    initDiskUsageChart(data.disk_usage, data.disk_free, data.usage, data.free);
-                };
-                script.onerror = () => {
-                    window.echartsLoading = false;
-                    console.error('加载ECharts库失败');
-                    showChartError();
-                };
-                document.head.appendChild(script);
-            }
-        } else {
-            // 初始化 ECharts 图表
-            initDiskUsageChart(data.disk_usage, data.disk_free, data.usage, data.free);
-        }
-    } catch (error) {
-        console.error('获取磁盘使用率失败:', error);
-        showChartError();
-    }
-}
-
-// 初始化磁盘使用率图表
-function initDiskUsageChart(usedPercent, freePercent, used, free) {
-    const chartDom = document.getElementById('disk-usage-chart');
-    if (!chartDom) return;
-
-    const chart = echarts.init(chartDom);
-    const option = {
-        tooltip: {
-            formatter: '{b}: {c}%'
-        },
-        graphic: [{
-            type: 'text',
-            left: 'center',
-            top: 'center',
-            style: {
-                text: (usedPercent) + '%',
-                textAlign: 'center',
-                fill: '#67afdfff',
-                fontSize: 20,
-                fontWeight: 'bold'
-            }
-        }],
-        series: [{
-            name: '磁盘使用率',
-            type: 'pie',
-            radius: ['60%', '80%'],
-            avoidLabelOverlap: false,
-            itemStyle: {
-                borderRadius: 0,
-                borderColor: '#ffffffff',
-                borderWidth: 2
-            },
-            label: {
-                show: false
-            },
-            emphasis: {
-                label: {
-                    show: false
-                }
-            },
-            data: [
-                {
-                    value: usedPercent,
-                    name: `已使用: ${used} GB
-                            已使用`,
-                    itemStyle: { color: '#386ffcff' }
-                },
-                {
-                    value: freePercent,
-                    name: `未使用: ${free} GB
-                            未使用`,
-                    itemStyle: { color: '#a2c2fcff' },
-                }
-            ]
-        }]
-    };
-
-    chart.setOption(option);
-}
-
-// 显示图表错误状态
-function showChartError() {
-    const chartDom = document.getElementById('disk-usage-chart');
-    if (chartDom) {
-        chartDom.innerHTML = `
-            <div style="text-align:center; padding:40px 0; color:#e74c3c;">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>获取数据失败</p>
-            </div>
-        `;
-    }
-}
-
 // 获取设置数据
 async function fetchSettings() {
     try {
@@ -1564,4 +1489,283 @@ function sendCommand(serverName) {
 
     // 清空输入框
     commandInput.value = '';
+}
+
+// 全局定时器对象
+let CpuRamDiskTimers = {
+    cpu: null,
+    ram: null,
+    disk: null
+};
+
+// 获取CPU、内存和磁盘使用率
+function fetchCpuRamDiskUsage() {
+    const cpuChart = document.getElementById('cpu-usage-chart');
+    const ramChart = document.getElementById('ram-usage-chart');
+    const diskChart = document.getElementById('disk-usage-chart');
+
+    if (!cpuChart || !ramChart || !diskChart) {
+        console.error('图表容器未找到，等待500ms重试...');
+        setTimeout(fetchCpuRamDiskUsage, 500);
+        return;
+    }
+
+    // 初始化CPU图表
+    fetchCpuUsage();
+    // 初始化内存图表
+    fetchRamUsage();
+    // 初始化磁盘图表
+    fetchDiskUsage();
+}
+
+// 获取CPU使用率
+async function fetchCpuUsage() {
+    try {
+        const response = await fetch('/api/program/get/CPU/Usage');
+        const data = await response.json();
+
+        // 动态加载ECharts库
+        if (typeof echarts === 'undefined') {
+            if (!window.echartsLoading) {
+                window.echartsLoading = true;
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js';
+                script.onload = () => {
+                    window.echartsLoading = false;
+                    initCpuUsageChart(data.used, data.total);
+                };
+                script.onerror = () => {
+                    window.echartsLoading = false;
+                    console.error('加载ECharts库失败');
+                    const chartDom = document.getElementById('cpu-usage-chart');
+                    if (chartDom) chartDom.innerHTML = '图表库加载失败';
+                };
+                document.head.appendChild(script);
+            }
+        } else {
+            initCpuUsageChart(data.used, data.total, data.abs_used, data.abs_total);
+        }
+
+        CpuRamDiskTimers.cpu = setTimeout(fetchCpuUsage, 5000);
+    } catch (error) {
+        console.error('获取CPU使用率失败:', error);
+        const chartDom = document.getElementById('cpu-usage-chart');
+        if (chartDom) chartDom.innerHTML = '数据获取失败';
+    }
+}
+
+// 获取内存使用率
+async function fetchRamUsage() {
+    try {
+        const response = await fetch('/api/program/get/RAM/Usage');
+        const data = await response.json();
+
+        // 动态加载ECharts库
+        if (typeof echarts === 'undefined') {
+            if (!window.echartsLoading) {
+                window.echartsLoading = true;
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js';
+                script.onload = () => {
+                    window.echartsLoading = false;
+                    initRamUsageChart(data.used, data.total);
+                };
+                script.onerror = () => {
+                    window.echartsLoading = false;
+                    console.error('加载ECharts库失败');
+                    const chartDom = document.getElementById('ram-usage-chart');
+                    if (chartDom) chartDom.innerHTML = '图表库加载失败';
+                };
+                document.head.appendChild(script);
+            }
+        } else {
+            initRamUsageChart(data.used, data.total, data.abs_used, data.abs_total);
+        }
+
+        CpuRamDiskTimers.ram = setTimeout(fetchRamUsage, 5000);
+    } catch (error) {
+        console.error('获取内存使用率失败:', error);
+        const chartDom = document.getElementById('ram-usage-chart');
+        if (chartDom) chartDom.innerHTML = '数据获取失败';
+    }
+}
+
+// 初始化CPU图表
+function initCpuUsageChart(used, total, abs_used, abs_total) {
+    const chartDom = document.getElementById('cpu-usage-chart');
+    if (!chartDom) return;
+
+    const chart = echarts.init(chartDom);
+
+    const option = {
+        tooltip: {
+            formatter: '{b}'
+        },
+        graphic: [{
+            type: 'text',
+            left: 'center',
+            top: 'center',
+            style: {
+                text: `${((used)).toFixed(1)}%`,
+                textAlign: 'center',
+                fill: '#67afdfff',
+                fontSize: 20,
+                fontWeight: 'bold'
+            }
+        }],
+        series: [{
+            type: 'pie',
+            radius: ['60%', '80%'],
+            data: [
+                { value: used, name: '已使用:' + used.toFixed(2) + '%', itemStyle: { color: '#36a3eb' } },
+                { value: 100 - used, name: '未使用:' + (100 - used).toFixed(2) + '%', itemStyle: { color: '#a2c2fcff' } }
+            ]
+        }]
+    };
+    chart.setOption(option);
+
+    // 更新统计信息
+    document.getElementById('cpu-used').textContent = `${abs_used} MHz`;
+    document.getElementById('cpu-total').textContent = `${abs_total} MHz`;
+}
+
+// 初始化内存图表
+function initRamUsageChart(used, total, abs_used, abs_total) {
+    const chartDom = document.getElementById('ram-usage-chart');
+    if (!chartDom) return;
+
+    const chart = echarts.init(chartDom);
+    const option = {
+        tooltip: {
+            formatter: '{b}'
+        },
+        graphic: [{
+            type: 'text',
+            left: 'center',
+            top: 'center',
+            style: {
+                text: `${((abs_used / abs_total) * 100).toFixed(1)}%`,
+                textAlign: 'center',
+                fill: '#67afdfff',
+                fontSize: 20,
+                fontWeight: 'bold'
+            }
+        }],
+        series: [{
+            type: 'pie',
+            radius: ['60%', '80%'],
+            data: [
+                { value: abs_used, name: '已使用:' + abs_used.toFixed(2) + 'MB', itemStyle: { color: '#36a3eb' } },
+                { value: abs_total - abs_used, name: '未使用:' + (abs_total).toFixed(2) + 'MB', itemStyle: { color: '#a2c2fcff' } }
+            ]
+        }]
+    };
+    chart.setOption(option);
+
+    // 更新统计信息
+    document.getElementById('ram-used').textContent = `${abs_used} MB`;
+    document.getElementById('ram-total').textContent = `${abs_total} MB`;
+}
+
+// 获取磁盘使用率
+async function fetchDiskUsage() {
+    try {
+        const response = await fetch('/api/program/disk_usage');
+        const data = await response.json();
+
+        if (data.error) {
+            console.error('获取磁盘使用率失败:', data.error);
+            showChartError();
+            return;
+        }
+
+        // 动态加载 ECharts 库（如果未加载）
+        if (typeof echarts === 'undefined') {
+            // 防止重复加载
+            if (!window.echartsLoading) {
+                window.echartsLoading = true;
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js';
+                script.onload = () => {
+                    window.echartsLoading = false;
+                    initDiskUsageChart(data.disk_usage, data.disk_free, data.usage, data.free);
+                };
+                script.onerror = () => {
+                    window.echartsLoading = false;
+                    console.error('加载ECharts库失败');
+                    showChartError();
+                };
+                document.head.appendChild(script);
+            }
+        } else {
+            // 初始化 ECharts 图表
+            initDiskUsageChart(data.disk_usage, data.disk_free, data.usage, data.free);
+        }
+
+        CpuRamDiskTimers.disk = setTimeout(fetchDiskUsage, 5000);
+    } catch (error) {
+        console.error('获取磁盘使用率失败:', error);
+        showChartError();
+    }
+}
+
+// 初始化磁盘使用率图表
+function initDiskUsageChart(usedPercent, freePercent, used, free) {
+    const chartDom = document.getElementById('disk-usage-chart');
+    if (!chartDom) return;
+
+    const chart = echarts.init(chartDom);
+    const option = {
+        tooltip: {
+            formatter: '{b}: {c}%'
+        },
+        graphic: [{
+            type: 'text',
+            left: 'center',
+            top: 'center',
+            style: {
+                text: (usedPercent) + '%',
+                textAlign: 'center',
+                fill: '#67afdfff',
+                fontSize: 20,
+                fontWeight: 'bold'
+            }
+        }],
+        series: [{
+            type: 'pie',
+            radius: ['60%', '80%'],
+            data: [
+                {
+                    value: usedPercent,
+                    name: `已使用: ${used} GB
+                            已使用`,
+                    itemStyle: { color: '#386ffcff' }
+                },
+                {
+                    value: freePercent,
+                    name: `未使用: ${free} GB
+                            未使用`,
+                    itemStyle: { color: '#a2c2fcff' },
+                }
+            ]
+        }]
+    };
+    chart.setOption(option);
+
+    // 更新统计信息
+    document.getElementById('disk-used').textContent = `${used} GB`;
+    document.getElementById('disk-total').textContent = `${free + used} GB`;
+}
+
+// 显示图表错误状态
+function showChartError() {
+    const chartDom = document.getElementById('disk-usage-chart');
+    if (chartDom) {
+        chartDom.innerHTML = `
+            <div style="text-align:center; padding:40px 0; color:#e74c3c;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>获取数据失败</p>
+            </div>
+        `;
+    }
 }

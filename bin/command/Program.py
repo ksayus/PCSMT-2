@@ -8,6 +8,7 @@ from bin.export import GetTime
 from bin.export import Get
 from bin.export import timer
 from time import sleep
+import psutil
 import sys
 import os
 import winreg
@@ -491,5 +492,43 @@ class Format:
             Format.Settings()
         except Exception as e:
             log.logger.error('格式化程序失败！')
+            log.logger.error(e)
+            return
+
+class Get:
+    def CPU_Usage():
+        """
+        获取CPU占用率
+
+        :return:
+        CPU_Usage_Percent: CPU占用率
+        CPU_Usage_MB: CPU占用MB
+        """
+        try:
+            # 获取CPU使用率
+            CPU_Usage_Percent = psutil.cpu_percent(interval=1)
+            CPU_Freq_now = psutil.cpu_freq().current
+            CPU_Freq_Max = psutil.cpu_freq().max
+            return round(CPU_Usage_Percent, 2), round(CPU_Freq_now, 2), round(CPU_Freq_Max, 2)
+        except Exception as e:
+            log.logger.error('获取CPU占用率失败！')
+            log.logger.error(e)
+            return
+
+    def RAM_Usage():
+        """
+        获取RAM占用率
+
+        :return:
+        RAM_Usage_Percent: RAM占用率
+        RAM_Usage_MB: RAM占用MB
+        """
+        try:
+            # 获取RAM占用率
+            RAM_Usage_Percent = psutil.virtual_memory().percent
+            RAM_Usage_MB = psutil.virtual_memory().used / (1024 * 1024)
+            return round(RAM_Usage_Percent, 2), round(RAM_Usage_MB, 2)
+        except Exception as e:
+            log.logger.error('获取RAM占用率失败！')
             log.logger.error(e)
             return
