@@ -14,7 +14,7 @@
 
 ## 部署到 GitHub
 该项目已部署到 GitHub，您可以通过以下链接访问：
-[https://github.com/ksayus/PCSMT-2](https://github.com/ksayus/PCSMT-2)
+[PCSMT2](https://ksayus.github.io/PCSMT-2/)
 
 ## 功能概述
 ### 核心功能
