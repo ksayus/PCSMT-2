@@ -12,6 +12,10 @@
 > - 需要手动下载和配置服务器核心；
 > - 参数配置需要打开文件配置。
 
+## 部署到 GitHub
+该项目已部署到 GitHub，您可以通过以下链接访问：
+[https://github.com/ksayus/PCSMT-2](https://github.com/ksayus/PCSMT-2)
+
 ## 功能概述
 ### 核心功能
 1. **创建服务器**
