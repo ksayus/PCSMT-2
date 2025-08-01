@@ -2,6 +2,15 @@
 ### Minecraft服务器管理终端-2
 
 如题，一个简单的服务器管理终端，使用Python编写，依赖`Python3.13.2`。
+
+## GitHub Pages
+该项目已部署到 GitHub Pages，您可以通过以下链接访问：
+[PCSMT2](https://ksayus.github.io/PCSMT-2/)
+
+> [!NOTE]
+> 此项目的文档已部署到 GitHub Pages，您可以通过以下链接访问：
+> [PCSMT2-Docs](https://ksayus.github.io/PCSMT2-Docs/)
+
 > [!CAUTION]
 > 警告 使用程序前请先检查是否安装java环境!!!
 
@@ -11,10 +20,7 @@
 > - 远程控制麻烦；
 > - 需要手动下载和配置服务器核心；
 > - 参数配置需要打开文件配置。
-
-## 部署到 GitHub
-该项目已部署到 GitHub，您可以通过以下链接访问：
-[PCSMT2](https://ksayus.github.io/PCSMT-2/)
+> 注意 该项目仅用于学习和研究，不建议用于商业用途。
 
 ## 功能概述
 ### 核心功能
