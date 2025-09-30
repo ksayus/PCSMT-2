@@ -194,7 +194,7 @@ def return_server_storage_info(server_name):
     try:
         server_storage_size = Get.Info.StorageSize(server_name)
 
-        # 修改：提取数值部分并转换为浮点数
+        # 提取数值部分并转换为浮点数
         numeric_values = []
         for val in server_storage_size['storage_size']:
             # 分离数值和单位（例如："5.2GB" -> 5.2）
@@ -507,46 +507,3 @@ def get_history_players(server_name):
     except Exception as e:
         log.logger.error(str(e))
         return jsonify({"error": "获取历史玩家列表时发生内部错误", "success": False})
-
-@main.app.route('/api/program/get/CPU/Usage')
-def get_CPU_Usage():
-    """获取CPU占用率"""
-    try:
-        # 获取CPU占用率
-        CPU_Usage_Percent, CPU_Freq_now, CPU_Freq_Max = Program.Get.CPU_Usage()
-
-        return jsonify(
-            {
-                "success": True,
-                "message": "获取CPU占用率成功",
-                "used": CPU_Usage_Percent,
-                "total": CPU_Freq_Max,
-                "abs_used": round(CPU_Freq_now, 2),
-                "abs_total": round(CPU_Freq_Max, 2)
-            }
-        )
-    except Exception as e:
-        log.logger.error('获取CPU占用率失败！')
-        log.logger.error(e)
-        return
-
-@main.app.route('/api/program/get/RAM/Usage')
-def get_RAM_Usage():
-    """获取RAM占用率"""
-    try:
-        # 获取RAM占用率
-        RAM_Usage_Percent, RAM_Usage_MB = Program.Get.RAM_Usage()
-        return jsonify(
-            {
-                "success": True,
-                "message": "获取RAM占用率成功",
-                "used": RAM_Usage_Percent,
-                "total": RAM_Usage_MB,
-                "abs_used": round(RAM_Usage_MB, 2),
-                "abs_total": round(RAM_Usage_MB / (RAM_Usage_Percent / 100), 2)
-            }
-        )
-    except Exception as e:
-        log.logger.error('获取RAM占用率失败！')
-        log.logger.error(e)
-        return
