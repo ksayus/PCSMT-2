@@ -1292,6 +1292,39 @@ class Get:
             log.logger.error(e)
             return False
 
+    def CurrentPlayers(ServerInfo: str):
+        """
+        获取服务器当前玩家列表
+
+        :param ServerInfo: 服务器信息
+        :return: 当前玩家列表
+        """
+        try:
+            # 获取数据并验证结构
+            server_data = timer.Heartbeat_instance.GetList()
+            if not server_data or 'Name' not in server_data or 'Online' not in server_data:
+                log.logger.error(f'数据为空: {server_data}')
+                return False
+            # 重构为更安全的处理逻辑
+            found = False
+            player_status = None
+
+            for i in range(len(server_data['Name'])):
+                if server_data['Name'][i] == ServerInfo['Name']:
+                    player_status = server_data['Online'][i]
+                    found = True
+                    break
+
+            if not found:
+                log.logger.error(f'未找到服务器: {ServerInfo["Name"]}')
+                return False
+
+            return player_status
+        except Exception as e:
+            log.logger.error('获取当前玩家列表失败！')
+            log.logger.error(e)
+            return False
+
 class Change:
     def Properties(server_name: str, keyword: str, argument: str):
         """
@@ -1325,7 +1358,7 @@ class Change:
                     log.logger.info('正在修改服务器启动批处理文件...')
                     log.logger.info('修改服务器启动内存为：' + str(memory_min) + ' ' + str(memory_max))
                     f.write('cd ' + server_info['Path'] + '\n')
-                    f.write(f'{java_args} -Xmx' + str(memory_min) + 'M -Xms' + str(memory_max) + 'M -jar ' + server_info['Core'])
+                    f.write(f'{java_args} -Xms' + str(memory_min) + 'M -Xmx' + str(memory_max) + 'M -jar ' + server_info['Core'])
                     if Info.Config.Nogui() == "true" or Info.Config.Nogui() == True:
                         f.write(' -nogui')
                     else:

@@ -39,6 +39,10 @@ def server_lists():
 
 @main.app.route('/api/server/players/<string:ServerName>', methods=['GET'])
 def server_players(ServerName):
+    """
+    获取服务器玩家列表
+    :param ServerName: 服务器名称
+    """
     try:
         # 获取数据并验证结构
         server_data = timer.Heartbeat_instance.GetList()
@@ -310,6 +314,10 @@ def DeleteServer(server_name):
 
 @main.app.route('/api/server/get/document/server.properties/<string:server_name>', methods=['GET'])
 def server_properties_document(server_name):
+    """
+    获取服务器配置文件
+    :param server_name: 服务器名称
+    """
     try:
         properties_dict = {}
         for item in Server.Get.Properties(server_name):
@@ -327,6 +335,10 @@ def server_properties_document(server_name):
 
 @main.app.route('/api/server/get/run_memory/<string:server_name>', methods=['GET'])
 def get_run_memory(server_name):
+    """
+    获取服务器运行内存
+    :param server_name: 服务器名称
+    """
     try:
         RunMemory = Server.Get.RunMemory(server_name)
         return jsonify(
@@ -341,6 +353,10 @@ def get_run_memory(server_name):
 
 @main.app.route('/api/server/set/settings/<string:server_name>', methods=['POST'])
 def set_server_settings(server_name):
+    """
+    设置服务器配置
+    :param server_name: 服务器名称
+    """
     try:
         # 获取请求数据
         request_data = request.form
