@@ -812,8 +812,8 @@ class Do:
                         time.sleep(2)
                         ConnectStatus = True
                     except Exception as e:
-                        log.logger.debug('连接RCON失败！')
-                        log.logger.debug(e)
+                        log.Debug('连接RCON失败！')
+                        log.Debug(e)
                         # break
                         time.sleep(2) # 重试延迟
 

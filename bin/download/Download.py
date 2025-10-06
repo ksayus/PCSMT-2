@@ -1,4 +1,5 @@
 from openpyxl import Workbook, load_workbook
+from openpyxl.utils import get_column_letter
 from bin.export import Info
 from bin.export import Examine
 from bin.command import Server
@@ -44,6 +45,35 @@ class Excel:
 
             self.wb1.save(f"./{Info.File.Folder.Resource}/{Info.File.Folder.Excel}/{self.sheet}.xlsx")
 
+        def Auto_Adapt(self):
+            """
+            自动调整行宽和列高
+            遍历查找所有工作表的所有单元格，找到最大长度的单元格，根据其长度调整列宽
+            遍历查找所有工作表的所有单元格，找到最大长度的单元格，根据其长度调整行高
+            """
+            wb = load_workbook(f"./{Info.File.Folder.Resource}/{Info.File.Folder.Excel}/{self.sheet}.xlsx")
+            ws = wb.active # 获取默认工作表
+            max_row = ws.max_row
+            max_col = ws.max_column
+
+            for j in range(1, max_col + 1):
+                max_d = 1
+                for i in range(1, max_row + 1):
+                    cell_value = ws.cell(i,j).value
+                    if isinstance(cell_value,str):
+                        d = len(cell_value.encode('utf-8'))
+                    else:
+                        d = len(str(cell_value))
+
+                    if d > max_d:
+                        max_d = d
+
+                log.Debug(f'列{get_column_letter(j)}最大长度为{max_d}，调整为{max_d}')
+                k = get_column_letter(j)
+                ws.column_dimensions[k].width = max_d
+
+            wb.save(f"./{Info.File.Folder.Resource}/{Info.File.Folder.Excel}/{self.sheet}.xlsx")
+
         def WriteData(self):
             """
             写入数据
@@ -61,6 +91,8 @@ class Excel:
             CurrentPlayers = Server.Get.CurrentPlayers(self.ServerInfo)
             if not isinstance(CurrentPlayers, list):
                 CurrentPlayers = []
+            else:
+                CurrentPlayers = CurrentPlayers[2]
 
             StorageInfo = Get.Info.StorageSize(self.ServerInfo['Name'])
             if StorageInfo is None or not isinstance(StorageInfo, dict):
@@ -85,17 +117,25 @@ class Excel:
             self.ws1['B4'] = self.ServerInfo['LatestStartedTime']
             self.ws1['B5'] = self.ServerInfo['Counts']
             self.ws1['B6'] = self.ServerInfo['Size']
+            self.ws1['B7'] = f'共{len(HistoryPlayers)}人'
+            self.ws1['B8'] = f'共{len(WhiteListPlayers)}人'
+            self.ws1['B9'] = f'共{len(BannedPlayers)}人'
+            self.ws1['B10'] = f'共{len(CurrentPlayers)}人'
             for i in range(len(HistoryPlayers)):
-                word = chr(66 + i)
+                log.Debug(f'正在写入历史玩家 {HistoryPlayers[i]}')
+                word = chr(67 + i)
                 self.ws1[word + '7'] = HistoryPlayers[i]
             for i in range(len(WhiteListPlayers)):
-                word = chr(66 + i)
+                log.Debug(f'正在写入白名单玩家 {WhiteListPlayers[i]}')
+                word = chr(67 + i)
                 self.ws1[word + '8'] = WhiteListPlayers[i]
             for i in range(len(BannedPlayers)):
-                word = chr(66 + i)
+                log.Debug(f'正在写入封禁玩家 {BannedPlayers[i]}')
+                word = chr(67 + i)
                 self.ws1[word + '9'] = BannedPlayers[i]
             for i in range(len(CurrentPlayers)):
-                word = chr(66 + i)
+                log.Debug(f'正在写入当前玩家 {CurrentPlayers[i]}')
+                word = chr(67 + i)
                 self.ws1[word + '10'] = CurrentPlayers[i]
 
 
@@ -113,6 +153,8 @@ class Excel:
 
             # 保存文件
             self.wb1.save(f"./{Info.File.Folder.Resource}/{Info.File.Folder.Excel}/{self.sheet}.xlsx")
+
+            self.Auto_Adapt()
 
         def FilePath(self):
                 """
@@ -157,6 +199,31 @@ class Excel:
             # 保存文件
             self.wb2.save(f"./{Info.File.Folder.Resource}/{Info.File.Folder.Excel}/{Info.File.Document.ServerInfoExcel}")
 
+        def Auto_Adapt(self):
+            """
+            自动调整行宽和列高
+            遍历查找所有工作表的所有单元格，找到最大长度的单元格，根据其长度调整列宽
+            遍历查找所有工作表的所有单元格，找到最大长度的单元格，根据其长度调整行高
+            """
+            for sheet_name in self.sheets:
+                self.ws2 = self.wb2[sheet_name]
+                max_row = self.ws2.max_row
+                max_col = self.ws2.max_column
+
+                for j in range(1, max_col + 1):
+                    max_d = 1
+                    for i in range(1, max_row + 1):
+                        cell_value = self.ws2.cell(i,j).value
+                        if isinstance(cell_value,str):
+                            d = len(cell_value.encode('utf-8'))
+                        else:
+                            d = len(str(cell_value))
+                        if d > max_d:
+                            max_d = d
+                    log.Debug(f'列{get_column_letter(j)}最大长度为{max_d}，调整为{max_d}')
+                    k = get_column_letter(j)
+                    self.ws2.column_dimensions[k].width = max_d
+
         def WriteData(self):
             """
             写入数据
@@ -179,6 +246,8 @@ class Excel:
                 CurrentPlayers = Server.Get.CurrentPlayers(ServerInfo)
                 if not isinstance(CurrentPlayers, list):
                     CurrentPlayers = []
+                else:
+                    CurrentPlayers = CurrentPlayers[2]
 
                 StorageInfo = Get.Info.StorageSize(ServerInfo['Name'])
                 if StorageInfo == None or not isinstance(StorageInfo, dict):
@@ -206,17 +275,21 @@ class Excel:
                 self.ws2['B4'] = ServerInfo['LatestStartedTime']
                 self.ws2['B5'] = ServerInfo['Counts']
                 self.ws2['B6'] = ServerInfo['Size']
+                self.ws2['B7'] = f'共{len(HistoryPlayers)}人'
+                self.ws2['B8'] = f'共{len(WhiteListPlayers)}人'
+                self.ws2['B9'] = f'共{len(BannedPlayers)}人'
+                self.ws2['B10'] = f'共{len(CurrentPlayers)}人'
                 for i in range(len(HistoryPlayers)):
-                    word = chr(66 + i)
+                    word = chr(67 + i)
                     self.ws2[word + '7'] = HistoryPlayers[i]
                 for i in range(len(WhiteListPlayers)):
-                    word = chr(66 + i)
+                    word = chr(67 + i)
                     self.ws2[word + '8'] = WhiteListPlayers[i]
                 for i in range(len(BannedPlayers)):
-                    word = chr(66 + i)
+                    word = chr(67 + i)
                     self.ws2[word + '9'] = BannedPlayers[i]
                 for i in range(len(CurrentPlayers)):
-                    word = chr(66 + i)
+                    word = chr(67 + i)
                     self.ws2[word + '10'] = CurrentPlayers[i]
 
                 self.ws2['A11'] = '存储占用'
@@ -228,6 +301,8 @@ class Excel:
                     for i in range(len(StorageInfo['storage_size'])):
                         self.ws2[f'A{i+12}'] = StorageInfo['storage_size'][i]
                         self.ws2[f'B{i+12}'] = StorageInfo['time'][i]
+
+            self.Auto_Adapt()
 
             self.wb2.save(f"./{Info.File.Folder.Resource}/{Info.File.Folder.Excel}/{Info.File.Document.ServerInfoExcel}")
 
