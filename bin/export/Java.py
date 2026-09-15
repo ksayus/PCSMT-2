@@ -68,7 +68,10 @@ class Install:
                                     timeout=60) as response:
                         response.raise_for_status()
                         total_size = int(response.headers.get('content-length', 0))
+<<<<<<< HEAD
+=======
                         downloaded_size = 0
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
 
                         with open(installer_path, "wb") as f:
                             with tqdm(total=total_size, unit='B', unit_scale=True, unit_divisor=1024, desc="正在下载") as pbar:
@@ -87,8 +90,14 @@ class Install:
                     if os.path.exists(installer_path):
                         try:
                             os.remove(installer_path)
+<<<<<<< HEAD
+                        except Exception as e:
+                            log.logger.error(f"删除安装包失败: {str(e)}")
+                            continue
+=======
                         except:
                             pass
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
                     time.sleep(10)
 
             if not download_success:
@@ -99,7 +108,11 @@ class Install:
             log.logger.debug(f"安装包绝对路径：{installer_abs_path}")
 
             if not os.path.exists(installer_abs_path):
+<<<<<<< HEAD
+                log.logger.error("安装包不存在，请检查下载路径")
+=======
                 log.logger.error(f"安装包不存在，请检查下载路径")
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
                 return False
 
             max_retries = 3

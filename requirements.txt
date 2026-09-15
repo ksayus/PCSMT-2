@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 flask>=2.0.3
 requests>=2.28.1
 openpyxl>=3.1.2
@@ -12,3 +13,22 @@ pyperclip>=1.8.2
 winshell>=0.6
 python-dotenv>=0.21.1
 urllib3>=1.26.14
+cmd2>=4.0.0
+mcrcon>=0.7.0
+tqdm>=4.64.1
+=======
+flask>=2.0.3
+requests>=2.28.1
+openpyxl>=3.1.2
+cryptography>=38.0.4
+pygetwindow>=0.0.4
+pywin32>=306
+psutil>=5.9.4
+Pillow>=9.4.0
+packaging>=21.3
+pyinstaller>=5.11.0
+pyperclip>=1.8.2
+winshell>=0.6
+python-dotenv>=0.21.1
+urllib3>=1.26.14
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16

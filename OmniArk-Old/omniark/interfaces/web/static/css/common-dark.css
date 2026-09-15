@@ -1,0 +1,285 @@
+/* =========================================================
+ * OmniArk 深色主题 —— 独立页面共享样式
+ * 设计令牌与规范见 docs/frontend-design.md 第 1 节
+ * 适用页面：ServerSettings / manager / chart_js / CreateServer
+ * ========================================================= */
+
+:root {
+  --bg-primary: #0f1419;      /* 页面背景 */
+  --bg-secondary: #1a1f27;    /* 卡片/面板背景 */
+  --bg-tertiary: #242b36;     /* 悬停/输入框背景 */
+  --border: #2d3542;
+  --text-primary: #e6e9ef;
+  --text-secondary: #9aa4b2;
+  --accent: #4f8cff;          /* 主色调 */
+  --accent-hover: #6ba0ff;
+  --success: #3fb96c;
+  --danger: #e5534b;
+  --warning: #d9a038;
+  --radius: 10px;
+  --sidebar-width: 240px;
+}
+
+html, body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: "Segoe UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+body {
+  margin: 0;
+  line-height: 1.6;
+}
+
+a { color: var(--accent); }
+a:hover { color: var(--accent-hover); }
+
+/* ---------------- 顶部导航条 ---------------- */
+.oa-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  height: 56px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+}
+
+.oa-navbar .oa-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.oa-navbar .oa-brand img { width: 28px; height: 28px; }
+
+.oa-navbar .oa-page-title {
+  color: var(--text-secondary);
+  font-size: .95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oa-navbar .oa-nav-spacer { flex: 1; }
+
+.oa-navbar .oa-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: .9rem;
+  transition: border-color .15s, background-color .15s;
+}
+
+.oa-navbar .oa-back-link:hover {
+  border-color: var(--accent);
+  background: var(--bg-tertiary);
+  color: var(--accent-hover);
+}
+
+/* ---------------- 卡片 ---------------- */
+.oa-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.oa-card > .oa-card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+}
+
+.oa-card > .oa-card-title i { color: var(--accent); }
+
+/* ---------------- 表单控件 ---------------- */
+.oa-input,
+.oa-select {
+  width: 100%;
+  padding: 9px 12px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: .95rem;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.oa-input:focus,
+.oa-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, .2);
+}
+
+.oa-input::placeholder { color: var(--text-secondary); }
+
+.oa-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* 开关（基于 Bootstrap form-switch 微调） */
+.form-check.form-switch .form-check-input {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border);
+  cursor: pointer;
+}
+
+.form-check.form-switch .form-check-input:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.form-check.form-switch .form-check-input:focus {
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, .2);
+}
+
+.form-check-label { cursor: pointer; color: var(--text-primary); }
+
+/* ---------------- 按钮 ---------------- */
+.oa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: all .15s;
+  text-decoration: none;
+}
+
+.oa-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+.oa-btn-primary { background: var(--accent); color: #fff; }
+.oa-btn-primary:hover:not(:disabled) { background: var(--accent-hover); color: #fff; }
+
+.oa-btn-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+.oa-btn-ghost:hover:not(:disabled) {
+  background: var(--bg-tertiary);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+.oa-btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
+.oa-btn-danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
+
+/* ---------------- Toast ---------------- */
+.oa-toast-container {
+  position: fixed;
+  top: 70px;
+  right: 16px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: min(360px, calc(100vw - 32px));
+}
+
+.oa-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
+  color: var(--text-primary);
+  font-size: .9rem;
+  animation: oa-toast-in .2s ease-out;
+}
+
+.oa-toast.oa-toast-success { border-left-color: var(--success); }
+.oa-toast.oa-toast-success i { color: var(--success); }
+.oa-toast.oa-toast-error { border-left-color: var(--danger); }
+.oa-toast.oa-toast-error i { color: var(--danger); }
+.oa-toast.oa-toast-info i { color: var(--accent); }
+
+.oa-toast .oa-toast-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1;
+}
+.oa-toast .oa-toast-close:hover { color: var(--text-primary); }
+
+.oa-toast.oa-toast-out {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity .25s, transform .25s;
+}
+
+@keyframes oa-toast-in {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ---------------- Bootstrap 深色组件微调 ---------------- */
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+}
+
+.modal-header, .modal-footer { border-color: var(--border); }
+.modal-header .btn-close { filter: invert(1) grayscale(1); }
+
+.form-control, .form-select {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.form-control:focus, .form-select:focus {
+  background-color: var(--bg-tertiary);
+  border-color: var(--accent);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, .2);
+}
+
+.form-control::placeholder { color: var(--text-secondary); }
+
+/* ---------------- 滚动条 ---------------- */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 5px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bg-tertiary); }

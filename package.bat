@@ -1,0 +1,1 @@
+pyinstaller -F -c --name=PCSMT2 --add-data ".\templates;templates" --add-data ".\static;static" --icon=./static/PCSMT2.ico PCSMT2.py

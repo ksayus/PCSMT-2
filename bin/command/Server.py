@@ -138,6 +138,10 @@ class Processing:
                     with open(Path + Info.File.Document.Eula, 'w') as f:
                         f.write('eula=true')
 
+<<<<<<< HEAD
+                # 计算服务器大小
+=======
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
                 if find_folder.find_folders_with_existence(Path):
                     server_size = size_change.size_change(GetThings.Info.DirSize(Path))
 
@@ -1003,6 +1007,10 @@ class Get:
         """
         搜索服务器
         :param server_name: 服务器名称
+<<<<<<< HEAD
+        :param Output: 是否输出服务器信息 Default=True
+=======
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
         返回值：
         False(错误) or server_info(正确)
         """

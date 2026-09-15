@@ -1,0 +1,64 @@
+/* 服务器设置页（ServerSettings.html）专属样式 */
+/* 令牌与通用组件见 common-dark.css */
+
+.settings-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+}
+
+.settings-header {
+  margin: 8px 0 24px;
+}
+
+.settings-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.settings-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: .9rem;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.settings-grid .field { min-width: 0; }
+
+.settings-switches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px 16px;
+}
+
+.settings-switches .form-check {
+  padding: 10px 12px 10px 3em;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin: 0;
+  transition: border-color .15s;
+}
+
+.settings-switches .form-check:hover { border-color: var(--accent); }
+
+.settings-submit-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.settings-submit-bar .oa-btn { min-width: 140px; justify-content: center; }
+
+@media (max-width: 600px) {
+  .settings-grid { grid-template-columns: 1fr; }
+  .settings-submit-bar { flex-direction: column-reverse; }
+  .settings-submit-bar .oa-btn { width: 100%; }
+}

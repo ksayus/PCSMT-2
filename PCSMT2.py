@@ -1,3 +1,18 @@
+<<<<<<< HEAD
+import sys
+
+from bin.bootstrap import run_bootstrap
+from bin.console.commands import PCSMT2
+from bin.gui.app import TkinterApp
+from bin.export import log
+
+if __name__ == "__main__":
+    run_bootstrap()
+
+    console = PCSMT2()
+
+    use_gui = True
+=======
 import os
 import sys  # 新增导入
 
@@ -1139,6 +1154,7 @@ if __name__ == "__main__":
 
     # GUI启动选项
     use_gui = True  # 设置为True使用GUI界面
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
 
     if use_gui:
         log.logger.info("启动图形界面...")
@@ -1148,4 +1164,8 @@ if __name__ == "__main__":
             console.cmdloop()
         except KeyboardInterrupt:
             log.logger.info("\n退出PCSMT 2，正在安全关闭...")
+<<<<<<< HEAD
             sys.exit(0)
+=======
+            sys.exit(0)
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16

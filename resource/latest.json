@@ -1,0 +1,11 @@
+{
+    "Name": "sr",
+    "Counts": 13,
+    "Core": "I:\\Project\\PCSMT-2\\servers\\1201-Survival-Redstone\\1.20.1-fabric.jar",
+    "Path": "I:\\Project\\PCSMT-2\\servers\\1201-Survival-Redstone",
+    "StartBatchPath": "I:\\Project\\PCSMT-2\\servers\\1201-Survival-Redstone\\start.bat",
+    "Size": "54.89MB",
+    "Version": "1.20.1",
+    "LatestStartedTime": "2025/10/07/01:27:44",
+    "CoreType": "fabric"
+}

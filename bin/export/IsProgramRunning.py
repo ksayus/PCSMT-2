@@ -6,6 +6,14 @@ import win32gui
 
 class Is:
     def Running():
+<<<<<<< HEAD
+        """
+        判断程序是否正在运行
+        True: 程序正在运行
+        False: 程序未运行
+        """
+=======
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
         pids = psutil.pids()
         pid_lists = []
         counts = 0
@@ -19,7 +27,11 @@ class Is:
                 pid_lists.append(p.name())
                 s = str(p.name())
                 if s == pName:
+<<<<<<< HEAD
+                    if not Is.ProgramExe():
+=======
                     if Is.ProgramExe() != True:
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
                         pass
                         # print(psutil.Process(pid).name())
                     counts += 1

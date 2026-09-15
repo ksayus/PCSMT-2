@@ -27,5 +27,9 @@ if IsProgramRunning.Is.Running():
     log.disabled = True  # 禁用请求日志
 
 def run_flask():
+<<<<<<< HEAD
+    from . import api, api_server, api_program, api_resource_manager, PageServer, PageProgram, Resouce, ServerSocket
+=======
     from . import api, api_server, api_program, PageServer, PageProgram, Resouce, ServerSocket
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
     app.run(port = Info.Config.Port())

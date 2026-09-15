@@ -49,6 +49,9 @@ class Core:
             except Exception as e:
                 log.logger.error('下载Forge核心失败,请检查')
                 log.logger.error(e)
+<<<<<<< HEAD
+                return False
+=======
                 return False
         # if core_type == 'spigot':
         #     if find_file.find_files_with_existence(program_info.work_path + program_info.spigot_core_installation):
@@ -64,3 +67,4 @@ class Core:
         #         except Exception as e:
         #             log.logger.error('获取Fabric核心下载器失败,请检查')
         #             return False
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16

@@ -1,0 +1,99 @@
+/* 存储占用图表页（chart_js.html）专属样式 */
+/* 令牌与通用组件见 common-dark.css */
+
+.chart-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px 16px 60px;
+}
+
+.chart-header {
+  margin: 8px 0 20px;
+}
+
+.chart-header h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.chart-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: .9rem;
+}
+
+/* 统计卡片 */
+.chart-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stat-card .stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.stat-card .stat-icon.latest { background: rgba(79, 140, 255, .15); color: var(--accent); }
+.stat-card .stat-icon.max { background: rgba(229, 83, 75, .15); color: var(--danger); }
+.stat-card .stat-icon.avg { background: rgba(63, 185, 108, .15); color: var(--success); }
+
+.stat-card .stat-label {
+  font-size: .82rem;
+  color: var(--text-secondary);
+}
+
+.stat-card .stat-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card .stat-value .unit {
+  font-size: .85rem;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+/* 图表卡片 */
+.chart-card .chart-box {
+  position: relative;
+  height: 420px;
+}
+
+.chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 300px;
+  color: var(--text-secondary);
+}
+
+.chart-empty i { font-size: 2.4rem; }
+
+@media (max-width: 640px) {
+  .chart-card .chart-box { height: 300px; }
+}

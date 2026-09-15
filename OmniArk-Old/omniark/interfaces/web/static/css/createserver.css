@@ -1,0 +1,195 @@
+/* 创建服务器页（CreateServer.html）专属样式 */
+/* 令牌与通用组件见 common-dark.css */
+
+.create-page {
+  min-height: calc(100vh - 56px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px 60px;
+}
+
+.create-card {
+  width: 100%;
+  max-width: 560px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  padding: 32px 32px 28px;
+}
+
+.create-card h1 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  text-align: center;
+  margin: 0 0 4px;
+}
+
+.create-card .subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: .9rem;
+  margin-bottom: 24px;
+}
+
+.create-form .form-group { margin-bottom: 18px; }
+
+/* 核心类型：卡片式单选 */
+.core-type-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.core-type-card input { display: none; }
+
+.core-type-card label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: .88rem;
+  color: var(--text-primary);
+  transition: all .15s;
+  margin: 0;
+  width: 100%;
+}
+
+.core-type-card label i { font-size: 1.4rem; color: var(--text-secondary); transition: color .15s; }
+
+.core-type-card label:hover { border-color: var(--accent); }
+
+.core-type-card input:checked + label {
+  border-color: var(--accent);
+  background: rgba(79, 140, 255, .12);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.core-type-card input:checked + label i { color: var(--accent); }
+
+/* 可搜索版本下拉 */
+.version-dropdown { position: relative; }
+
+.version-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+  z-index: 50;
+  display: none;
+}
+
+.version-list.open { display: block; }
+
+.version-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: .92rem;
+  color: var(--text-primary);
+  transition: background-color .12s;
+}
+
+.version-item:hover, .version-item.active { background: rgba(79, 140, 255, .18); }
+
+.version-item.muted {
+  color: var(--text-secondary);
+  cursor: default;
+}
+
+.version-item.muted:hover { background: transparent; }
+
+/* 游戏模式：胶囊单选 */
+.game-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.game-mode-option input { display: none; }
+
+.game-mode-option label {
+  display: block;
+  text-align: center;
+  padding: 8px 4px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: .88rem;
+  color: var(--text-primary);
+  transition: all .15s;
+  margin: 0;
+  width: 100%;
+}
+
+.game-mode-option label:hover { border-color: var(--accent); }
+
+.game-mode-option input:checked + label {
+  border-color: var(--accent);
+  background: rgba(79, 140, 255, .12);
+  color: var(--accent-hover);
+}
+
+/* 开关行 */
+.switch-row {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+/* 提交按钮 */
+.create-submit {
+  width: 100%;
+  justify-content: center;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+/* 加载遮罩 */
+#loadingOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 20, 25, .85);
+  backdrop-filter: blur(3px);
+  z-index: 9999;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--text-primary);
+}
+
+#loadingOverlay.show { display: flex; }
+
+#loadingOverlay .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  color: var(--accent);
+}
+
+#loadingOverlay p { margin: 0; color: var(--text-secondary); }
+
+@media (max-width: 560px) {
+  .core-type-grid { grid-template-columns: repeat(2, 1fr); }
+  .game-mode-grid { grid-template-columns: repeat(2, 1fr); }
+  .create-card { padding: 24px 20px; }
+}

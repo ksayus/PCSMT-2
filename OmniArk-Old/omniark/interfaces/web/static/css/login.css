@@ -1,0 +1,111 @@
+/* ============================================================
+   OmniArk 登录页 —— 深色居中卡片（与 main.css 同一套设计令牌）
+   ============================================================ */
+
+:root {
+  --bg-primary: #0f1419;
+  --bg-secondary: #1a1f27;
+  --bg-tertiary: #242b36;
+  --border: #2d3542;
+  --text-primary: #e6e9ef;
+  --text-secondary: #9aa4b2;
+  --accent: #4f8cff;
+  --accent-hover: #6ba0ff;
+  --danger: #e5534b;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: radial-gradient(ellipse at top, #16202c 0%, var(--bg-primary) 60%);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  padding: 2.2rem 2rem 1.6rem;
+}
+
+.login-brand { text-align: center; margin-bottom: 1.6rem; }
+
+.login-logo { width: 56px; height: 56px; margin-bottom: 0.6rem; }
+
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.login-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0;
+}
+
+.login-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgba(229, 83, 75, 0.12);
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  color: var(--danger);
+  font-size: 0.88rem;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.form-label { color: var(--text-secondary); font-size: 0.88rem; }
+
+.form-control, .input-group-text {
+  background-color: var(--bg-tertiary);
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+
+.form-control:focus {
+  background-color: var(--bg-tertiary);
+  border-color: var(--accent);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 0.2rem rgba(79, 140, 255, 0.2);
+}
+
+.form-control::placeholder { color: var(--text-secondary); opacity: 0.6; }
+.input-group-text { color: var(--text-secondary); }
+
+.btn-primary {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  border-radius: 8px;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.login-btn { padding: 0.6rem 0; font-weight: 600; }
+
+.login-footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 1.4rem 0 0;
+  opacity: 0.7;
+}

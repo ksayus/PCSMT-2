@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
     "PCSMT2_Version": "1.2.2.1.3",
     "ReleaseVersion": "Release",
@@ -10,4 +11,18 @@
     "MinecraftTestVersion": false,
     "StorageSizeUpdateTime": 1800,
     "Port": 40000
+=======
+{
+    "PCSMT2_Version": "1.2.2.1.3",
+    "ReleaseVersion": "Release",
+    "RunningMemories_Min": 2048,
+    "RunningMemories_Max": 4096,
+    "Nogui": true,
+    "WaitEulaGenerateTime": 25,
+    "AutomaticStartup": false,
+    "AutoUpdateSource": "Github",
+    "MinecraftTestVersion": false,
+    "StorageSizeUpdateTime": 1800,
+    "Port": 40000
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
 }

@@ -1,3 +1,98 @@
+<<<<<<< HEAD
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/PCSMT2.ico">
+    <title>PCSMT2 | 创建服务器</title>
+    <link rel="stylesheet" href="/static/css/createserver.css">
+</head>
+<body>
+    <div class="container">
+        <h1>创建服务器</h1>
+        <p>请填写以下信息以创建服务器：</p>
+        <div class="form-container">
+            <form action="" method="post">
+                <div class="form-group">
+                    <label for="serverName">服务器名：</label>
+                    <input type="text" id="serverName" name="serverName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="coreType">核心类型：</label>
+                    <select id="coreType" name="coreType" required>
+                        <option value="official">官方</option>
+                        <option value="forge">Forge</option>
+                        <option value="fabric">Fabric</option>
+                        <option value="mohist">Mohist</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="coreVersion">核心版本：</label>
+                    <select id="coreVersion" name="coreVersion" required>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="port">端口号：</label>
+                    <input type="number" id="port" name="port" min="1024" max="65535" value="25565" required>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="pvpEnabled" name="pvpEnabled" value="true" checked>
+                        <input type="hidden" name="pvpEnabled" value="false">
+                        <label for="pvpEnabled">启用PVP</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="onlineMode" name="onlineMode" value="true">
+                        <input type="hidden" name="onlineMode" value="false">
+                        <label for="onlineMode">启用正版验证</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>默认游戏模式：</label>
+                    <div class="game-options">
+                        <div class="radio-group">
+                            <input type="radio" id="survival" name="gameMode" value="survival" checked>
+                            <label for="survival">生存模式</label>
+                        </div>
+                        <div class="radio-group">
+                            <input type="radio" id="creative" name="gameMode" value="creative">
+                            <label for="creative">创造模式</label>
+                        </div>
+                        <div class="radio-group">
+                            <input type="radio" id="adventure" name="gameMode" value="adventure">
+                            <label for="adventure">冒险模式</label>
+                        </div>
+                        <div class="radio-group">
+                            <input type="radio" id="spectator" name="gameMode" value="spectator">
+                            <label for="spectator">旁观模式</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" id="create">创建服务器</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="loadingOverlay">
+        <img src="/static/loading.gif" alt="加载中" style="width: 80px; height: 80px;">
+        <p>正在创建服务器...</p>
+    </div>
+
+    <script src="/static/js/createserver.js"></script>
+</body>
+=======
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -240,4 +335,5 @@
         });
     </script>
 </body>
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
 </html>

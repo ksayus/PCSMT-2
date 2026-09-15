@@ -1,0 +1,12 @@
+# OmniArk-Old 运行时依赖（Windows，Python 3.12+）
+flask>=2.0.3
+requests>=2.28.1
+openpyxl>=3.1.2
+cryptography>=38.0.4
+pywin32>=306
+psutil>=5.9.4
+Pillow>=9.4.0
+packaging>=21.3
+cmd2>=4.0.0
+mcrcon>=0.7.0
+pywebview>=5.0

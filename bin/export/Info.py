@@ -1,6 +1,9 @@
 import os
 from bin.command import Server
+<<<<<<< HEAD
+=======
 from bin.export import Init
+>>>>>>> 95e86289eb46f54ed8b7cff04029780dc0b25b16
 from bin.export import Get
 
 program_name = 'PCSMT2'

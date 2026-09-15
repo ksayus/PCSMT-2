@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/icon" href="/static/PCSMT2.ico">
+    <title>OmniArk | 文件管理器 - {{ server_info.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/common-dark.css?v={{ asset_version }}">
+    <link rel="stylesheet" href="/static/css/manager.css?v={{ asset_version }}">
+</head>
+<body>
+    <nav class="oa-navbar">
+        <a class="oa-brand" href="/">
+            <img src="/static/PCSMT2.ico" alt="OmniArk">
+            <span>OmniArk</span>
+        </a>
+        <span class="oa-page-title"><i class="bi bi-folder2-open"></i> 文件管理器 — {{ server_info.name }}</span>
+        <span class="oa-nav-spacer"></span>
+        <a class="oa-back-link" href="/"><i class="bi bi-arrow-left"></i> 返回主控台</a>
+    </nav>
+
+    <main class="manager-page">
+        <div class="manager-header">
+            <h1><i class="bi bi-hdd-stack"></i> <span class="server-name">{{ server_info.name }}</span> 的文件</h1>
+            <span class="hint">双击目录进入；勾选后可重命名 / 复制 / 移动 / 删除</span>
+        </div>
+
+        <!-- 面包屑路径导航 -->
+        <nav class="manager-breadcrumb" id="breadcrumb" aria-label="路径导航"></nav>
+
+        <!-- 工具栏 -->
+        <div class="manager-toolbar">
+            <button type="button" class="oa-btn oa-btn-ghost" id="btn-new-file">
+                <i class="bi bi-file-earmark-plus"></i> 新建文件
+            </button>
+            <button type="button" class="oa-btn oa-btn-ghost" id="btn-new-folder">
+                <i class="bi bi-folder-plus"></i> 新建文件夹
+            </button>
+            <span class="toolbar-sep"></span>
+            <button type="button" class="oa-btn oa-btn-ghost" id="btn-rename">
+                <i class="bi bi-pencil-square"></i> 重命名
+            </button>
+            <button type="button" class="oa-btn oa-btn-ghost" id="btn-copy">
+                <i class="bi bi-files"></i> 复制到
+            </button>
+            <button type="button" class="oa-btn oa-btn-ghost" id="btn-move">
+                <i class="bi bi-box-arrow-right"></i> 移动到
+            </button>
+            <button type="button" class="oa-btn oa-btn-danger" id="btn-delete">
+                <i class="bi bi-trash3"></i> 删除
+            </button>
+            <span class="toolbar-sep"></span>
+            <button type="button" class="oa-btn oa-btn-ghost" id="btn-up">
+                <i class="bi bi-arrow-90deg-up"></i> 上级目录
+            </button>
+            <button type="button" class="oa-btn oa-btn-ghost" id="btn-refresh">
+                <i class="bi bi-arrow-clockwise"></i> 刷新
+            </button>
+        </div>
+
+        <!-- 文件表格 -->
+        <div class="file-table-wrap">
+            <table class="file-table">
+                <thead>
+                    <tr>
+                        <th class="col-check"><input type="checkbox" class="file-check" id="check-all" aria-label="全选"></th>
+                        <th>名称</th>
+                        <th class="col-size">大小</th>
+                        <th class="col-time">修改时间</th>
+                    </tr>
+                </thead>
+                <tbody id="file-tbody"></tbody>
+            </table>
+            <div class="manager-loading" id="loading" style="display:none;">
+                <span class="spinner-border spinner-border-sm"></span> 加载中...
+            </div>
+            <div class="file-empty" id="empty" style="display:none;">
+                <i class="bi bi-inbox"></i>
+                此目录为空
+            </div>
+        </div>
+        <div class="manager-statusbar">
+            <span id="status-count">0 个项目</span>
+            <span id="status-selected">已选择 0 个项目</span>
+        </div>
+    </main>
+
+    <!-- 输入 Modal（新建 / 重命名 / 复制 / 移动共用） -->
+    <div class="modal fade" id="inputModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="input-modal-title">输入</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="oa-label" for="input-modal-field" id="input-modal-label">名称</label>
+                    <input type="text" class="oa-input" id="input-modal-field" autocomplete="off">
+                    <div class="modal-path-hint" id="input-modal-hint"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="oa-btn oa-btn-ghost" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="oa-btn oa-btn-primary" id="input-modal-confirm">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认 Modal（删除等危险操作） -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirm-modal-title">确认操作</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="关闭"></button>
+                </div>
+                <div class="modal-body" id="confirm-modal-body"></div>
+                <div class="modal-footer">
+                    <button type="button" class="oa-btn oa-btn-ghost" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="oa-btn oa-btn-danger" id="confirm-modal-confirm">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.SERVER_NAME = {{ server_info.Name | tojson }};
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/ui.js?v={{ asset_version }}"></script>
+    <script src="/static/js/manager.js?v={{ asset_version }}"></script>
+</body>
+</html>

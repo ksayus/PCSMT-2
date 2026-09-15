@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 构建产物
+build/
+dist/
+*.spec.bak
+
+# 运行数据
+config.json
+java_versions.json
+saves/
+servers/
+server_storage_size/
+logs/
+resource/
+excel/
+latest.txt
+delete_old_program.bat
+.secret_key
+
+# 工具缓存
+.VSCodeCounter/
+.vscode/
+*.log
+.pytest_cache/
+.uv-cache/
+.smoke-home/
+tmp_test/
